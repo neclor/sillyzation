@@ -3,8 +3,5 @@
     <File Path="TODO.md" />
   </Folder>
   <Project Path="Game.Client/Game.Client.csproj" Id="9c23a040-2d21-45fc-b365-be97615ee0ea" />
-  <Project Path="Game.Common/Game.Common.csproj" Id="59b60007-58d9-47b4-97cb-c468baa60f05" />
-  <Project Path="StandaloneGame/StandaloneGame.csproj" Id="161ed656-21ae-480e-9daf-f7a28a9c809e" />
-  <Project Path="StrategyGame.Client/StrategyGame.Client.csproj" />
-  <Project Path="StrategyGame.Server/StrategyGame.Server.csproj" />
+  <Project Path="Game.Core/Game.Core.csproj" />
 </Solution>

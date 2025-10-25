@@ -1,0 +1,42 @@
+@page "/"
+@page "/menu"
+
+@inject NavigationManager Nav
+
+<div class="d-flex flex-column vh-100 justify-content-between text-center bg-dark text-white">
+	<div class="my-auto">
+		<h1 class="display-3 fw-bold">Sillyzation</h1>
+		<button class="btn btn-warning btn-lg mt-4" @onclick="OnPlay">Play</button>
+	</div>
+
+	<footer class="pb-3">
+		<a href="https://github.com/neclor/sillyzation" class="text-white me-3">GitHub</a>
+	</footer>
+</div>
+
+@code {
+	void OnPlay() {
+		Nav.NavigateTo("/lobby/offline");
+	}
+
+	@*
+	async Task CreateLobby() {
+		if (await ServerAvailable()) {
+			// сервер создаёт лобби и возвращает код
+			var code = await ServerCreateLobby();
+			Nav.NavigateTo($"/lobby/{code}");
+		} else {
+			// оффлайн-лобби
+			Nav.NavigateTo("/lobby/offline");
+		}
+	}
+	*@
+
+	Task<bool> ServerAvailable() {
+		// проверка соединения с сервером
+		return Task.FromResult(false); // пример: сервер недоступен
+	}
+
+
+
+}

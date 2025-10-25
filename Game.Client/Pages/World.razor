@@ -1,13 +1,23 @@
-@page "/"
+@using System.Numerics;
 
-<PageTitle>Game</PageTitle>
+@page "/world"
 
-<SKCanvasView EnableRenderLoop="true" OnPaintSurface="OnPaintSurface" Width="400" Height="400" />
+<PageTitle>World</PageTitle>
+
+<SKCanvasView EnableRenderLoop="true" OnPaintSurface="OnPaintSurface" style="position: fixed; top: 0; left: 0; width: 50vw; height: 50vh;" />
 
 @code {
 
 
+
 	private SKCanvasView? _canvasView;
+
+	private Vector2 _position = new(100, 100);
+	private Vector2 _velocity = new(10, 10);
+	private Vector2 _min = Vector2.Zero;
+	private Vector2 _max = new(800, 400);
+
+
 
 	private void OnPaintSurface(SKPaintSurfaceEventArgs e) {
 		SKCanvas canvas = e.Surface.Canvas;
@@ -19,10 +29,16 @@
 			IsAntialias = true
 		};
 		Console.WriteLine("OnPaintSurface called");
+
 		// рисуем круг в центре канваса
-		float centerX = e.Info.Width / 2f;
+
+		_position = new((_position.X + _velocity.X) % _max.X, (_position.Y + _velocity.Y) % _max.Y);
+
+
+
+
 		float centerY = e.Info.Height / 2f;
-		canvas.DrawCircle(centerX, centerY, 50, paint);
+		canvas.DrawCircle(_position.X, _position.Y, 50, paint);
 	}
 }
 
