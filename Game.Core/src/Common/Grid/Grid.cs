@@ -1,12 +1,12 @@
 using System.Numerics;
 
-namespace Game.Core;
+namespace Game.Core.Common.Grid;
 
-public partial class Grid<T> {
+public class Grid<T> {
 
 	public int Width { get; private set; }
 	public int Height { get; private set; }
-	public Vector2 Size { get; private set; }
+	public Vector2I Size { get; private set; }
 	public int Length => _data.Length;
 
 	private T[] _data;
@@ -17,9 +17,9 @@ public partial class Grid<T> {
 	}
 
 #pragma warning disable CA1043
-	public T this[Vector2 position] {
-		get => this[(int)position.X, (int)position.Y];
-		set => this[(int)position.X, (int)position.Y] = value;
+	public T this[Vector2I position] {
+		get => this[position.X, position.Y];
+		set => this[position.X, position.Y] = value;
 	}
 #pragma warning restore CA1043
 
@@ -35,37 +35,31 @@ public partial class Grid<T> {
 
 	public Grid(int width, int height, Func<T> valueFactory) : this(width, height) {
 		ArgumentNullException.ThrowIfNull(valueFactory);
-		for (int i = 0; i < _data.Length; i++) {
-			_data[i] = valueFactory();
-		}
+		Fill((x, y) => valueFactory());
 	}
 
 	public Grid(int width, int height, Func<int, int, T> valueFactory) : this(width, height) {
 		ArgumentNullException.ThrowIfNull(valueFactory);
-		for (int y = 0; y < Height; y++) {
-			for (int x = 0; x < Width; x++) {
-				_data[IndexFrom(x, y)] = valueFactory(x, y);
-			}
-		}
+		Fill(valueFactory);
 	}
 
-	public Grid(Vector2 size) : this((int)size.X, (int)size.Y) { }
-	public Grid(Vector2 size, Func<T> valueFactory) : this((int)size.X, (int)size.Y, valueFactory) { }
-	public Grid(Vector2 size, Func<int, int, T> valueFactory) : this((int)size.X, (int)size.Y, valueFactory) { }
+	public Grid(Vector2I size) : this(size.X, size.Y) { }
+	public Grid(Vector2I size, Func<T> valueFactory) : this(size.X, size.Y, valueFactory) { }
+	public Grid(Vector2I size, Func<int, int, T> valueFactory) : this(size.X, size.Y, valueFactory) { }
 
 	public T GetValue(int x, int y) {
 		CheckBounds(x, y);
 		return _data[IndexFrom(x, y)];
 	}
 
-	public T GetValue(Vector2 position) => GetValue((int)position.X, (int)position.Y);
+	public T GetValue(Vector2I position) => GetValue(position.X, position.Y);
 
 	public void SetValue(int x, int y, T value) {
 		CheckBounds(x, y);
 		_data[IndexFrom(x, y)] = value;
 	}
 
-	public void SetValue(Vector2 position, T value) => SetValue((int)position.X, (int)position.Y, value);
+	public void SetValue(Vector2I position, T value) => SetValue(position.X, position.Y, value);
 
 	public void Resize(int width, int height) => InternalResize(width, height);
 
@@ -79,9 +73,9 @@ public partial class Grid<T> {
 		InternalResize(width, height, valueFactory);
 	}
 
-	public void Resize(Vector2 size) => Resize((int)size.X, (int)size.Y);
-	public void Resize(Vector2 size, Func<T> valueFactory) => Resize((int)size.X, (int)size.Y, valueFactory);
-	public void Resize(Vector2 size, Func<int, int, T> valueFactory) => Resize((int)size.X, (int)size.Y, valueFactory);
+	public void Resize(Vector2I size) => Resize(size.X, size.Y);
+	public void Resize(Vector2I size, Func<T> valueFactory) => Resize(size.X, size.Y, valueFactory);
+	public void Resize(Vector2I size, Func<int, int, T> valueFactory) => Resize(size.X, size.Y, valueFactory);
 
 	private static int IndexFrom(int x, int y, int width) => y * width + x;
 
@@ -100,6 +94,14 @@ public partial class Grid<T> {
 	private void CheckXBounds(int x) => CheckValueBounds(x, 0, Width - 1);
 
 	private void CheckYBounds(int y) => CheckValueBounds(y, 0, Height - 1);
+
+	private void Fill(Func<int, int, T> valueFactory) {
+		for (int y = 0; y < Height; y++) {
+			for (int x = 0; x < Width; x++) {
+				_data[IndexFrom(x, y)] = valueFactory(x, y);
+			}
+		}
+	}
 
 	private void InternalResize(int width, int height, Func<int, int, T>? valueFactory = null) {
 		if (width <= 0) throw new ArgumentOutOfRangeException(nameof(width), "Width must be positive.");

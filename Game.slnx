@@ -2,6 +2,10 @@
   <Folder Name="/Solution Items/">
     <File Path="TODO.md" />
   </Folder>
+  <Project Path="BlazorApp1/BlazorApp1.Client/BlazorApp1.Client.csproj" Id="a44d4a7f-e141-459e-9ebe-3c4201975c78" />
+  <Project Path="BlazorApp1/BlazorApp1/BlazorApp1.csproj" Id="e3c9be6a-90cc-4692-8fec-c927a2328c76" />
   <Project Path="Game.Client/Game.Client.csproj" Id="9c23a040-2d21-45fc-b365-be97615ee0ea" />
   <Project Path="Game.Core/Game.Core.csproj" />
+  <Project Path="Game.Server/Game.Server.csproj" Id="1d3ba5b5-eb7c-4622-9131-ebd563fca8be" />
+  <Project Path="Game.Shared/Game.Shared.csproj" Id="921934ff-7421-4162-9f01-ced65718703f" />
 </Solution>

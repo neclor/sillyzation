@@ -1,19 +1,19 @@
-@page "/lobby/{LobbyCode}"
+@page "/lobby/{LobbyCode?}"
 
-@inject NavigationManager Navigation
+@inject NavigationManager Nav
 
 <div class="container py-4">
 
 	<h2 class="text-center mb-4">Lobby</h2>
 
 	<div class="mb-3">
-		<label>Invitation link:</label>
-		<input class="form-control" value="@LobbyLink" readonly />
-		<button class="btn btn-outline-secondary mt-2" @onclick="CopyLink">Copy</button>
+		<label>Invitation link: @LobbyLink</label>
+		<input class="form-control d-inline" size="@LobbyLink.Length" value="@LobbyLink" readonly />
+		@*<button class="btn btn-outline-secondary mt-2" @onclick="CopyLink">Copy</button>*@
 	</div>
 
 	<div class="mb-4">
-		<h4>Players (@Players.Count / 20)</h4>
+		<h4>Players: @Players.Count / 20</h4>
 		@foreach (var player in Players) {
 			<div class="d-flex align-items-center mb-2">
 				<input class="form-control me-2" style="width:200px" @bind="player.Name" />
@@ -23,52 +23,67 @@
 			</div>
 		}
 		@if (IsHost && Players.Count < 20) {
-			<button class="btn btn-sm btn-success" @onclick="AddAIPlayer">Добавить ИИ</button>
+			<button class="btn btn-sm btn-success" @onclick="AddAIPlayer">Add AI</button>
 		}
 	</div>
 
 	<div class="text-center">
-		<button class="btn btn-primary btn-lg" @onclick="StartGame">Начать игру</button>
+		<button class="btn btn-primary btn-lg" @onclick="StartGame">Start</button>
 	</div>
 
 </div>
 
 @code {
-	private string LobbyCode = Guid.NewGuid().ToString().Substring(0, 12);
+
+	[Parameter]
+	public string? LobbyCode { get; set; }
+	bool IsOffline => string.IsNullOrEmpty(LobbyCode) || LobbyCode == "offline";
 
 
-	private string LobbyLink => Nav.BaseUri + "lobby?code=" + LobbyCode;
-	private string LobbyCode = Guid.NewGuid().ToString().Substring(0, 12);
+
+	private string LobbyLink => Nav.BaseUri + "lobby/" + LobbyCode;
+
+
+	protected override void OnParametersSet() => LobbyCode = LobbyCode ?? "fantastic";
+
+
+	private List<Player> Players = new();
+
 
 	bool IsHost = true; // логика определить кто хост
-	List<Player> Players = new List<Player>();
 
 	protected override void OnInitialized() {
 		// Если нет соединения с сервером — добавить 1 ИИ
-		if (!ServerAvailable())
-			Players.Add(new Player { Name = "ИИ-1", IsAI = true });
+
 	}
 
 	void AddAIPlayer() {
-		int aiCount = Players.Count(p => p.IsAI) + 1;
-		Players.Add(new Player { Name = $"ИИ-{aiCount}", IsAI = true });
-	}
 
-	void RemovePlayer(Player p) => Players.Remove(p);
+	}
 
 	void StartGame() {
 		// логика начала игры
 	}
+
+
+	void RemovePlayer(Player p) {
+		
+	}
+
 
 	void CopyLink() {
 		// JSInterop для копирования в буфер
 	}
 
 	bool ServerAvailable() => false; // проверка соединения с сервером
+
+
+	class Player {
+		public string Name { get; set; }
+		public bool IsAI { get; set; } = false;
+	}
+
+
 }
 
-class Player
-{
-    public string Name { get; set; }
-    public bool IsAI { get; set; } = false;
-}
+
