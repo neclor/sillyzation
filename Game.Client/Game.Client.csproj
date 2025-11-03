@@ -21,6 +21,39 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Include="wwwroot\assets\attack.png" />
+    <None Include="wwwroot\assets\attack_particle.png" />
+    <None Include="wwwroot\assets\barraks.png" />
+    <None Include="wwwroot\assets\Buildings\Houses\house_1.png" />
+    <None Include="wwwroot\assets\Buildings\Houses\house_2.png" />
+    <None Include="wwwroot\assets\Buildings\Houses\house_3.png" />
+    <None Include="wwwroot\assets\Buildings\Houses\house_4.png" />
+    <None Include="wwwroot\assets\Buildings\Houses\wall.png" />
+    <None Include="wwwroot\assets\castle_1.png" />
+    <None Include="wwwroot\assets\castle_2.png" />
+    <None Include="wwwroot\assets\church.png" />
+    <None Include="wwwroot\assets\focus.png" />
+    <None Include="wwwroot\assets\fog.png" />
+    <None Include="wwwroot\assets\forge.png" />
+    <None Include="wwwroot\assets\movement.png" />
+    <None Include="wwwroot\assets\Objects\tree_1.png" />
+    <None Include="wwwroot\assets\Objects\tree_2.png" />
+    <None Include="wwwroot\assets\Objects\tree_3.png" />
+    <None Include="wwwroot\assets\Objects\tree_4.png" />
+    <None Include="wwwroot\assets\qween.png" />
+    <None Include="wwwroot\assets\Tilesheet.png" />
+    <None Include="wwwroot\assets\torch.png" />
+    <None Include="wwwroot\assets\tower.png" />
+    <None Include="wwwroot\assets\Units\gnome.png" />
+    <None Include="wwwroot\assets\Units\human.png" />
+    <None Include="wwwroot\assets\Units\invalid.png" />
+    <None Include="wwwroot\assets\Units\knight.png" />
+    <None Include="wwwroot\assets\Units\tank.png" />
+    <None Include="wwwroot\assets\Units\ufo.png" />
+    <None Include="wwwroot\assets\Units\wizard.png" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="10.0.0-rc.1.25451.107" />
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="10.0.0-rc.1.25451.107" PrivateAssets="all" />
     <PackageReference Include="SkiaSharp.Views.Blazor" Version="3.119.1" />

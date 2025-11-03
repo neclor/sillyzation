@@ -7,5 +7,4 @@
   <Project Path="Game.Client/Game.Client.csproj" Id="9c23a040-2d21-45fc-b365-be97615ee0ea" />
   <Project Path="Game.Core/Game.Core.csproj" />
   <Project Path="Game.Server/Game.Server.csproj" Id="1d3ba5b5-eb7c-4622-9131-ebd563fca8be" />
-  <Project Path="Game.Shared/Game.Shared.csproj" Id="921934ff-7421-4162-9f01-ced65718703f" />
 </Solution>

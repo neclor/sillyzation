@@ -1,4 +1,5 @@
-
+using Game.Server.Singletons;
+using Game.Server.Hubs;
 
 namespace Game.Server;
 
@@ -9,8 +10,8 @@ internal static class Program {
 
 		builder.Services.AddRazorComponents()
 			.AddInteractiveWebAssemblyComponents();
-
 		builder.Services.AddSignalR();
+		builder.Services.AddSingleton<GameManager>();
 
 		WebApplication app = builder.Build();
 
@@ -20,7 +21,7 @@ internal static class Program {
 
 		app.UseAntiforgery();
 
-		app.MapHub<LobbyHub>("/lobby");
+		app.MapHub<GameHub>("/lobby");
 
 		app.Run();
 	}
