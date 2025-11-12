@@ -22,6 +22,7 @@ internal static class Program {
 		app.UseAntiforgery();
 
 		app.MapHub<GameHub>("/lobby");
+		app.MapFallbackToPage("/_Host");
 
 		app.Run();
 	}
