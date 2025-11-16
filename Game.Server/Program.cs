@@ -1,5 +1,5 @@
-using Game.Server.Singletons;
 using Game.Server.Hubs;
+using Game.Server.Singletons;
 
 namespace Game.Server;
 
