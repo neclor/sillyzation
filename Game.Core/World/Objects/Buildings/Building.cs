@@ -1,6 +1,10 @@
+
+
+
+
 namespace Game.Core.WorldObjects.Buildings;
 
-public abstract class Building : WorldObject {
+public abstract class Building {
 
 
 
