@@ -1,0 +1,38 @@
+@page "/"
+@page "/index"
+@page "/home"
+
+
+@inject NavigationManager Nav
+
+
+@inject ConnectionService ConnectionService
+
+
+<button class="btn" @onclick="Click">Connect</button>
+
+
+
+
+
+
+
+
+
+@code {
+
+	protected override async Task OnInitializedAsync() {
+		await ConnectionService.Connection.CreateGameAsync();
+	}
+
+
+
+	private async Task Click() {
+
+		await ConnectionService.HubConnection.SendAsync("CreateGameAsync");
+
+	}
+
+
+
+}
