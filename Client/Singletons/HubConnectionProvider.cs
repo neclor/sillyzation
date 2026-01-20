@@ -5,11 +5,11 @@ using Client.SignalRClientSourceGenerator;
 
 namespace Client.Singletons;
 
-internal class ConnectionService : IClientHub {
+internal class HubConnectionProvider : IClientHub {
 
-	public IServerHub Connection { get; }
+	public IServerHub HubConnection { get; }
 
-	public ConnectionService(NavigationManager nav) {
+	public HubConnectionProvider(NavigationManager nav) {
 		HubConnection hubConnection = new HubConnectionBuilder()
 			.WithUrl(nav.ToAbsoluteUri("/lobby"))
 			.WithAutomaticReconnect()
