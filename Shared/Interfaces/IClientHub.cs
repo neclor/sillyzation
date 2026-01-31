@@ -2,5 +2,5 @@ namespace Shared.Interfaces;
 
 public interface IClientHub {
 
-	Task UpdateLobbyAsync();
+	Task ReciveMessageAsync(string message);
 }

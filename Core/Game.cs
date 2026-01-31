@@ -6,6 +6,14 @@ public class Game {
 
 	public Lobby Lobby { get; } = new();
 
+
+
+
+
+
+
+
+
 	public WorldManager WorldManager { get; } = new();
 
 	public bool TryStartGame() {

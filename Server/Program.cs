@@ -1,5 +1,6 @@
+using Microsoft.AspNetCore.SignalR;
 using Server.Hubs;
-using Server.Singletons;
+using Server.Services;
 
 namespace Server;
 
@@ -11,6 +12,7 @@ internal static class Program {
 			.AddInteractiveWebAssemblyComponents();
 		builder.Services.AddSignalR();
 
+		builder.Services.AddSingleton<IUserIdProvider, PlayerIdUserIdProvider>();
 		builder.Services.AddSingleton<GameManager>();
 
 		WebApplication app = builder.Build();
@@ -19,7 +21,7 @@ internal static class Program {
 		app.MapStaticAssets();
 		app.UseAntiforgery();
 
-		app.MapHub<GameHub>("/lobby");
+		app.MapHub<ServerHub>("/serverhub");
 
 		app.MapFallbackToFile("index.html");
 

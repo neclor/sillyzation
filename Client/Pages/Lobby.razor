@@ -1,50 +1,48 @@
-@page "/lobby/{LobbyCode?}"
+@page "/lobby/{LobbyCode}"
 
 @inject NavigationManager Nav
+@inject HubConnectionProvider HubConnectionProvider
 
-<div class="container py-4">
+<div class="center">
 
-	<h2 class="text-center mb-4">Lobby</h2>
-
-	<div class="mb-3">
-		<label>Invitation link: @LobbyLink</label>
-		<input class="form-control d-inline" size="@LobbyLink.Length" value="@LobbyLink" readonly />
-		@*<button class="btn btn-outline-secondary mt-2" @onclick="CopyLink">Copy</button>*@
-	</div>
-
-	<div class="mb-4">
-		<h4>Players: @Players.Count / 20</h4>
-		@foreach (var player in Players) {
-			<div class="d-flex align-items-center mb-2">
-				<input class="form-control me-2" style="width:200px" @bind="player.Name" />
-				@if (IsHost) {
-					<button class="btn btn-sm btn-danger" @onclick="() => RemovePlayer(player)">X</button>
-				}
-			</div>
-		}
-		@if (IsHost && Players.Count < 20) {
-			<button class="btn btn-sm btn-success" @onclick="AddAIPlayer">Add AI</button>
-		}
-	</div>
-
-	<div class="text-center">
-		<button class="btn btn-primary btn-lg" @onclick="StartGame">Start</button>
-	</div>
+	<h1>Lobby</h1>
+	
 
 </div>
+
+
+
+
+
+
+
 
 @code {
 
 	[Parameter]
 	public string? LobbyCode { get; set; }
-	bool IsOffline => string.IsNullOrEmpty(LobbyCode) || LobbyCode == "offline";
+	
+	protected override async Task OnParametersSetAsync() {
+		if (string.IsNullOrEmpty(LobbyCode)) {
+			Nav.NavigateTo("/");
+			return;
+		}
+
+
+		var joined = await LobbyService.JoinLobbyAsync(Code);
+		if (joined)
+		Nav.NavigateTo($"/lobby/{LobbyCode}");
+		else
+		NavigationManager.NavigateTo("/error");
+	}
 
 
 
-	private string LobbyLink => Nav.BaseUri + "lobby/" + LobbyCode;
 
 
-	protected override void OnParametersSet() => LobbyCode = LobbyCode ?? "fantastic";
+
+
+
 
 
 	private List<Player> Players = new();
@@ -82,6 +80,12 @@
 		public string Name { get; set; }
 		public bool IsAI { get; set; } = false;
 	}
+
+
+
+
+
+
 
 
 }

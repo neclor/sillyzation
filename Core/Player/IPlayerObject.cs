@@ -1,6 +1,12 @@
-namespace Core;
+using System;
+using System.Collections.Generic;
+using System.Text;
 
-public interface IPlayerObject {
+namespace Core.Player;
 
-	Guid PlayerId { get; set; }
+internal interface IPlayerObject {
+
+
+
+
 }

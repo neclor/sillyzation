@@ -2,4 +2,7 @@ using System.Drawing;
 
 namespace Shared.Dto;
 
-public record PlayerDto(Guid Id, string Name, Color Color, bool IsReady);
+public record PlayerDto(
+	string Name,
+	Color Color
+);

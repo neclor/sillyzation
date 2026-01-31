@@ -1,6 +1,6 @@
+using Client.Services;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
-using Client.Singletons;
 
 namespace Client;
 
@@ -13,8 +13,16 @@ internal static class Program {
 
 		builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
 
-		builder.Services.AddSingleton<ConnectionService>();
+		builder.Services.AddSingleton<UserIdProvider>();
+		builder.Services.AddSingleton<ClientHub>();
+		builder.Services.AddSingleton<HubConnectionProvider>();
 
-		await builder.Build().RunAsync().ConfigureAwait(true);
+		WebAssemblyHost app = builder.Build();
+
+		HubConnectionProvider hub = app.Services.GetRequiredService<HubConnectionProvider>();
+		await hub.InitializeAsync().ConfigureAwait(true);
+		_ = hub.HubConnection?.StartAsync();
+
+		await app.RunAsync().ConfigureAwait(true);
 	}
 }
