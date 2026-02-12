@@ -17,7 +17,7 @@
 	  <AnalysisModeStyle>Default</AnalysisModeStyle>
 	  <CodeAnalysisTreatWarningsAsErrors>false</CodeAnalysisTreatWarningsAsErrors>
 
-    <RootNamespace></RootNamespace>
+    <RootNamespace>Game</RootNamespace>
   </PropertyGroup>
 
 </Project>
