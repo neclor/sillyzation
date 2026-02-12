@@ -21,7 +21,7 @@ window/size/viewport_height=360
 
 [dotnet]
 
-project/assembly_name="Sillyzation"
+project/assembly_name="Game"
 
 [editor]
 
