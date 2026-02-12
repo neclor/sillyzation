@@ -38,12 +38,16 @@
 	- Zone de contrôle :
 		- Pouvoir mettre en évidence quelle pays à quel case
 		- Détecter les fronts pour pouvoir placer des unités dessus
+	- First proto forced capture of territory by unit (maybe scouting mecanic)
 - Unitées :
 	- Placer une unité sur la carte
 	- Pouvoir la déplacer
 	- Pouvoir les assigner à un front
 	- Pouvoir faire un combat avec un autre unité en face
 	- Définir les statistiques de chaques types d'unités
+	- we can place units in city
+	- chose whwere to place after cretaion
+	- units in queue stop prod while waiting for placement 
 - Menu :
 	- Topbar :
 		- Afficher la population calculée avec les cases controllées
