@@ -1,2 +1,2 @@
-# sillyzation
+# Sillyzation
 Turn based strategy game
