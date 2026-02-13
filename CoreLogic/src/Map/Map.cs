@@ -2,15 +2,15 @@ using QuikGraph;
 
 namespace CoreLogic;
 
-public record MapCell<T>(GameCell cell, T key);
+public record MapCell<TKey>(GameCell cell, TKey key);
 
-public class Map<T> where T : notnull {
-	private readonly UndirectedGraph<T, Edge<T>> graph;
-	private readonly Dictionary<T, GameCell> cells;
+public class Map<TKey> where TKey : notnull {
+	private readonly UndirectedGraph<TKey, Edge<TKey>> graph;
+	private readonly Dictionary<TKey, GameCell> cells;
 
 	public Map(
-		IEnumerable<(T key, GameCell cell)> cells,
-		IEnumerable<(T key1, T key2)> connexions
+		IEnumerable<(TKey key, GameCell cell)> cells,
+		IEnumerable<(TKey key1, TKey key2)> connexions
 	) {
 		ArgumentNullException.ThrowIfNull(cells);
 		ArgumentNullException.ThrowIfNull(connexions);
@@ -18,13 +18,13 @@ public class Map<T> where T : notnull {
 		this.cells = [];
 		graph = new();
 
-		foreach ((T key, GameCell cell) in cells) {
+		foreach ((TKey key, GameCell cell) in cells) {
 			this.cells.Add(key, cell);
 			_ = graph.AddVertex(key);
 		}
 
-		foreach ((T key1, T key2) in connexions) {
-			if (!graph.AddEdge(new Edge<T>(key1, key2))) {
+		foreach ((TKey key1, TKey key2) in connexions) {
+			if (!graph.AddEdge(new Edge<TKey>(key1, key2))) {
 				throw new InvalidOperationException(
 					$"The cells {key1} and {key2} cannot be connected"
 				);
@@ -32,11 +32,11 @@ public class Map<T> where T : notnull {
 		}
 	}
 
-	public GameCell getCell(T key) => cells[key];
+	public GameCell getCell(TKey key) => cells[key];
 
-	public IEnumerable<(T key, GameCell cell)> getNeightbours(T key) {
-		foreach (Edge<T> edge in graph.AdjacentEdges(key)) {
-			T neightbour = edge.Source.Equals(key)
+	public IEnumerable<(TKey key, GameCell cell)> getNeightbours(TKey key) {
+		foreach (Edge<TKey> edge in graph.AdjacentEdges(key)) {
+			TKey neightbour = edge.Source.Equals(key)
 				? edge.Target
 				: edge.Source;
 
