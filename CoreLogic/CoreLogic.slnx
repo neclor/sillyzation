@@ -1,4 +1,4 @@
 <Solution>
-  <Project Path="src/Game.CoreLogic/Game.CoreLogic.csproj" />
-  <Project Path="tests/Game.CoreLogic.Tests/Game.CoreLogic.Tests.csproj" />
+  <Project Path="CoreLogic.csproj" />
+  <Project Path="CoreLogic.Tests.csproj" />
 </Solution>

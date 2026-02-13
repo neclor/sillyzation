@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <OutputType>Exe</OutputType>
+    <OutputType>Library</OutputType>
     <TargetFramework>net9.0</TargetFramework>
     <LangVersion>preview</LangVersion>
 
@@ -15,7 +15,10 @@
 	  <AnalysisModeStyle>Default</AnalysisModeStyle>
 	  <CodeAnalysisTreatWarningsAsErrors>false</CodeAnalysisTreatWarningsAsErrors>
 
-    <RootNamespace>Game.CoreLogic.Tests</RootNamespace>
+    <RootNamespace>CoreLogic</RootNamespace>
   </PropertyGroup>
 
+  <ItemGroup>
+    <PackageReference Include="QuikGraph" Version="2.5.0" />
+  </ItemGroup>
 </Project>
