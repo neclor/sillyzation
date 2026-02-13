@@ -5,7 +5,7 @@ public class BaseUnit(
 	uint health,
 	uint speed
 ) {
-	public uint BaseHealth { get; } = baseHealth;
-	public uint Health { get; } = health;
-	public uint Speed { get; } = speed;
+	public uint baseHealth { get; } = baseHealth;
+	public uint health { get; } = health;
+	public uint speed { get; } = speed;
 }

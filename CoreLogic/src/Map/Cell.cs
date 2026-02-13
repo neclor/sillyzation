@@ -9,7 +9,7 @@ public enum Terrain {
 }
 
 public class Cell {
-	public Terrain Terrain { get; }
-	public uint Population { get; }
-	public IList<(Ressource Ressource, int Amount)> Ressources { get; } = [];
+	public Terrain terrain { get; }
+	public uint population { get; }
+	public IList<(Ressource ressource, int amount)> ressources { get; } = [];
 }
