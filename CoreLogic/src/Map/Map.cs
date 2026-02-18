@@ -2,10 +2,12 @@ using QuikGraph;
 
 namespace CoreLogic;
 
-public record MapCell<TKey>(GameCell cell, TKey key);
-
 public class Map<TKey> where TKey : notnull {
+	private record MapCell<T>(GameCell cell, TKey key);
+
+	// Stores the keys inside a graph
 	private readonly UndirectedGraph<TKey, Edge<TKey>> graph;
+	// Stores a dictionary of both key and Cells
 	private readonly Dictionary<TKey, GameCell> cells;
 
 	public Map(
@@ -24,7 +26,7 @@ public class Map<TKey> where TKey : notnull {
 		}
 
 		foreach ((TKey key1, TKey key2) in connexions) {
-			if (!graph.AddEdge(new Edge<TKey>(key1, key2))) {
+			if (!graph.AddEdge(new(key1, key2))) {
 				throw new InvalidOperationException(
 					$"The cells {key1} and {key2} cannot be connected"
 				);

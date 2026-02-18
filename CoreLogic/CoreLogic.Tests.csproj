@@ -19,6 +19,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="ErrorOr" Version="2.0.1" />
     <PackageReference Include="QuikGraph" Version="2.5.0" />
   </ItemGroup>
 </Project>
