@@ -1,6 +1,6 @@
 using QuikGraph;
 
-namespace CoreLogic;
+namespace CoreLogic.Map;
 
 public class Map<TKey> where TKey : notnull {
 	private record MapCell<T>(GameCell cell, TKey key);

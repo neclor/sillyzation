@@ -1,6 +1,6 @@
 using CoreLogic.Units;
 
-namespace CoreLogic;
+namespace CoreLogic.Map;
 
 public class GameCell : Cell {
 	public int ownership { get; }

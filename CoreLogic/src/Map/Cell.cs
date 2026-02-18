@@ -1,4 +1,4 @@
-namespace CoreLogic;
+namespace CoreLogic.Map;
 
 public enum Ressource {
 	Oil,
