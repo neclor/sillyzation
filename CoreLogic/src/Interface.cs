@@ -2,12 +2,14 @@ using ErrorOr;
 
 namespace CoreLogic;
 
-public record Game();
+public interface IGame {
+	IEnumerable<IPlayer> players { get; }
+};
 
-public record Player(
-	uint id,
-	string name
-);
+public interface IPlayer {
+	uint id { get; }
+	string name { get; }
+};
 
 public enum Ressource {
 	Oil,
@@ -17,84 +19,84 @@ public enum Terrain {
 	Plain,
 }
 
-public record Cell(
-	uint id,
-	string name,
-	uint? owner,
-	Terrain terrain,
-	IEnumerable<(Ressource res, uint amount)> ressources
-);
+public interface ICell {
+	uint id { get; }
+	string name { get; }
+	uint? owner { get; }
+	Terrain terrain { get; }
+	IEnumerable<(Ressource res, uint amount)> ressources { get; }
+};
 
-public record Unit(
-	uint id,
-	uint baseHealth,
-	uint health,
-	uint speed,
-	uint owner,
-	uint position
-);
+public interface IUnit {
+	uint id { get; }
+	uint baseHealth { get; }
+	uint health { get; }
+	uint speed { get; }
+	uint owner { get; }
+	uint position { get; }
+};
 
 #pragma warning disable CA1711 // Identifiers should not have incorrect suffix
-public record UnitQueue(
-	uint id,
-	uint parallelUnitPoints,
-	IEnumerable<(Unit res, uint progress)> units
-);
+public interface IUnitQueue {
 #pragma warning restore CA1711 // Identifiers should not have incorrect suffix
+	uint id { get; }
+	uint parallelUnitPoints { get; }
+	IEnumerable<(IUnit res, uint progress)> units { get; }
+};
 
-public record Combat(
-	uint id,
-	IEnumerable<Unit> defenderUnit,
-	IEnumerable<Unit> attackerUnit,
+public interface ICombat {
+	uint id { get; }
+	IEnumerable<IUnit> defenderUnit { get; }
+	IEnumerable<IUnit> attackerUnit { get; }
 
 	/**
 	Number from -100 to 100
 	where 100 is the attacker winning
 	and -100 is the defender winning
 	*/
-	int combatStatus
-);
+	int combatStatus { get; }
+};
 
-public record Front(
-	uint id,
-	IEnumerable<(uint cellId1, uint cellId2)> edges,
-	IEnumerable<(uint cellId1, uint cellId2)> extremities
-);
+public interface IFront {
+	uint id { get; }
+	IEnumerable<(uint cellId1, uint cellId2)> edges { get; }
+	IEnumerable<(uint cellId1, uint cellId2)> extremities { get; }
+};
 
 public interface ICore {
 
 	// Game
-	ErrorOr<Game> nextGameTick();
-	ErrorOr<Game> syncGame();
+	ErrorOr<IGame> nextGameTick();
+	ErrorOr<IGame> syncGame();
 
 	// Player
-	ErrorOr<Player> getPlayer(uint playerId);
-	ErrorOr<IEnumerable<Player>> getAllPlayers();
+	ErrorOr<IPlayer> getPlayer(uint playerId);
+	ErrorOr<IEnumerable<IPlayer>> getAllPlayers();
 	ErrorOr<bool> addPlayer();
 	ErrorOr<bool> kickPlayer();
 
 	// Cells
-	ErrorOr<Cell> getCell(uint playerId, uint cellId);
+	ErrorOr<ICell> getCell(uint playerId, uint cellId);
 
 	// Unit Queue
-	ErrorOr<UnitQueue> getUnitQueue(uint playerId);
+	ErrorOr<IUnitQueue> getUnitQueue(uint playerId);
 	ErrorOr<bool> createUnitQueueGroup(uint playerId);
 	ErrorOr<bool> deployUnitQueueGroup(uint playerId, uint queueGroupId);
 	ErrorOr<bool> addUnitToQueueGroup(uint playerId);
 	ErrorOr<bool> removeUnitToQueueGroup(uint playerId, uint unitInQueueGroupId);
 
 	// Unit
-	ErrorOr<Unit> getUnit(uint playerId, uint unitId);
-	ErrorOr<IEnumerable<Unit>> getAllUnits(uint playerId);
+	ErrorOr<IUnit> getUnit(uint playerId, uint unitId);
+	ErrorOr<IEnumerable<IUnit>> getAllUnits(uint playerId);
 	ErrorOr<bool> moveUnit(uint playerId, uint unitId, uint cellId);
 	ErrorOr<bool> assignUnitToFront(uint playerId, uint unitId, uint frontId);
 	ErrorOr<bool> deleteUnit(uint playerId, uint unitId);
 
 	// Combat
-	ErrorOr<Combat> getCombatInfo(uint playerId, uint combatId);
+	ErrorOr<ICombat> getCombatInfo(uint playerId, uint combatId);
 
 	// Front
-	ErrorOr<Front> getFront(uint playerId, uint frontId);
+	ErrorOr<IFront> getFront(uint playerId, uint frontId);
 	ErrorOr<bool> createFront(uint playerId, uint cellId1, uint cellId2);
 	ErrorOr<bool> moveFront(uint playerId, uint frontId, uint cellId, bool side);
 }
