@@ -2,69 +2,7 @@ using ErrorOr;
 
 namespace CoreLogic;
 
-public interface IGame {
-	IEnumerable<IPlayer> players { get; }
-};
-
-public interface IPlayer {
-	uint id { get; }
-	string name { get; }
-};
-
-public enum Ressource {
-	Oil,
-}
-
-public enum Terrain {
-	Plain,
-}
-
-public interface ICell {
-	uint id { get; }
-	string name { get; }
-	uint? owner { get; }
-	Terrain terrain { get; }
-	IEnumerable<(Ressource res, uint amount)> ressources { get; }
-};
-
-public interface IUnit {
-	uint id { get; }
-	uint baseHealth { get; }
-	uint health { get; }
-	uint speed { get; }
-	uint owner { get; }
-	uint position { get; }
-};
-
-#pragma warning disable CA1711 // Identifiers should not have incorrect suffix
-public interface IUnitQueue {
-#pragma warning restore CA1711 // Identifiers should not have incorrect suffix
-	uint id { get; }
-	uint parallelUnitPoints { get; }
-	IEnumerable<(IUnit res, uint progress)> units { get; }
-};
-
-public interface ICombat {
-	uint id { get; }
-	IEnumerable<IUnit> defenderUnit { get; }
-	IEnumerable<IUnit> attackerUnit { get; }
-
-	/**
-	Number from -100 to 100
-	where 100 is the attacker winning
-	and -100 is the defender winning
-	*/
-	int combatStatus { get; }
-};
-
-public interface IFront {
-	uint id { get; }
-	IEnumerable<(uint cellId1, uint cellId2)> edges { get; }
-	IEnumerable<(uint cellId1, uint cellId2)> extremities { get; }
-};
-
 public interface ICore {
-
 	// Game
 	ErrorOr<IGame> nextGameTick();
 	ErrorOr<IGame> syncGame();
