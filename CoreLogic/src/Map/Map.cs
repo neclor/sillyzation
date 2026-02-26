@@ -2,16 +2,16 @@ using QuikGraph;
 
 namespace CoreLogic;
 
-internal class Map<TKey> where TKey : notnull {
-	private record MapCell<T>(ICell cell, TKey key);
+internal class Map<TKey> where TKey : notnull, IEquatable<TKey> {
+	private record MapCell<T>(ICell<T> cell, T key);
 
 	// Stores the keys inside a graph
 	private readonly UndirectedGraph<TKey, Edge<TKey>> graph;
 	// Stores a dictionary of both key and Cells
-	private readonly Dictionary<TKey, ICell> cells;
+	private readonly Dictionary<TKey, ICell<TKey>> cells;
 
 	public Map(
-		IEnumerable<(TKey key, ICell cell)> cells,
+		IEnumerable<(TKey key, ICell<TKey> cell)> cells,
 		IEnumerable<(TKey key1, TKey key2)> connexions
 	) {
 		ArgumentNullException.ThrowIfNull(cells);
@@ -20,7 +20,7 @@ internal class Map<TKey> where TKey : notnull {
 		this.cells = [];
 		graph = new();
 
-		foreach ((TKey key, ICell cell) in cells) {
+		foreach ((TKey key, ICell<TKey> cell) in cells) {
 			this.cells.Add(key, cell);
 			_ = graph.AddVertex(key);
 		}
@@ -34,9 +34,9 @@ internal class Map<TKey> where TKey : notnull {
 		}
 	}
 
-	public ICell getCell(TKey key) => cells[key];
+	public ICell<TKey> getCell(TKey key) => cells[key];
 
-	public IEnumerable<(TKey key, ICell cell)> getNeightbours(TKey key) {
+	public IEnumerable<(TKey key, ICell<TKey> cell)> getNeightbours(TKey key) {
 		foreach (Edge<TKey> edge in graph.AdjacentEdges(key)) {
 			TKey neightbour = edge.Source.Equals(key)
 				? edge.Target

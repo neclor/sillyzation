@@ -8,8 +8,8 @@ public enum Terrain {
 	Plain,
 }
 
-public interface ICell {
-	uint id { get; }
+public interface ICell<TKey> {
+	TKey id { get; }
 	string name { get; }
 	uint? owner { get; }
 	Terrain terrain { get; }

@@ -2,7 +2,7 @@ using ErrorOr;
 
 namespace CoreLogic;
 
-public interface ICore {
+public interface ICore<TKey> {
 	// Game
 	ErrorOr<IGame> nextGameTick();
 	ErrorOr<IGame> syncGame();
@@ -14,7 +14,7 @@ public interface ICore {
 	ErrorOr<bool> kickPlayer();
 
 	// Cells
-	ErrorOr<ICell> getCell(uint playerId, uint cellId);
+	ErrorOr<ICell<TKey>> getCell(uint playerId, uint cellId);
 
 	// Unit Queue
 	ErrorOr<IUnitQueue> getUnitQueue(uint playerId);

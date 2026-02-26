@@ -1,4 +1,4 @@
-using ErrorOr;
+using CoreLogic.Map;
 
 namespace CoreLogic.Tests;
 
@@ -7,51 +7,53 @@ internal class Program {
 		Console.WriteLine("\n\n\nStarting tests\n");
 
 		test();
-		// _ = test_error_handling();
 
 		Console.WriteLine("\nEnding tests");
 	}
 
-	public static string test_error_handling() {
-		ErrorOr<string> d = Error.NotFound();
-		if (d.IsError) {
-			foreach (Error error in d.Errors) {
-				Console.WriteLine(error);
-			}
-			return "1";
-		}
-		string test = d.Match(
-			x => x,
-			errors => {
-				foreach (Error error in d.Errors) {
-					Console.WriteLine(error);
-				}
-				return "1";
-			}
-		);
-		Console.WriteLine(test);
-
-		return "";
-	}
-
 	private static void test() {
-		// Map<uint> map = new(
-		// 	[
-		// 		(1, new GameCell()),
-		// 		(2, new GameCell()),
-		// 		(3, new GameCell()),
-		// 		(4, new GameCell()),
-		// 	],
-		// 	[
-		// 		(1, 2),
-		// 		(2, 3),
-		// 		(3, 4),
-		// 		(4, 1),
-		// 	]
-		// );
+		Map<(int, int)> map = new(
+			[
+				((1, 1), new Cell<(int, int)>((1, 1), "Bruxelles", Terrain.Plain)),
+				((2, 1), new Cell<(int, int)>((2, 1), "Namur", Terrain.Plain)),
+				((2, 2), new Cell<(int, int)>((2, 2), "Liege", Terrain.Plain)),
+				((1, 2), new Cell<(int, int)>((1, 2), "Leuven", Terrain.Plain)),
+			],
+			[
+				((1, 1), (2, 1)),
+				((2, 1), (2, 2)),
+				((2, 2), (1, 2)),
+				((1, 2), (1, 1)),
+			]
+		);
 
-		// foreach ((uint key, GameCell _) in map.getNeightbours(2)) {
-		// 	Console.WriteLine($"{key}");
-		// }
+		foreach (int y in Enumerable.Range(0, 2)) {
+			foreach (int x in Enumerable.Range(0, 2)) {
+				Console.Write($"({x} {y})");
+			}
+			Console.WriteLine();
+		}
 	}
 }
+
+// public static string test_error_handling() {
+// 	ErrorOr<Tuple<int, int>> d = Error.NotFound();
+// 	if (d.IsError) {
+// 		foreach (Error error in d.Errors) {
+// 			Console.WriteLine(error);
+// 		}
+// 		return "1";
+// 	}
+// 	Tuple<int, int> test = d.Match(
+// 		x => x,
+// 		errors => {
+// 			foreach (Error error in d.Errors) {
+// 				Console.WriteLine(error);
+// 			}
+// 			return "1";
+// 		}
+// 	);
+// 	Console.WriteLine(test);
+
+// 	return "";
+// }

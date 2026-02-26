@@ -3,24 +3,10 @@ using ErrorOr;
 
 namespace CoreLogic;
 
-internal class Core : ICore {
-	private Map<uint> map;
+internal class Core<TKey> : ICore<TKey> where TKey : notnull, IEquatable<TKey> {
+	private Map<uint> map = new([], []);
 
 	public Core() {
-		map = new(
-			[
-				(1, new Cell()),
-				(2, new Cell()),
-				(3, new Cell()),
-				(4, new Cell()),
-			],
-			[
-				(1, 2),
-				(2, 3),
-				(3, 4),
-				(4, 1),
-			]
-		);
 	}
 
 	public ErrorOr<IGame> nextGameTick() {
@@ -53,8 +39,9 @@ internal class Core : ICore {
 
 
 	// Cells
-	public ErrorOr<ICell> getCell(uint playerId, uint cellId) {
-		return new Cell();
+	public ErrorOr<ICell<TKey>> getCell(uint playerId, uint cellId) {
+		throw new NotImplementedException();
+		// return new Cell<TKey>(null, null, Terrain.Plain);
 	}
 
 
