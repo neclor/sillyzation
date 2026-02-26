@@ -228,7 +228,7 @@ csharp_style_prefer_readonly_struct_member = true:warning # IDE0251 Member can b
 
 dotnet_diagnostic.IDE0280.severity = warning # Use nameof
 
-csharp_style_prefer_primary_constructors = true:suggestion # IDE0290 Use primary constructor
+csharp_style_prefer_primary_constructors = false # IDE0290 Use primary constructor
 csharp_prefer_static_anonymous_function = true:warning # IDE0320 Make anonymous function static
 csharp_prefer_system_threading_lock = true:warning # IDE0330 Prefer System.Threading.Lock
 csharp_style_prefer_unbound_generic_type_in_nameof = true:warning # IDE0340 Use unbound generic type

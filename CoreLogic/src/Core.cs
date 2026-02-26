@@ -4,9 +4,18 @@ using ErrorOr;
 namespace CoreLogic;
 
 internal class Core<TKey> : ICore<TKey> where TKey : notnull, IEquatable<TKey> {
-	private Map<uint> map = new([], []);
+	private readonly Map<uint> map = new([], []);
+	private readonly IEnumerable<IPlayer> players;
 
-	public Core() {
+	public Core(
+		IEnumerable<PlayerInit> players
+	) {
+		uint id = 1;
+		this.players = players.Select(player => new Player(
+			id++,
+			player.name,
+			player.color
+		));
 	}
 
 	public ErrorOr<IGame> nextGameTick() {
@@ -21,11 +30,15 @@ internal class Core<TKey> : ICore<TKey> where TKey : notnull, IEquatable<TKey> {
 
 	// Player
 	public ErrorOr<IPlayer> getPlayer(uint playerId) {
-		return new Player();
+		IPlayer? player = players.First(player => player.id == playerId);
+		if (player == null) {
+			return Error.NotFound();
+		}
+		return ErrorOrFactory.From(player);
 	}
 
 	public ErrorOr<IEnumerable<IPlayer>> getAllPlayers() {
-		return new[] { new Player() };
+		return ErrorOrFactory.From(players);
 	}
 
 	public ErrorOr<bool> addPlayer() {

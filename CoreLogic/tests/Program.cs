@@ -14,10 +14,10 @@ internal class Program {
 	private static void test() {
 		Map<(int, int)> map = new(
 			[
-				((1, 1), new Cell<(int, int)>((1, 1), "Bruxelles", Terrain.Plain)),
-				((2, 1), new Cell<(int, int)>((2, 1), "Namur", Terrain.Plain)),
-				((2, 2), new Cell<(int, int)>((2, 2), "Liege", Terrain.Plain)),
-				((1, 2), new Cell<(int, int)>((1, 2), "Leuven", Terrain.Plain)),
+				((1, 1), new Cell<(int, int)>((1, 1), "Bruxelles", Terrain.Plain, [])),
+				((2, 1), new Cell<(int, int)>((2, 1), "Namur", Terrain.Plain, [])),
+				((2, 2), new Cell<(int, int)>((2, 2), "Liege", Terrain.Plain, [])),
+				((1, 2), new Cell<(int, int)>((1, 2), "Leuven", Terrain.Plain, [])),
 			],
 			[
 				((1, 1), (2, 1)),
