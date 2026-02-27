@@ -4,7 +4,7 @@ using ErrorOr;
 namespace CoreLogic;
 
 internal class Core<TKey> : ICore<TKey> where TKey : notnull, IEquatable<TKey> {
-	private readonly Map<uint> map = new([], []);
+	// private readonly Map<uint> map = new([], []);
 	private readonly IEnumerable<IPlayer> players;
 
 	public Core(
@@ -34,11 +34,11 @@ internal class Core<TKey> : ICore<TKey> where TKey : notnull, IEquatable<TKey> {
 		if (player == null) {
 			return Error.NotFound();
 		}
-		return ErrorOrFactory.From(player);
+		return player.ToErrorOr();
 	}
 
-	public ErrorOr<IEnumerable<IPlayer>> getAllPlayers() {
-		return ErrorOrFactory.From(players);
+	public IEnumerable<IPlayer> getAllPlayers() {
+		return players;
 	}
 
 	public ErrorOr<bool> addPlayer() {

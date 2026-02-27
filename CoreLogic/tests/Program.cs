@@ -33,6 +33,14 @@ internal class Program {
 			}
 			Console.WriteLine();
 		}
+
+		var path = map.getShortestPath((1, 1), (2, 2));
+		if (path.IsError) {
+			return;
+		}
+		foreach (var step in path.Value) {
+			Console.WriteLine(step.id + " " + step.name);
+		}
 	}
 }
 

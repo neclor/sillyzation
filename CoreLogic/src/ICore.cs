@@ -9,7 +9,7 @@ public interface ICore<TKey> {
 
 	// Player
 	ErrorOr<IPlayer> getPlayer(uint playerId);
-	ErrorOr<IEnumerable<IPlayer>> getAllPlayers();
+	IEnumerable<IPlayer> getAllPlayers();
 	ErrorOr<bool> addPlayer();
 	ErrorOr<bool> kickPlayer();
 
