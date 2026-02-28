@@ -1,18 +1,15 @@
-
-
 using ErrorOr;
 
 namespace CoreLogic;
 
-
-internal class Core {
+internal class Core : ICore {
 
 	private readonly Map map;
-	private IEnumerable<IPlayer> players = [];
+	private List<IPlayer> players = [];
 	private PlayerKey playerId = 1;
 
 	public Core(
-		IEnumerable<PlayerInit> players,
+		IEnumerable<(string name, Color color)> players,
 		IEnumerable<(CellKey key, ICell cell)> cells,
 		IEnumerable<(CellKey key1, CellKey key2)> connexions
 	) {
@@ -53,7 +50,7 @@ internal class Core {
 
 	public ErrorOr<bool> addPlayer(string name, Color color) {
 		try {
-			players = players.Append(new Player(
+			players.Add(new Player(
 				playerId++,
 				name,
 				color

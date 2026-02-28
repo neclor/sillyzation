@@ -1,5 +1,5 @@
-global using PlayerKey = System.UInt32;
-global using CellKey = (System.UInt32, System.UInt32);
+global using PlayerKey = uint;
+global using CellKey = (uint, uint);
 
 using ErrorOr;
 

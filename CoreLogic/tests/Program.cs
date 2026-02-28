@@ -1,5 +1,3 @@
-using CoreLogic.Map;
-
 namespace CoreLogic.Tests;
 
 internal class Program {
@@ -14,16 +12,16 @@ internal class Program {
 	private static void test() {
 		Core core = new(
 			[
-				new PlayerInit("England", Color.Red),
-				new PlayerInit("France", Color.Blue),
-				new PlayerInit("Germany", Color.Gray),
-				new PlayerInit("Russia", Color.Green),
-				new PlayerInit("Italy", Color.LightGreen),
-				new PlayerInit("Spain", Color.Yellow),
-				new PlayerInit("Belgium", Color.Gold),
-				new PlayerInit("Netherland", Color.Orange),
-				new PlayerInit("Austria-Hungary", Color.Orange),
-				new PlayerInit("Ottoman", Color.Orange),
+				("England", Color.Red),
+				("France", Color.Blue),
+				("Germany", Color.Gray),
+				("Russia", Color.Green),
+				("Italy", Color.LightGreen),
+				("Spain", Color.Yellow),
+				("Belgium", Color.Gold),
+				("Netherland", Color.Orange),
+				("Austria-Hungary", Color.Orange),
+				("Ottoman", Color.Orange),
 			],
 			[
 				((1, 1), new Cell((1, 1), "Bruxelles", Terrain.Swamp, 10000000, [])),

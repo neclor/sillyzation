@@ -1,7 +1,5 @@
 namespace CoreLogic;
 
-public record PlayerInit(string name, Color color);
-
 public enum Color {
 	Red,
 	Gold,

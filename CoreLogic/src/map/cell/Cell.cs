@@ -1,7 +1,6 @@
-namespace CoreLogic.Map;
+namespace CoreLogic;
 
-
-internal class Cell {
+internal class Cell : ICell {
 
 	public CellKey id { get; }
 	public string name { get; }
@@ -9,7 +8,7 @@ internal class Cell {
 	public Terrain terrain { get; }
 	public uint population { get; }
 	public IEnumerable<(Ressource res, uint amount)> ressources { get; }
-	private IEnumerable<PlayerKey> isKnownByList { get; set; } = [];
+	private IList<PlayerKey> isKnownByList { get; set; } = [];
 
 	public Cell(
 		CellKey id,
@@ -26,7 +25,7 @@ internal class Cell {
 	}
 
 	public void explore(PlayerKey playerId) {
-		isKnownByList = isKnownByList.Append(playerId);
+		isKnownByList.Add(playerId);
 	}
 
 	public bool isKnownBy(PlayerKey playerId) {
