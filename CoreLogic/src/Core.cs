@@ -1,21 +1,31 @@
-using CoreLogic.Map;
+
+
 using ErrorOr;
 
 namespace CoreLogic;
 
-internal class Core<TKey> : ICore<TKey> where TKey : notnull, IEquatable<TKey> {
-	// private readonly Map<uint> map = new([], []);
-	private readonly IEnumerable<IPlayer> players;
+
+internal class Core {
+
+	private readonly Map map;
+	private IEnumerable<IPlayer> players = [];
+	private PlayerKey playerId = 1;
 
 	public Core(
-		IEnumerable<PlayerInit> players
+		IEnumerable<PlayerInit> players,
+		IEnumerable<(CellKey key, ICell cell)> cells,
+		IEnumerable<(CellKey key1, CellKey key2)> connexions
 	) {
-		uint id = 1;
-		this.players = players.Select(player => new Player(
-			id++,
-			player.name,
-			player.color
-		));
+		// Players
+		foreach (var player in players) {
+			var status = addPlayer(player.name, player.color);
+			if (status.IsError) {
+				throw new InvalidDataException("Failed to insert players");
+			}
+		}
+
+		// Map
+		map = new(cells, connexions);
 	}
 
 	public ErrorOr<IGame> nextGameTick() {
@@ -29,7 +39,7 @@ internal class Core<TKey> : ICore<TKey> where TKey : notnull, IEquatable<TKey> {
 
 
 	// Player
-	public ErrorOr<IPlayer> getPlayer(uint playerId) {
+	public ErrorOr<IPlayer> getPlayer(PlayerKey playerId) {
 		IPlayer? player = players.First(player => player.id == playerId);
 		if (player == null) {
 			return Error.NotFound();
@@ -41,87 +51,105 @@ internal class Core<TKey> : ICore<TKey> where TKey : notnull, IEquatable<TKey> {
 		return players;
 	}
 
-	public ErrorOr<bool> addPlayer() {
-		return true;
+	public ErrorOr<bool> addPlayer(string name, Color color) {
+		try {
+			players = players.Append(new Player(
+				playerId++,
+				name,
+				color
+			));
+			return true;
+		}
+		catch (ArgumentNullException) {
+			return false;
+		}
 	}
 
-	public ErrorOr<bool> kickPlayer() {
+	public ErrorOr<bool> kickPlayer(PlayerKey playerId) {
+		try {
+			players = players
+				.Where(player => player.id != playerId)
+				.ToList();
+		}
+		catch (ArgumentNullException) {
+			return Error.NotFound("Player to remove not found");
+		}
 		return true;
 	}
 
 
 
 	// Cells
-	public ErrorOr<ICell<TKey>> getCell(uint playerId, uint cellId) {
-		throw new NotImplementedException();
-		// return new Cell<TKey>(null, null, Terrain.Plain);
+	public ErrorOr<ICell> getCell(PlayerKey playerId, CellKey cellId) {
+		// TODO Add player protection
+		return map.getCell(cellId);
 	}
 
 
 
 	// Unit Queue
-	public ErrorOr<IUnitQueue> getUnitQueue(uint playerId) {
+	public ErrorOr<IUnitQueue> getUnitQueue(PlayerKey playerId) {
 		return new UnitQueue();
 	}
 
-	public ErrorOr<bool> createUnitQueueGroup(uint playerId) {
+	public ErrorOr<bool> createUnitQueueGroup(PlayerKey playerId) {
 		return true;
 	}
 
-	public ErrorOr<bool> deployUnitQueueGroup(uint playerId, uint queueGroupId) {
+	public ErrorOr<bool> deployUnitQueueGroup(PlayerKey playerId, uint queueGroupId) {
 		return true;
 	}
 
-	public ErrorOr<bool> addUnitToQueueGroup(uint playerId) {
+	public ErrorOr<bool> addUnitToQueueGroup(PlayerKey playerId) {
 		return true;
 	}
 
-	public ErrorOr<bool> removeUnitToQueueGroup(uint playerId, uint unitInQueueGroupId) {
+	public ErrorOr<bool> removeUnitToQueueGroup(PlayerKey playerId, uint unitInQueueGroupId) {
 		return true;
 	}
 
 
 
 	// Unit
-	public ErrorOr<IUnit> getUnit(uint playerId, uint unitId) {
+	public ErrorOr<IUnit> getUnit(PlayerKey playerId, uint unitId) {
 		return new Unit();
 	}
 
-	public ErrorOr<IEnumerable<IUnit>> getAllUnits(uint playerId) {
+	public ErrorOr<IEnumerable<IUnit>> getAllUnits(PlayerKey playerId) {
 		return new[] { new Unit() };
 	}
 
-	public ErrorOr<bool> moveUnit(uint playerId, uint unitId, uint cellId) {
+	public ErrorOr<bool> moveUnit(PlayerKey playerId, uint unitId, CellKey cellId) {
 		return true;
 	}
 
-	public ErrorOr<bool> assignUnitToFront(uint playerId, uint unitId, uint frontId) {
+	public ErrorOr<bool> assignUnitToFront(PlayerKey playerId, uint unitId, uint frontId) {
 		return true;
 	}
 
-	public ErrorOr<bool> deleteUnit(uint playerId, uint unitId) {
+	public ErrorOr<bool> deleteUnit(PlayerKey playerId, uint unitId) {
 		return true;
 	}
 
 
 
 	// Combat
-	public ErrorOr<ICombat> getCombatInfo(uint playerId, uint combatId) {
+	public ErrorOr<ICombat> getCombatInfo(PlayerKey playerId, uint combatId) {
 		return new Combat();
 	}
 
 
 
 	// Front
-	public ErrorOr<IFront> getFront(uint playerId, uint frontId) {
+	public ErrorOr<IFront> getFront(PlayerKey playerId, uint frontId) {
 		return new Front();
 	}
 
-	public ErrorOr<bool> createFront(uint playerId, uint cellId1, uint cellId2) {
+	public ErrorOr<bool> createFront(PlayerKey playerId, CellKey cellId1, CellKey cellId2) {
 		return true;
 	}
 
-	public ErrorOr<bool> moveFront(uint playerId, uint frontId, uint cellId, bool side) {
+	public ErrorOr<bool> moveFront(PlayerKey playerId, uint frontId, CellKey cellId, bool side) {
 		return true;
 	}
 }

@@ -4,20 +4,20 @@ using QuikGraph.Algorithms;
 
 namespace CoreLogic;
 
-internal class Map<TKey> where TKey : notnull, IEquatable<TKey> {
-	private record MapCell<T>(ICell<T> cell, T key);
+internal class Map {
+	private record MapCell<T>(ICell cell, T key);
 
 	// Stores the keys inside a graph
-	private readonly UndirectedGraph<TKey, TaggedEdge<TKey, uint>> graph;
+	private readonly UndirectedGraph<CellKey, TaggedEdge<CellKey, uint>> graph;
 	// Stores a dictionary of both key and Cells
-	private readonly Dictionary<TKey, ICell<TKey>> cells;
+	private readonly Dictionary<CellKey, ICell> cells;
 	// Way for algorithm to use the weight
-	private readonly Func<TaggedEdge<TKey, uint>, double> edgeWeights
+	private readonly Func<TaggedEdge<CellKey, uint>, double> edgeWeights
 		= new(edge => edge.Tag);
 
 	public Map(
-		IEnumerable<(TKey key, ICell<TKey> cell)> cells,
-		IEnumerable<(TKey key1, TKey key2)> connexions
+		IEnumerable<(CellKey key, ICell cell)> cells,
+		IEnumerable<(CellKey key1, CellKey key2)> connexions
 	) {
 		ArgumentNullException.ThrowIfNull(cells);
 		ArgumentNullException.ThrowIfNull(connexions);
@@ -30,7 +30,7 @@ internal class Map<TKey> where TKey : notnull, IEquatable<TKey> {
 			_ = graph.AddVertex(key);
 		}
 
-		foreach ((TKey key1, TKey key2) in connexions) {
+		foreach ((CellKey key1, CellKey key2) in connexions) {
 			uint weight = calculateConnexionWeigth(this.cells[key1])
 				+ calculateConnexionWeigth(this.cells[key2]);
 
@@ -42,7 +42,7 @@ internal class Map<TKey> where TKey : notnull, IEquatable<TKey> {
 		}
 	}
 
-	private static uint calculateConnexionWeigth(ICell<TKey> cell) {
+	private static uint calculateConnexionWeigth(ICell cell) {
 		return cell.terrain switch {
 			Terrain.Plain => 1,
 			Terrain.Forest => 3,
@@ -55,19 +55,29 @@ internal class Map<TKey> where TKey : notnull, IEquatable<TKey> {
 		};
 	}
 
-	public ICell<TKey> getCell(TKey key) => cells[key];
-
-	public IEnumerable<(TKey key, ICell<TKey> cell)> getNeightbours(TKey key) {
-		foreach (var edge in graph.AdjacentEdges(key)) {
-			TKey neightbour = edge.Source.Equals(key)
-				? edge.Target
-				: edge.Source;
-
-			yield return (neightbour, getCell(neightbour));
+	public ErrorOr<ICell> getCell(CellKey key) {
+		try {
+			return cells[key].ToErrorOr();
+		}
+		catch (ArgumentNullException) {
+			return Error.Unexpected("Invalid Value");
+		}
+		catch (KeyNotFoundException) {
+			return Error.NotFound("Cell not found");
 		}
 	}
 
-	public ErrorOr<IEnumerable<ICell<TKey>>> getShortestPath(TKey origin, TKey destination) {
+	public IEnumerable<(CellKey key, ICell cell)> getNeightbours(CellKey key) {
+		foreach (var edge in graph.AdjacentEdges(key)) {
+			CellKey neightbour = edge.Source.Equals(key)
+				? edge.Target
+				: edge.Source;
+
+			yield return (neightbour, getCell(neightbour).Value);
+		}
+	}
+
+	public ErrorOr<IEnumerable<ICell>> getShortestPath(CellKey origin, CellKey destination) {
 		var algorithm = graph.ShortestPathsDijkstra(edgeWeights, origin);
 		if (!algorithm(destination, out var path)) {
 			return Error.NotFound("Path does not exist");

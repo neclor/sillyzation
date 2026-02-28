@@ -64,7 +64,7 @@ csharp_style_pattern_matching_over_as_with_null_check = true:suggestion # IDE001
 csharp_style_pattern_matching_over_is_with_cast_check = true:suggestion # IDE0020, IDE0038 Use pattern matching to avoid is check followed by a cast
 
 csharp_style_expression_bodied_constructors = when_on_single_line:suggestion # IDE0021 Use expression body for constructors
-csharp_style_expression_bodied_methods = when_on_single_line:suggestion # IDE0022 Use expression body for methods
+csharp_style_expression_bodied_methods = none # IDE0022 Use expression body for methods
 csharp_style_expression_bodied_operators = when_on_single_line:suggestion # IDE0023, IDE0024 Use expression body for conversion operators
 csharp_style_expression_bodied_properties = when_on_single_line:suggestion # IDE0025 Use expression body for properties
 csharp_style_expression_bodied_indexers = when_on_single_line:suggestion # IDE0026 Use expression body for indexers

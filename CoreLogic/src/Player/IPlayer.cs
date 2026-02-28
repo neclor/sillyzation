@@ -4,19 +4,21 @@ public record PlayerInit(string name, Color color);
 
 public enum Color {
 	Red,
+	Gold,
 	Orange,
 	Yellow,
 	LightGreen,
-	GREEN,
+	Green,
 	LightBlue,
 	Blue,
 	Purple,
 	White,
 	Gray,
+	Brown,
 }
 
 public interface IPlayer {
-	uint id { get; }
+	PlayerKey id { get; }
 	string name { get; }
 	Color color { get; }
 };

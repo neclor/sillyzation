@@ -12,12 +12,24 @@ internal class Program {
 	}
 
 	private static void test() {
-		Map<(int, int)> map = new(
+		Core core = new(
 			[
-				((1, 1), new Cell<(int, int)>((1, 1), "Bruxelles", Terrain.Plain, [])),
-				((2, 1), new Cell<(int, int)>((2, 1), "Namur", Terrain.Plain, [])),
-				((2, 2), new Cell<(int, int)>((2, 2), "Liege", Terrain.Plain, [])),
-				((1, 2), new Cell<(int, int)>((1, 2), "Leuven", Terrain.Plain, [])),
+				new PlayerInit("England", Color.Red),
+				new PlayerInit("France", Color.Blue),
+				new PlayerInit("Germany", Color.Gray),
+				new PlayerInit("Russia", Color.Green),
+				new PlayerInit("Italy", Color.LightGreen),
+				new PlayerInit("Spain", Color.Yellow),
+				new PlayerInit("Belgium", Color.Gold),
+				new PlayerInit("Netherland", Color.Orange),
+				new PlayerInit("Austria-Hungary", Color.Orange),
+				new PlayerInit("Ottoman", Color.Orange),
+			],
+			[
+				((1, 1), new Cell((1, 1), "Bruxelles", Terrain.Swamp, 10000000, [])),
+				((2, 1), new Cell((2, 1), "Namur", Terrain.Forest, 3000000, [])),
+				((2, 2), new Cell((2, 2), "Liege", Terrain.Forest, 5000000, [])),
+				((1, 2), new Cell((1, 2), "Leuven", Terrain.Plain, 2000000, [])),
 			],
 			[
 				((1, 1), (2, 1)),
@@ -27,20 +39,25 @@ internal class Program {
 			]
 		);
 
-		foreach (int y in Enumerable.Range(0, 2)) {
-			foreach (int x in Enumerable.Range(0, 2)) {
-				Console.Write($"({x} {y})");
+
+		foreach (uint y in Enumerable.Range(1, 2)) {
+			foreach (uint x in Enumerable.Range(1, 2)) {
+				var cell = core.getCell(0, (x, y));
+				if (cell.IsError) {
+					return;
+				}
+				Console.Write($"{cell.Value.id}, {cell.Value.id})");
 			}
 			Console.WriteLine();
 		}
 
-		var path = map.getShortestPath((1, 1), (2, 2));
-		if (path.IsError) {
-			return;
-		}
-		foreach (var step in path.Value) {
-			Console.WriteLine(step.id + " " + step.name);
-		}
+		// var path = map.getShortestPath((1, 1), (2, 2));
+		// if (path.IsError) {
+		// 	return;
+		// }
+		// foreach (var step in path.Value) {
+		// 	Console.WriteLine(step.id + " " + step.name);
+		// }
 	}
 }
 
