@@ -1,5 +1,9 @@
 global using PlayerKey = uint;
 global using CellKey = (uint, uint);
+global using UnitKey = uint;
+global using FrontKey = uint;
+global using IGameTick = bool;
+
 
 using ErrorOr;
 
@@ -7,8 +11,8 @@ namespace CoreLogic;
 
 public interface ICore {
 	// Game
-	ErrorOr<IGame> nextGameTick();
-	ErrorOr<IGame> syncGame();
+	ErrorOr<IGameTick> nextGameTick();
+	ErrorOr<IGameTick> syncGame();
 
 	// Player
 	ErrorOr<IPlayer> getPlayer(PlayerKey playerId);
@@ -24,20 +28,20 @@ public interface ICore {
 	ErrorOr<bool> createUnitQueueGroup(PlayerKey playerId);
 	ErrorOr<bool> deployUnitQueueGroup(PlayerKey playerId, uint queueGroupId);
 	ErrorOr<bool> addUnitToQueueGroup(PlayerKey playerId);
-	ErrorOr<bool> removeUnitToQueueGroup(PlayerKey playerId, uint unitInQueueGroupId);
+	ErrorOr<bool> removeUnitToQueueGroup(PlayerKey playerId, UnitKey unitInQueueGroupId);
 
 	// Unit
-	ErrorOr<IUnit> getUnit(PlayerKey playerId, uint unitId);
+	ErrorOr<IUnit> getUnit(PlayerKey playerId, UnitKey unitId);
 	ErrorOr<IEnumerable<IUnit>> getAllUnits(PlayerKey playerId);
-	ErrorOr<bool> moveUnit(PlayerKey playerId, uint unitId, CellKey cellId);
-	ErrorOr<bool> assignUnitToFront(PlayerKey playerId, uint unitId, uint frontId);
-	ErrorOr<bool> deleteUnit(PlayerKey playerId, uint unitId);
+	ErrorOr<bool> moveUnit(PlayerKey playerId, UnitKey unitId, CellKey cellId);
+	ErrorOr<bool> assignUnitToFront(PlayerKey playerId, UnitKey unitId, FrontKey frontId);
+	ErrorOr<bool> deleteUnit(PlayerKey playerId, UnitKey unitId);
 
 	// Combat
-	ErrorOr<ICombat> getCombatInfo(uint playerId, uint combatId);
+	ErrorOr<ICombat> getCombatInfo(PlayerKey playerId, uint combatId);
 
 	// Front
-	ErrorOr<IFront> getFront(PlayerKey playerId, uint frontId);
+	ErrorOr<IFront> getFront(PlayerKey playerId, FrontKey frontId);
 	ErrorOr<bool> createFront(PlayerKey playerId, CellKey cellId1, CellKey cellId2);
-	ErrorOr<bool> moveFront(PlayerKey playerId, uint frontId, CellKey cellId, bool side);
+	ErrorOr<bool> moveFront(PlayerKey playerId, FrontKey frontId, CellKey cellId, bool side);
 }

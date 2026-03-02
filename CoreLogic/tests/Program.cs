@@ -44,7 +44,7 @@ internal class Program {
 				if (cell.IsError) {
 					return;
 				}
-				Console.Write($"{cell.Value.id}, {cell.Value.id})");
+				Console.Write($"{cell.Value.id}{cell.Value.terrain}");
 			}
 			Console.WriteLine();
 		}

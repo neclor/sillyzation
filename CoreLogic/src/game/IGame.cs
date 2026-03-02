@@ -1,5 +1,11 @@
+using ErrorOr;
+
 namespace CoreLogic;
 
 public interface IGame {
-	IEnumerable<IPlayer> players { get; }
+	// Player
+	ErrorOr<IPlayer> getPlayer(PlayerKey playerId);
+	IEnumerable<IPlayer> getAllPlayers();
+	ErrorOr<bool> addPlayer(string name, Color color);
+	ErrorOr<bool> kickPlayer(PlayerKey playerId);
 };

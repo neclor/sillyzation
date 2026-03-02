@@ -5,8 +5,6 @@ using QuikGraph.Algorithms;
 namespace CoreLogic;
 
 internal class Map {
-	private record MapCell<T>(ICell cell, T key);
-
 	// Stores the keys inside a graph
 	private readonly UndirectedGraph<CellKey, TaggedEdge<CellKey, uint>> graph;
 	// Stores a dictionary of both key and Cells

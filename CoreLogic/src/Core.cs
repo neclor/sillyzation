@@ -5,73 +5,44 @@ namespace CoreLogic;
 internal class Core : ICore {
 
 	private readonly Map map;
-	private List<IPlayer> players = [];
-	private PlayerKey playerId = 1;
+	private readonly Game game;
 
 	public Core(
 		IEnumerable<(string name, Color color)> players,
 		IEnumerable<(CellKey key, ICell cell)> cells,
 		IEnumerable<(CellKey key1, CellKey key2)> connexions
 	) {
-		// Players
-		foreach (var player in players) {
-			var status = addPlayer(player.name, player.color);
-			if (status.IsError) {
-				throw new InvalidDataException("Failed to insert players");
-			}
-		}
+		game = new(players);
 
 		// Map
 		map = new(cells, connexions);
 	}
 
-	public ErrorOr<IGame> nextGameTick() {
-		return new Game();
+	public ErrorOr<IGameTick> nextGameTick() {
+		return true.ToErrorOr();
 	}
 
-	public ErrorOr<IGame> syncGame() {
-		return new Game();
+	public ErrorOr<IGameTick> syncGame() {
+		return true.ToErrorOr();
 	}
 
 
 
 	// Player
 	public ErrorOr<IPlayer> getPlayer(PlayerKey playerId) {
-		IPlayer? player = players.First(player => player.id == playerId);
-		if (player == null) {
-			return Error.NotFound();
-		}
-		return player.ToErrorOr();
+		return game.getPlayer(playerId);
 	}
 
 	public IEnumerable<IPlayer> getAllPlayers() {
-		return players;
+		return game.getAllPlayers();
 	}
 
 	public ErrorOr<bool> addPlayer(string name, Color color) {
-		try {
-			players.Add(new Player(
-				playerId++,
-				name,
-				color
-			));
-			return true;
-		}
-		catch (ArgumentNullException) {
-			return false;
-		}
+		return game.addPlayer(name, color);
 	}
 
 	public ErrorOr<bool> kickPlayer(PlayerKey playerId) {
-		try {
-			players = players
-				.Where(player => player.id != playerId)
-				.ToList();
-		}
-		catch (ArgumentNullException) {
-			return Error.NotFound("Player to remove not found");
-		}
-		return true;
+		return game.kickPlayer(playerId);
 	}
 
 
