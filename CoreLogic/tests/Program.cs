@@ -14,39 +14,64 @@ internal class Program {
 		Console.WriteLine("\nEnding tests");
 	}
 
+	private const string BORDER_COLOR = "\u001b[38;5;244m";
+
 	private static void printCell(Terrain terrain, uint? playerId, uint line) {
 		var cell_color = terrain switch {
-			Terrain.Plain => "\u001b[102m",
-			Terrain.Desert => "\u001b[103m",
-			Terrain.Forest => "\u001b[107m",
-			Terrain.Jungle => "\u001b[100m",
-			Terrain.Savanna => "\u001b[101m",
-			Terrain.Swamp => "\u001b[105m",
-			Terrain.Tundra => "\u001b[104m",
+			Terrain.Plain => "\u001b[48;5;40m",
+			Terrain.Desert => "\u001b[48;5;220m",
+			Terrain.Forest => "\u001b[48;5;28m",
+			Terrain.Jungle => "\u001b[48;5;34m",
+			Terrain.Savanna => "\u001b[48;5;172m",
+			Terrain.Swamp => "\u001b[48;5;95m",
+			Terrain.Tundra => "\u001b[48;5;74m",
 			_ => throw new NotImplementedException()
 		};
-		var player_color = playerId switch {
-			0 => "\u001b[40m",
-			1 => "\u001b[41m",
-			2 => "\u001b[42m",
-			3 => "\u001b[43m",
-			4 => "\u001b[44m",
-			5 => "\u001b[45m",
-			6 => "\u001b[46m",
-			null => "\u001b[47m",
+
+		var terrain_label = terrain switch {
+			Terrain.Plain => "PLN",
+			Terrain.Desert => "DSR",
+			Terrain.Forest => "FOR",
+			Terrain.Jungle => "JGL",
+			Terrain.Savanna => "SVN",
+			Terrain.Swamp => "SWP",
+			Terrain.Tundra => "TUN",
+			_ => throw new NotImplementedException()
+		};
+
+		var player_fg = playerId switch {
+			0 => "\u001b[38;5;196m", // Red
+			1 => "\u001b[38;5;45m",  // Cyan
+			2 => "\u001b[38;5;201m", // Magenta
+			3 => "\u001b[38;5;214m", // Orange
+			4 => "\u001b[38;5;118m", // Bright Green
+			5 => "\u001b[38;5;226m", // Bright Yellow
+			6 => "\u001b[38;5;135m", // Purple
+			null => "\u001b[38;5;250m", // Light Gray for Neutral
 			_ => throw new NotImplementedException(),
 		};
 
-		if (line == 0 || line == 3) {
-			Console.Write($"{player_color}      {RESET}");
-		}
-		else {
-			Console.Write($"{player_color} {cell_color}    {player_color} {RESET}");
+		string player_icon = playerId.HasValue ? $"P{playerId}" : " ∙";
+
+		switch (line) {
+			case 0:
+				Console.Write($"{BORDER_COLOR}┌─────┐{RESET}");
+				break;
+			case 1:
+				Console.Write($"{BORDER_COLOR}│{cell_color}\u001b[30m {terrain_label} {RESET}{BORDER_COLOR}│{RESET}");
+				break;
+			case 2:
+				Console.Write($"{BORDER_COLOR}│{cell_color} {player_fg}{player_icon}\u001b[30m  {RESET}{BORDER_COLOR}│{RESET}");
+				break;
+			case 3:
+				Console.Write($"{BORDER_COLOR}└─────┘{RESET}");
+				break;
+			default:
+				break;
 		}
 	}
 
 	private static void printMap(uint playerId, ICore core) {
-
 		for (uint y = 1; y <= 2; y++) {
 			for (uint line = 0; line <= 3; line++) {
 				for (uint x = 1; x <= 2; x++) {
