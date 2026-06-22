@@ -8,14 +8,22 @@ internal class Core : ICore {
 	private readonly Game game;
 
 	public Core(
-		IEnumerable<(string name, Color color)> players,
+		IEnumerable<(string name, Color color, CellKey[] ownership)> players,
 		IEnumerable<(CellKey key, ICell cell)> cells,
 		IEnumerable<(CellKey key1, CellKey key2)> connexions
 	) {
-		game = new(players);
+		game = new(players.Select(p => (p.name, p.color)));
+
+		IEnumerable<(uint playerId, CellKey[] cells)> ownerships = players
+			.Join(
+				game.getAllPlayers(),
+				playerInput => playerInput.name,
+				playerDict => playerDict.Value.name,
+				(playerInput, playerDict) => (playerId: playerDict.Key, cells: playerInput.ownership)
+			);
 
 		// Map
-		map = new(cells, connexions);
+		map = new(cells, connexions, ownerships);
 	}
 
 	public ErrorOr<IGameTick> nextGameTick() {

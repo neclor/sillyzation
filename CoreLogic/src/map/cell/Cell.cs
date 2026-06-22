@@ -4,7 +4,7 @@ internal class Cell : ICell {
 
 	public CellKey id { get; }
 	public string name { get; }
-	public PlayerKey? owner { get; }
+	public PlayerKey? owner { get; set; }
 	public Terrain terrain { get; }
 	public uint population { get; }
 	public IEnumerable<(Ressource res, uint amount)> ressources { get; }

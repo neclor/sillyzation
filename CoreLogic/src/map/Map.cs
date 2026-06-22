@@ -15,7 +15,8 @@ internal class Map {
 
 	public Map(
 		IEnumerable<(CellKey key, ICell cell)> cells,
-		IEnumerable<(CellKey key1, CellKey key2)> connexions
+		IEnumerable<(CellKey key1, CellKey key2)> connexions,
+		IEnumerable<(uint playerId, CellKey[] cells)> ownerships
 	) {
 		ArgumentNullException.ThrowIfNull(cells);
 		ArgumentNullException.ThrowIfNull(connexions);
@@ -36,6 +37,18 @@ internal class Map {
 				throw new InvalidOperationException(
 					$"The cells {key1} and {key2} cannot be connected"
 				);
+			}
+		}
+
+		foreach ((uint owner, CellKey[] owned_cells) in ownerships) {
+			foreach (CellKey owned in owned_cells) {
+				if (!this.cells.TryGetValue(owned, out ICell? cell)) {
+					throw new InvalidOperationException($"Invalid Game State\nCell {owned} does not exist");
+				}
+				if (cell.owner != null) {
+					throw new InvalidOperationException("Invalid Game State\nCell " + owned + " has two owner " + cell.owner + " and " + owner);
+				}
+				cell.owner = owner;
 			}
 		}
 	}

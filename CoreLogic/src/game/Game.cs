@@ -10,6 +10,7 @@ internal class Game : IGame {
 
 	public Game(IEnumerable<(string name, Color color)> players) {
 		foreach (var player in players) {
+			Console.WriteLine(player);
 			var status = addPlayer(player.name, player.color);
 			if (status.IsError) {
 				throw new InvalidDataException("Failed to insert players");
@@ -38,12 +39,12 @@ internal class Game : IGame {
 
 	public ErrorOr<bool> addPlayer(string name, Color color) {
 		try {
-			playerId = playerId++;
 			players[playerId] = new Player(
 				playerId,
 				name,
 				color
 			);
+			playerId++;
 			return true;
 		}
 		catch (ArgumentNullException) {

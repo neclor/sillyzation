@@ -18,7 +18,7 @@ public enum Terrain {
 public interface ICell {
 	CellKey id { get; }
 	string name { get; }
-	PlayerKey? owner { get; }
+	PlayerKey? owner { get; set; }
 	Terrain terrain { get; }
 	IEnumerable<(Ressource res, uint amount)> ressources { get; }
 };

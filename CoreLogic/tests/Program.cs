@@ -16,7 +16,7 @@ internal class Program {
 
 	private const string BORDER_COLOR = "\u001b[38;5;244m";
 
-	private static void printCell(Terrain terrain, uint? playerId, uint line) {
+	private static void printCell(Terrain terrain, IPlayer? player, uint line) {
 		var cell_color = terrain switch {
 			Terrain.Plain => "\u001b[48;5;40m",
 			Terrain.Desert => "\u001b[48;5;220m",
@@ -39,19 +39,24 @@ internal class Program {
 			_ => throw new NotImplementedException()
 		};
 
-		var player_fg = playerId switch {
-			0 => "\u001b[38;5;196m", // Red
-			1 => "\u001b[38;5;45m",  // Cyan
-			2 => "\u001b[38;5;201m", // Magenta
-			3 => "\u001b[38;5;214m", // Orange
-			4 => "\u001b[38;5;118m", // Bright Green
-			5 => "\u001b[38;5;226m", // Bright Yellow
-			6 => "\u001b[38;5;135m", // Purple
-			null => "\u001b[38;5;250m", // Light Gray for Neutral
+		var player_fg = player?.color switch {
+			Color.Red => "\u001b[38;5;196m",
+			Color.LightBlue => "\u001b[38;5;45m",
+			Color.Purple => "\u001b[38;5;201m",
+			Color.Orange => "\u001b[38;5;214m",
+			Color.LightGreen => "\u001b[38;5;118m",
+			Color.Yellow => "\u001b[38;5;226m",
+			Color.Gray => "\u001b[38;5;250m",
+			Color.Gold => "\u001b[38;5;220m",
+			Color.Green => "\u001b[38;5;34m",
+			Color.Blue => "\u001b[38;5;21m",
+			Color.White => "\u001b[38;5;231m",
+			Color.Brown => "\u001b[38;5;130m",
+			null => "\u001b[38;5;250m",
 			_ => throw new NotImplementedException(),
 		};
 
-		string player_icon = playerId.HasValue ? $"P{playerId}" : " ∙";
+		string player_icon = player != null ? $"P{player.id}" : " ∙";
 
 		switch (line) {
 			case 0:
@@ -71,15 +76,17 @@ internal class Program {
 		}
 	}
 
-	private static void printMap(uint playerId, ICore core) {
+	private static void printMap(IPlayer player, Dictionary<uint, IPlayer> players, ICore core) {
 		for (uint y = 1; y <= 2; y++) {
 			for (uint line = 0; line <= 3; line++) {
 				for (uint x = 1; x <= 2; x++) {
-					var cell = core.getCell(playerId, (x, y));
+					var cell = core.getCell(player.id, (x, y));
 					if (cell.IsError) {
 						return;
 					}
-					printCell(cell.Value.terrain, cell.Value.owner, line);
+					uint? owner = cell.Value.owner;
+					IPlayer? p = owner != null ? players[owner.Value] : null;
+					printCell(cell.Value.terrain, p, line);
 				}
 				Console.WriteLine();
 			}
@@ -89,16 +96,16 @@ internal class Program {
 	private static void test() {
 		Core core = new(
 			[
-				("England", Color.Red),
-				("France", Color.Blue),
-				("Germany", Color.Gray),
-				("Russia", Color.Green),
-				("Italy", Color.LightGreen),
-				("Spain", Color.Yellow),
-				("Belgium", Color.Gold),
-				("Netherland", Color.Orange),
-				("Austria-Hungary", Color.Orange),
-				("Ottoman", Color.Orange),
+				("England", Color.Red, [(1,1)]),
+				("France", Color.Blue, [(1,3)]),
+				// ("Germany", Color.Gray, []),
+				// ("Russia", Color.Green, []),
+				// ("Italy", Color.LightGreen, []),
+				// ("Spain", Color.Yellow, []),
+				// ("Belgium", Color.Gold, []),
+				// ("Netherland", Color.Orange, []),
+				// ("Austria-Hungary", Color.Orange, []),
+				// ("Ottoman", Color.Orange, []),
 			],
 			[
 				((1, 1), new Cell((1, 1), "Bruxelles", Terrain.Swamp, 10000000, [])),
@@ -115,7 +122,23 @@ internal class Program {
 		);
 
 
-		printMap(0, core);
+		while (true) {
+			Console.WriteLine("Test\n");
+			var players = core.getAllPlayers();
+			foreach ((uint playerId, IPlayer player) in players) {
+				// Console.Clear();
+				Console.WriteLine("   xd " + playerId);
+				printMap(player, players, core);
+				char input = Console.ReadKey().KeyChar;
+				Console.WriteLine("=> " + (int) input);
+				switch ((int) input) {
+					case 27:
+						return;
+					default:
+						break;
+				}
+			}
+		}
 	}
 }
 
