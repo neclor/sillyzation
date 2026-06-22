@@ -16,7 +16,7 @@ public interface ICore {
 
 	// Player
 	ErrorOr<IPlayer> getPlayer(PlayerKey playerId);
-	IEnumerable<IPlayer> getAllPlayers();
+	Dictionary<uint, IPlayer> getAllPlayers();
 	ErrorOr<bool> addPlayer(string name, Color color);
 	ErrorOr<bool> kickPlayer(PlayerKey playerId);
 

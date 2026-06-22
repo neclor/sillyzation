@@ -3,7 +3,7 @@ using ErrorOr;
 namespace CoreLogic;
 
 internal class Game : IGame {
-	private List<IPlayer> players = [];
+	private Dictionary<uint, IPlayer> players = [];
 	private PlayerKey playerId = 1;
 
 
@@ -21,7 +21,7 @@ internal class Game : IGame {
 
 
 	public ErrorOr<IPlayer> getPlayer(PlayerKey playerId) {
-		IPlayer? player = players.First(player => player.id == playerId);
+		IPlayer? player = players[playerId];
 		if (player == null) {
 			return Error.NotFound();
 		}
@@ -30,7 +30,7 @@ internal class Game : IGame {
 
 
 
-	public IEnumerable<IPlayer> getAllPlayers() {
+	public Dictionary<uint, IPlayer> getAllPlayers() {
 		return players;
 	}
 
@@ -38,11 +38,12 @@ internal class Game : IGame {
 
 	public ErrorOr<bool> addPlayer(string name, Color color) {
 		try {
-			players.Add(new Player(
-				playerId++,
+			playerId = playerId++;
+			players[playerId] = new Player(
+				playerId,
 				name,
 				color
-			));
+			);
 			return true;
 		}
 		catch (ArgumentNullException) {
@@ -54,9 +55,7 @@ internal class Game : IGame {
 
 	public ErrorOr<bool> kickPlayer(PlayerKey playerId) {
 		try {
-			players = players
-				.Where(player => player.id != playerId)
-				.ToList();
+			_ = players.Remove(playerId);
 		}
 		catch (ArgumentNullException) {
 			return Error.NotFound("Player to remove not found");

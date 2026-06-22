@@ -33,7 +33,7 @@ internal class Core : ICore {
 		return game.getPlayer(playerId);
 	}
 
-	public IEnumerable<IPlayer> getAllPlayers() {
+	public Dictionary<uint, IPlayer> getAllPlayers() {
 		return game.getAllPlayers();
 	}
 
