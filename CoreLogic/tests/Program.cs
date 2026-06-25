@@ -80,7 +80,7 @@ internal class Program {
 		for (uint y = 1; y <= 2; y++) {
 			for (uint line = 0; line <= 3; line++) {
 				for (uint x = 1; x <= 2; x++) {
-					var cell = core.getCell(player.id, (x, y));
+					ErrorOr<ICell> cell = core.getCell(player.id, (x, y));
 					if (cell.IsError) {
 						return;
 					}
@@ -93,11 +93,17 @@ internal class Program {
 		}
 	}
 
+	private static void printTurn(IPlayer player, Dictionary<uint, IPlayer> players, ICore core) {
+		Console.Clear();
+		Console.WriteLine("The turn of " + player.name);
+		printMap(player, players, core);
+	}
+
 	private static void test() {
 		Core core = new(
 			[
-				("England", Color.Red, [(1,1)]),
-				("France", Color.Blue, [(1,3)]),
+				("England", Color.Red, [(1,1), (1,2)]),
+				("France", Color.Blue, [(2,2)]),
 				// ("Germany", Color.Gray, []),
 				// ("Russia", Color.Green, []),
 				// ("Italy", Color.LightGreen, []),
@@ -122,23 +128,24 @@ internal class Program {
 		);
 
 
-		while (true) {
-			Console.WriteLine("Test\n");
-			var players = core.getAllPlayers();
-			foreach ((uint playerId, IPlayer player) in players) {
-				// Console.Clear();
-				Console.WriteLine("   xd " + playerId);
-				printMap(player, players, core);
-				char input = Console.ReadKey().KeyChar;
-				Console.WriteLine("=> " + (int) input);
-				switch ((int) input) {
-					case 27:
-						return;
-					default:
-						break;
-				}
-			}
-		}
+		var app = new TerminalVersion(core, (2, 2));
+		app.start();
+
+		// while (true) {
+		// 	Dictionary<uint, IPlayer> players = core.getAllPlayers();
+		// 	foreach ((_, IPlayer player) in players) {
+		// 		printTurn(player, players, core);
+		// 		char input = Console.ReadKey().KeyChar;
+		// 		Console.WriteLine("key => " + (int) input);
+		// 		switch ((int) input) {
+		// 			case 27:
+		// 				return;
+		// 			default:
+		// 				break;
+		// 		}
+		// 		_ = Console.ReadKey();
+		// 	}
+		// }
 	}
 }
 

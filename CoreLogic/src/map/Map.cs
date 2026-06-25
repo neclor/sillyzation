@@ -20,6 +20,7 @@ internal class Map {
 	) {
 		ArgumentNullException.ThrowIfNull(cells);
 		ArgumentNullException.ThrowIfNull(connexions);
+		ArgumentNullException.ThrowIfNull(ownerships);
 
 		this.cells = [];
 		graph = new();
@@ -41,6 +42,9 @@ internal class Map {
 		}
 
 		foreach ((uint owner, CellKey[] owned_cells) in ownerships) {
+			if (owned_cells.Length == 0) {
+				throw new InvalidOperationException($"Invalid Game State\nA Player has no Starting owned provinces");
+			}
 			foreach (CellKey owned in owned_cells) {
 				if (!this.cells.TryGetValue(owned, out ICell? cell)) {
 					throw new InvalidOperationException($"Invalid Game State\nCell {owned} does not exist");
