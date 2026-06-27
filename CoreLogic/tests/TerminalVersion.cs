@@ -10,54 +10,54 @@ internal class TerminalVersion {
 	private static readonly (int x, int y) cell_size = (5, 3);
 	private const int minMenuWidth = 32;
 
-	private static readonly Dictionary<Terrain, string[]> backgrounds = new() {
+	private static readonly Dictionary<Terrain, string[][]> backgrounds = new() {
 		{
 			Terrain.Plain, [
-				"\x1b[48;5;107m     \x1b[0m",
-				"\x1b[48;5;106m     \x1b[0m",
-				"\x1b[48;5;107m     \x1b[0m",
+				["\x1b[48;5;107m \x1b[0m", "\x1b[48;5;107m \x1b[0m", "\x1b[48;5;107m \x1b[0m", "\x1b[48;5;107m \x1b[0m", "\x1b[48;5;107m \x1b[0m"],
+				["\x1b[48;5;106m \x1b[0m", "\x1b[48;5;106m \x1b[0m", "\x1b[48;5;106m \x1b[0m", "\x1b[48;5;106m \x1b[0m", "\x1b[48;5;106m \x1b[0m"],
+				["\x1b[48;5;107m \x1b[0m", "\x1b[48;5;107m \x1b[0m", "\x1b[48;5;107m \x1b[0m", "\x1b[48;5;107m \x1b[0m", "\x1b[48;5;107m \x1b[0m"]
 			]
 		},
 		{
 			Terrain.Forest, [
-				"\x1b[38;5;22;48;5;28m ▲ ▲ \x1b[0m",
-				"\x1b[38;5;22;48;5;34m   ▲ \x1b[0m",
-				"\x1b[38;5;22;48;5;28m ▲   \x1b[0m",
+				["\x1b[38;5;22;48;5;28m \x1b[0m", "\x1b[38;5;22;48;5;28m▲\x1b[0m", "\x1b[38;5;22;48;5;28m \x1b[0m", "\x1b[38;5;22;48;5;28m▲\x1b[0m", "\x1b[38;5;22;48;5;28m \x1b[0m"],
+				["\x1b[38;5;22;48;5;34m \x1b[0m", "\x1b[38;5;22;48;5;34m \x1b[0m", "\x1b[38;5;22;48;5;34m \x1b[0m", "\x1b[38;5;22;48;5;34m▲\x1b[0m", "\x1b[38;5;22;48;5;34m \x1b[0m"],
+				["\x1b[38;5;22;48;5;28m \x1b[0m", "\x1b[38;5;22;48;5;28m▲\x1b[0m", "\x1b[38;5;22;48;5;28m \x1b[0m", "\x1b[38;5;22;48;5;28m \x1b[0m", "\x1b[38;5;22;48;5;28m \x1b[0m"]
 			]
 		},
 		{
 			Terrain.Desert, [
-				"\x1b[48;5;221m     \x1b[0m", 
-				"\x1b[48;5;222m     \x1b[0m",
-				"\x1b[48;5;214m     \x1b[0m",
+				["\x1b[48;5;221m \x1b[0m", "\x1b[48;5;221m \x1b[0m", "\x1b[48;5;221m \x1b[0m", "\x1b[48;5;221m \x1b[0m", "\x1b[48;5;221m \x1b[0m"],
+				["\x1b[48;5;222m \x1b[0m", "\x1b[48;5;222m \x1b[0m", "\x1b[48;5;222m \x1b[0m", "\x1b[48;5;222m \x1b[0m", "\x1b[48;5;222m \x1b[0m"],
+				["\x1b[48;5;214m \x1b[0m", "\x1b[48;5;214m \x1b[0m", "\x1b[48;5;214m \x1b[0m", "\x1b[48;5;214m \x1b[0m", "\x1b[48;5;214m \x1b[0m"]
 			]
 		},
 		{
 			Terrain.Tundra, [
-				"\x1b[48;5;253m     \x1b[0m",
-				"\x1b[48;5;195m     \x1b[0m",
-				"\x1b[48;5;254m     \x1b[0m",
+				["\x1b[48;5;253m \x1b[0m", "\x1b[48;5;253m \x1b[0m", "\x1b[48;5;253m \x1b[0m", "\x1b[48;5;253m \x1b[0m", "\x1b[48;5;253m \x1b[0m"],
+				["\x1b[48;5;195m \x1b[0m", "\x1b[48;5;195m \x1b[0m", "\x1b[48;5;195m \x1b[0m", "\x1b[48;5;195m \x1b[0m", "\x1b[48;5;195m \x1b[0m"],
+				["\x1b[48;5;254m \x1b[0m", "\x1b[48;5;254m \x1b[0m", "\x1b[48;5;254m \x1b[0m", "\x1b[48;5;254m \x1b[0m", "\x1b[48;5;254m \x1b[0m"]
 			]
 		},
 		{
 			Terrain.Savanna, [
-				"\x1b[48;5;142m     \x1b[0m",
-				"\x1b[48;5;136m     \x1b[0m",
-				"\x1b[48;5;142m     \x1b[0m", 
+				["\x1b[48;5;142m \x1b[0m", "\x1b[48;5;142m \x1b[0m", "\x1b[48;5;142m \x1b[0m", "\x1b[48;5;142m \x1b[0m", "\x1b[48;5;142m \x1b[0m"],
+				["\x1b[48;5;136m \x1b[0m", "\x1b[48;5;136m \x1b[0m", "\x1b[48;5;136m \x1b[0m", "\x1b[48;5;136m \x1b[0m", "\x1b[48;5;136m \x1b[0m"],
+				["\x1b[48;5;142m \x1b[0m", "\x1b[48;5;142m \x1b[0m", "\x1b[48;5;142m \x1b[0m", "\x1b[48;5;142m \x1b[0m", "\x1b[48;5;142m \x1b[0m"]
 			]
 		},
 		{
 			Terrain.Swamp, [
-				"\x1b[48;5;59m     \x1b[0m",
-				"\x1b[48;5;30m   █ \x1b[0m",
-				"\x1b[48;5;30m █   \x1b[0m",
+				["\x1b[48;5;59m \x1b[0m", "\x1b[48;5;59m \x1b[0m", "\x1b[48;5;59m \x1b[0m", "\x1b[48;5;59m \x1b[0m", "\x1b[48;5;59m \x1b[0m"],
+				["\x1b[48;5;30m \x1b[0m", "\x1b[48;5;30m \x1b[0m", "\x1b[48;5;30m \x1b[0m", "\x1b[48;5;30m█\x1b[0m", "\x1b[48;5;30m \x1b[0m"],
+				["\x1b[48;5;30m \x1b[0m", "\x1b[48;5;30m█\x1b[0m", "\x1b[48;5;30m \x1b[0m", "\x1b[48;5;30m \x1b[0m", "\x1b[48;5;30m \x1b[0m"]
 			]
 		},
 		{
 			Terrain.Jungle, [
-				"\x1b[38;5;22;48;5;34m ♣   \x1b[0m",
-				"\x1b[48;5;28m     \x1b[0m",
-				"\x1b[38;5;22;48;5;34m   ♣ \x1b[0m",
+				["\x1b[38;5;22;48;5;34m \x1b[0m", "\x1b[38;5;22;48;5;34m♣\x1b[0m", "\x1b[38;5;22;48;5;34m \x1b[0m", "\x1b[38;5;22;48;5;34m \x1b[0m", "\x1b[38;5;22;48;5;34m \x1b[0m"],
+				["\x1b[48;5;28m \x1b[0m", "\x1b[48;5;28m \x1b[0m", "\x1b[48;5;28m \x1b[0m", "\x1b[48;5;28m \x1b[0m", "\x1b[48;5;28m \x1b[0m"],
+				["\x1b[38;5;22;48;5;34m \x1b[0m", "\x1b[38;5;22;48;5;34m \x1b[0m", "\x1b[38;5;22;48;5;34m \x1b[0m", "\x1b[38;5;22;48;5;34m♣\x1b[0m", "\x1b[38;5;22;48;5;34m \x1b[0m"]
 			]
 		},
 	};
@@ -79,17 +79,21 @@ internal class TerminalVersion {
 			}
 		}
 
-		List<string> res = [];
+		List<List<string[]>> map = [];
 		for (uint y = 0; y < map_size.y; y++) {
 			for (uint yc = 0; yc < cell_size.y; yc++) {
-				StringBuilder sb = new();
+				List<string[]> line = [];
 				for (uint x = 0; x < map_size.x; x++) {
-					_ = sb.Append(backgrounds[terrains[x][y]][yc]);
+					string[] cell_line = backgrounds[terrains[x][y]][yc];
+					line.AddRange(cell_line);
 				}
-				res.Add(sb.ToString());
+				map.Add(line);
 			}
 		}
-		return res;
+
+		return [.. map.Select(
+			(line) => line.Aggregate("", (acc, cur) => acc + string.Concat(cur)))
+		];
 	}
 
 	private void print(string[] contentMenu, IPlayer player) {
@@ -104,7 +108,12 @@ internal class TerminalVersion {
 		List<string> map = printMap(player);
 
 		StringBuilder sb = new();
-		_ = sb.Append('╔').Append('═', menuWidth).Append('╦').Append('═', mapWidth).AppendLine("╗");
+		_ = sb
+			.Append('╔')
+			.Append('═', menuWidth)
+			.Append('╦')
+			.Append('═', mapWidth)
+			.AppendLine("╗");
 		foreach ((string line, int i) in contentMenu.Select((value, index) => (value, index))) {
 			_ = sb
 				.Append('║')
