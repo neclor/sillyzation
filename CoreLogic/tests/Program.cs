@@ -16,7 +16,7 @@ internal class Program {
 		LocalSession session = new(
 			[
 				(new HumanPlayer(), Country.France, [(1,1), (1,2)]),
-				(new HumanPlayer(), Country.Germany, [(2,2)]),
+				(new HumanPlayer(), Country.Spain, [(2,4)]),
 			],
 			[
 				((1, 1), new Cell((1, 1), "Bruxelles", Terrain.Swamp, 10000000, [])),

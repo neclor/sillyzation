@@ -6,6 +6,7 @@ public enum Color {
 	Orange,
 	Yellow,
 	LightGreen,
+	DarkGreen,
 	Green,
 	LightBlue,
 	Blue,
