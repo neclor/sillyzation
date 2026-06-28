@@ -2,14 +2,14 @@ using ErrorOr;
 
 namespace CoreLogic;
 
-internal class Core : ICore {
+internal class Core<CellKey> : ICore<CellKey> {
 
-	private readonly Map map;
+	private readonly Map<CellKey> map;
 	private readonly Game game;
 
 	public Core(
 		IEnumerable<(string name, Color color, CellKey[] ownership)> players,
-		IEnumerable<(CellKey key, ICell cell)> cells,
+		IEnumerable<(CellKey key, ICell<CellKey> cell)> cells,
 		IEnumerable<(CellKey key1, CellKey key2)> connexions
 	) {
 		game = new(players.Select(p => (p.name, p.color)));
@@ -56,7 +56,7 @@ internal class Core : ICore {
 
 
 	// Cells
-	public ErrorOr<ICell> getCell(PlayerKey playerId, CellKey cellId) {
+	public ErrorOr<ICell<CellKey>> getCell(PlayerKey playerId, CellKey cellId) {
 		// TODO Add player protection
 		return map.getCell(cellId);
 	}

@@ -5,7 +5,7 @@ using ErrorOr;
 using System.Globalization;
 
 internal class TerminalVersion {
-	private ISession session { get; }
+	private ISession<(uint, uint)> session { get; }
 	private (int x, int y) map_size { get; }
 	private Dictionary<uint, IPlayer> players;
 
@@ -72,7 +72,7 @@ internal class TerminalVersion {
 		},
 	};
 
-	public TerminalVersion(ISession session, (int, int) map_size) {
+	public TerminalVersion(ISession<(uint, uint)> session, (int, int) map_size) {
 		this.session = session;
 		this.map_size = map_size;
 		players = session.getAllPlayers();
@@ -100,7 +100,7 @@ internal class TerminalVersion {
 		for (uint x = 0; x < map_size.x; x++) {
 			cells[x] = new (Terrain terrain, uint? ownership)[map_size.y];
 			for (uint y = 0; y < map_size.y; y++) {
-				ErrorOr<ICell> cell = session.getCell(player.id, (x + 1, y + 1));
+				ErrorOr<ICell<(uint, uint)>> cell = session.getCell(player.id, (x + 1, y + 1));
 				if (!cell.IsError) {
 					cells[x][y] = (cell.Value.terrain, cell.Value.owner);
 				}

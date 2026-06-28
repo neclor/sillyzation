@@ -1,6 +1,6 @@
 namespace CoreLogic;
 
-internal class Cell : ICell {
+internal class Cell<CellKey> : ICell<CellKey> {
 
 	public CellKey id { get; }
 	public string name { get; }

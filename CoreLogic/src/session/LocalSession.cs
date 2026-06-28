@@ -3,20 +3,20 @@ using ErrorOr;
 
 namespace session;
 
-internal class LocalSession : ISession {
+internal class LocalSession<CellKey> : ISession<CellKey> {
 	public IPlayer currentPlayer => throw new NotImplementedException();
 
 	public bool gameState => throw new NotImplementedException();
 
-	private ICore core;
+	private ICore<CellKey> core;
 
 	public LocalSession(
 		IEnumerable<(ISessionPlayer session, Country country, CellKey[] start)> players,
-		IEnumerable<(CellKey key, ICell cell)> cells,
+		IEnumerable<(CellKey key, ICell<CellKey> cell)> cells,
 		IEnumerable<(CellKey key1, CellKey key2)> connexions
 	) {
 		Console.WriteLine("Initializing a Multiplayer Local Game");
-		core = new Core(
+		core = new Core<CellKey>(
 			players.Select(p => (
 				p.country.name,
 				p.country.color,
@@ -30,7 +30,7 @@ internal class LocalSession : ISession {
 	}
 
 
-	public ErrorOr<ICell> getCell(uint playerId, CellKey cellId) {
+	public ErrorOr<ICell<CellKey>> getCell(uint playerId, CellKey cellId) {
 		return core.getCell(playerId, cellId);
 	}
 

@@ -1,5 +1,4 @@
 global using PlayerKey = uint;
-global using CellKey = (uint, uint);
 global using UnitKey = uint;
 global using FrontKey = uint;
 global using IGameTick = bool;
@@ -9,7 +8,7 @@ using ErrorOr;
 
 namespace CoreLogic;
 
-public interface ICore {
+public interface ICore<CellKey> {
 	// Game
 	ErrorOr<IGameTick> nextGameTick();
 	ErrorOr<IGameTick> syncGame();
@@ -21,7 +20,7 @@ public interface ICore {
 	ErrorOr<bool> kickPlayer(PlayerKey playerId);
 
 	// Cells
-	ErrorOr<ICell> getCell(uint playerId, CellKey cellId);
+	ErrorOr<ICell<CellKey>> getCell(uint playerId, CellKey cellId);
 
 	// Unit Queue
 	ErrorOr<IUnitQueue> getUnitQueue(PlayerKey playerId);
