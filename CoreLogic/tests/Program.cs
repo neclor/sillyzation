@@ -15,8 +15,8 @@ internal class Program {
 	private static void lanchTerminalTestApp() {
 		LocalSession<(uint, uint)> session = new(
 			[
-				(new HumanPlayer(), Country.France, [(1,1), (1,2)]),
-				(new HumanPlayer(), Country.Spain, [(2,4)]),
+				(new HumanPlayer(), Country.France, [(1,1)]),
+				(new HumanPlayer(), Country.England, [(2,4)]),
 			],
 			[
 				((1, 1), new Cell<(uint, uint)>((1, 1), "Bruxelles", Terrain.Swamp, 10000000, [])),

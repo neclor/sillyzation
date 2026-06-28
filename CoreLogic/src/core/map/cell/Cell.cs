@@ -1,8 +1,8 @@
 namespace CoreLogic;
 
-internal class Cell<CellKey> : ICell<CellKey> {
+internal class Cell<TCellKey> : ICell<TCellKey> where TCellKey : notnull {
 
-	public CellKey id { get; }
+	public TCellKey id { get; }
 	public string name { get; }
 	public PlayerKey? owner { get; set; }
 	public Terrain terrain { get; }
@@ -11,7 +11,7 @@ internal class Cell<CellKey> : ICell<CellKey> {
 	private IList<PlayerKey> isKnownByList { get; set; } = [];
 
 	public Cell(
-		CellKey id,
+		TCellKey id,
 		string name,
 		Terrain terrain,
 		uint population,

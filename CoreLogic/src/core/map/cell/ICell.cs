@@ -15,8 +15,8 @@ public enum Terrain {
 	Jungle,
 }
 
-public interface ICell<CellKey> {
-	CellKey id { get; }
+public interface ICell<TCellKey> where TCellKey : notnull {
+	TCellKey id { get; }
 	string name { get; }
 	PlayerKey? owner { get; set; }
 	Terrain terrain { get; }

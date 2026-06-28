@@ -8,7 +8,7 @@ using ErrorOr;
 
 namespace CoreLogic;
 
-public interface ICore<CellKey> {
+public interface ICore<TCellKey> where TCellKey : notnull {
 	// Game
 	ErrorOr<IGameTick> nextGameTick();
 	ErrorOr<IGameTick> syncGame();
@@ -20,7 +20,7 @@ public interface ICore<CellKey> {
 	ErrorOr<bool> kickPlayer(PlayerKey playerId);
 
 	// Cells
-	ErrorOr<ICell<CellKey>> getCell(uint playerId, CellKey cellId);
+	ErrorOr<ICell<TCellKey>> getCell(uint playerId, TCellKey cellId);
 
 	// Unit Queue
 	ErrorOr<IUnitQueue> getUnitQueue(PlayerKey playerId);
@@ -32,7 +32,7 @@ public interface ICore<CellKey> {
 	// Unit
 	ErrorOr<IUnit> getUnit(PlayerKey playerId, UnitKey unitId);
 	ErrorOr<IEnumerable<IUnit>> getAllUnits(PlayerKey playerId);
-	ErrorOr<bool> moveUnit(PlayerKey playerId, UnitKey unitId, CellKey cellId);
+	ErrorOr<bool> moveUnit(PlayerKey playerId, UnitKey unitId, TCellKey cellId);
 	ErrorOr<bool> assignUnitToFront(PlayerKey playerId, UnitKey unitId, FrontKey frontId);
 	ErrorOr<bool> deleteUnit(PlayerKey playerId, UnitKey unitId);
 
@@ -41,6 +41,6 @@ public interface ICore<CellKey> {
 
 	// Front
 	ErrorOr<IFront> getFront(PlayerKey playerId, FrontKey frontId);
-	ErrorOr<bool> createFront(PlayerKey playerId, CellKey cellId1, CellKey cellId2);
-	ErrorOr<bool> moveFront(PlayerKey playerId, FrontKey frontId, CellKey cellId, bool side);
+	ErrorOr<bool> createFront(PlayerKey playerId, TCellKey cellId1, TCellKey cellId2);
+	ErrorOr<bool> moveFront(PlayerKey playerId, FrontKey frontId, TCellKey cellId, bool side);
 }

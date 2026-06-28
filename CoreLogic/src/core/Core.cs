@@ -2,19 +2,19 @@ using ErrorOr;
 
 namespace CoreLogic;
 
-internal class Core<CellKey> : ICore<CellKey> {
+internal class Core<TCellKey> : ICore<TCellKey> where TCellKey : notnull {
 
-	private readonly Map<CellKey> map;
+	private readonly Map<TCellKey> map;
 	private readonly Game game;
 
 	public Core(
-		IEnumerable<(string name, Color color, CellKey[] ownership)> players,
-		IEnumerable<(CellKey key, ICell<CellKey> cell)> cells,
-		IEnumerable<(CellKey key1, CellKey key2)> connexions
+		IEnumerable<(string name, Color color, TCellKey[] ownership)> players,
+		IEnumerable<(TCellKey key, ICell<TCellKey> cell)> cells,
+		IEnumerable<(TCellKey key1, TCellKey key2)> connexions
 	) {
 		game = new(players.Select(p => (p.name, p.color)));
 
-		IEnumerable<(uint playerId, CellKey[] cells)> ownerships = players
+		IEnumerable<(uint playerId, TCellKey[] cells)> ownerships = players
 			.Join(
 				game.getAllPlayers(),
 				playerInput => playerInput.name,
@@ -56,7 +56,7 @@ internal class Core<CellKey> : ICore<CellKey> {
 
 
 	// Cells
-	public ErrorOr<ICell<CellKey>> getCell(PlayerKey playerId, CellKey cellId) {
+	public ErrorOr<ICell<TCellKey>> getCell(PlayerKey playerId, TCellKey cellId) {
 		// TODO Add player protection
 		return map.getCell(cellId);
 	}
@@ -95,7 +95,7 @@ internal class Core<CellKey> : ICore<CellKey> {
 		return new[] { new Unit() };
 	}
 
-	public ErrorOr<bool> moveUnit(PlayerKey playerId, uint unitId, CellKey cellId) {
+	public ErrorOr<bool> moveUnit(PlayerKey playerId, uint unitId, TCellKey cellId) {
 		return true;
 	}
 
@@ -121,11 +121,11 @@ internal class Core<CellKey> : ICore<CellKey> {
 		return new Front();
 	}
 
-	public ErrorOr<bool> createFront(PlayerKey playerId, CellKey cellId1, CellKey cellId2) {
+	public ErrorOr<bool> createFront(PlayerKey playerId, TCellKey cellId1, TCellKey cellId2) {
 		return true;
 	}
 
-	public ErrorOr<bool> moveFront(PlayerKey playerId, uint frontId, CellKey cellId, bool side) {
+	public ErrorOr<bool> moveFront(PlayerKey playerId, uint frontId, TCellKey cellId, bool side) {
 		return true;
 	}
 }

@@ -4,19 +4,19 @@ using QuikGraph.Algorithms;
 
 namespace CoreLogic;
 
-internal class Map<CellKey> {
+internal class Map<TCellKey> where TCellKey : notnull {
 	// Stores the keys inside a graph
-	private readonly UndirectedGraph<CellKey, TaggedEdge<CellKey, uint>> graph;
+	private readonly UndirectedGraph<TCellKey, TaggedEdge<TCellKey, uint>> graph;
 	// Stores a dictionary of both key and Cells
-	private readonly Dictionary<CellKey, ICell<CellKey>> cells;
+	private readonly Dictionary<TCellKey, ICell<TCellKey>> cells;
 	// Way for algorithm to use the weight
-	private readonly Func<TaggedEdge<CellKey, uint>, double> edgeWeights
+	private readonly Func<TaggedEdge<TCellKey, uint>, double> edgeWeights
 		= new(edge => edge.Tag);
 
 	public Map(
-		IEnumerable<(CellKey key, ICell<CellKey> cell)> cells,
-		IEnumerable<(CellKey key1, CellKey key2)> connexions,
-		IEnumerable<(uint playerId, CellKey[] cells)> ownerships
+		IEnumerable<(TCellKey key, ICell<TCellKey> cell)> cells,
+		IEnumerable<(TCellKey key1, TCellKey key2)> connexions,
+		IEnumerable<(uint playerId, TCellKey[] cells)> ownerships
 	) {
 		ArgumentNullException.ThrowIfNull(cells);
 		ArgumentNullException.ThrowIfNull(connexions);
@@ -30,7 +30,7 @@ internal class Map<CellKey> {
 			_ = graph.AddVertex(key);
 		}
 
-		foreach ((CellKey key1, CellKey key2) in connexions) {
+		foreach ((TCellKey key1, TCellKey key2) in connexions) {
 			uint weight = calculateConnexionWeigth(this.cells[key1])
 				+ calculateConnexionWeigth(this.cells[key2]);
 
@@ -41,12 +41,12 @@ internal class Map<CellKey> {
 			}
 		}
 
-		foreach ((uint owner, CellKey[] owned_cells) in ownerships) {
+		foreach ((uint owner, TCellKey[] owned_cells) in ownerships) {
 			if (owned_cells.Length == 0) {
 				throw new InvalidOperationException($"Invalid Game State\nA Player has no Starting owned provinces");
 			}
-			foreach (CellKey owned in owned_cells) {
-				if (!this.cells.TryGetValue(owned, out ICell<CellKey>? cell)) {
+			foreach (TCellKey owned in owned_cells) {
+				if (!this.cells.TryGetValue(owned, out ICell<TCellKey>? cell)) {
 					throw new InvalidOperationException($"Invalid Game State\nCell {owned} does not exist");
 				}
 				if (cell.owner != null) {
@@ -57,7 +57,7 @@ internal class Map<CellKey> {
 		}
 	}
 
-	private static uint calculateConnexionWeigth(ICell<CellKey> cell) {
+	private static uint calculateConnexionWeigth(ICell<TCellKey> cell) {
 		return cell.terrain switch {
 			Terrain.Plain => 1,
 			Terrain.Forest => 3,
@@ -70,7 +70,7 @@ internal class Map<CellKey> {
 		};
 	}
 
-	public ErrorOr<ICell<CellKey>> getCell(CellKey key) {
+	public ErrorOr<ICell<TCellKey>> getCell(TCellKey key) {
 		try {
 			return cells[key].ToErrorOr();
 		}
@@ -82,9 +82,9 @@ internal class Map<CellKey> {
 		}
 	}
 
-	public IEnumerable<(CellKey key, ICell<CellKey> cell)> getNeightbours(CellKey key) {
+	public IEnumerable<(TCellKey key, ICell<TCellKey> cell)> getNeightbours(TCellKey key) {
 		foreach (var edge in graph.AdjacentEdges(key)) {
-			CellKey neightbour = edge.Source.Equals(key)
+			TCellKey neightbour = edge.Source.Equals(key)
 				? edge.Target
 				: edge.Source;
 
@@ -92,7 +92,7 @@ internal class Map<CellKey> {
 		}
 	}
 
-	public ErrorOr<IEnumerable<ICell<CellKey>>> getShortestPath(CellKey origin, CellKey destination) {
+	public ErrorOr<IEnumerable<ICell<TCellKey>>> getShortestPath(TCellKey origin, TCellKey destination) {
 		var algorithm = graph.ShortestPathsDijkstra(edgeWeights, origin);
 		if (!algorithm(destination, out var path)) {
 			return Error.NotFound("Path does not exist");

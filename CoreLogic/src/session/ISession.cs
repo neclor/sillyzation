@@ -3,7 +3,7 @@ using ErrorOr;
 
 namespace session;
 
-internal interface ISession<CellKey> {
+internal interface ISession<TCellKey> where TCellKey : notnull {
 	// Give the UI the player to display (will always be the same if you are in
 	// multiplayer on the internet or on a singleplayer game)
 	IPlayer currentPlayer { get; }
@@ -14,5 +14,5 @@ internal interface ISession<CellKey> {
 	ErrorOr<IPlayer> getPlayer(PlayerKey playerId);
 	Dictionary<uint, IPlayer> getAllPlayers();
 
-	ErrorOr<ICell<CellKey>> getCell(uint playerId, CellKey cellId);
+	ErrorOr<ICell<TCellKey>> getCell(uint playerId, TCellKey cellId);
 }
