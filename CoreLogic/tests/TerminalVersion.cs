@@ -1,15 +1,18 @@
 using System.Text;
+using session;
 using CoreLogic;
 using ErrorOr;
+using System.Globalization;
 
 internal class TerminalVersion {
-	private ICore core { get; }
+	private ISession session { get; }
 	private (int x, int y) map_size { get; }
 	private Dictionary<uint, IPlayer> players;
 
 	private static readonly (int x, int y) cell_size = (5, 3);
 	private const int minMenuWidth = 32;
 
+	private const string RESET = "\x1b[0m";
 	private static readonly Dictionary<Terrain, string[][]> backgrounds = new() {
 		{
 			Terrain.Plain, [
@@ -62,10 +65,10 @@ internal class TerminalVersion {
 		},
 	};
 
-	public TerminalVersion(ICore core, (int, int) map_size) {
-		this.core = core;
+	public TerminalVersion(ISession session, (int, int) map_size) {
+		this.session = session;
 		this.map_size = map_size;
-		players = core.getAllPlayers();
+		players = session.getAllPlayers();
 	}
 
 	private List<string> printMap(IPlayer player) {
@@ -73,7 +76,7 @@ internal class TerminalVersion {
 		for (uint x = 0; x < map_size.x; x++) {
 			terrains[x] = new Terrain[map_size.y];
 			for (uint y = 0; y < map_size.y; y++) {
-				ErrorOr<ICell> cell = core.getCell(player.id, (x + 1, y + 1));
+				ErrorOr<ICell> cell = session.getCell(player.id, (x + 1, y + 1));
 				Terrain terrain = cell.IsError ? Terrain.Plain : cell.Value.terrain;
 				terrains[x][y] = terrain;
 			}
@@ -96,9 +99,9 @@ internal class TerminalVersion {
 		];
 	}
 
-	private void print(string[] contentMenu, IPlayer player) {
+	private void print((string content, string color)[] contentMenu, IPlayer player) {
 		int longest = (contentMenu.Length != 0)
-			? contentMenu.Max((cur) => cur.Length)
+			? contentMenu.Max((cur) => cur.content.Length)
 			: 0;
 		int menuWidth = Math.Max(longest, minMenuWidth);
 		int mapWidth = map_size.x * cell_size.x;
@@ -114,11 +117,8 @@ internal class TerminalVersion {
 			.Append('╦')
 			.Append('═', mapWidth)
 			.AppendLine("╗");
-		foreach ((string line, int i) in contentMenu.Select((value, index) => (value, index))) {
-			_ = sb
-				.Append('║')
-				.Append(line.PadRight(menuWidth))
-				.Append('║');
+		foreach (((string content, string color), int i) in contentMenu.Select((value, index) => (value, index))) {
+			_ = sb.Append(CultureInfo.InvariantCulture, $"║{color}{content.PadRight(menuWidth)}{RESET}║");
 			if (i >= mapHeight) {
 				_ = sb
 					.Append(' ', mapWidth)
@@ -135,9 +135,7 @@ internal class TerminalVersion {
 				_ = sb
 					.Append('║')
 					.Append(' ', menuWidth)
-					.Append('║')
-					.Append(map[i])
-					.AppendLine("║");
+					.AppendLine(CultureInfo.InvariantCulture, $"║{map[i]}║");
 			}
 		}
 		_ = sb
@@ -155,7 +153,7 @@ internal class TerminalVersion {
 
 	public void start() {
 		IPlayer testPlayer = players[1];
-		print(["Test", "Hello World"], testPlayer);
+		print([("Test", ""), ("Hello World", "\x1b[48;5;214m")], testPlayer);
 		// print(["Test", "Hello World", "Hello World", "Hello World", "Hello World", "Hello World", "Hello World", "Hello World", "Hello World", "Hello World", "Hello World", "Hello World", "Hello World", "Hello World", "Hello World", "Hello World", "Hello World", "Hello World", "Hello World", "Hello World"], testPlayer);
 		// while (true) {
 		// 	// foreach ((_, IPlayer player) in players) {
