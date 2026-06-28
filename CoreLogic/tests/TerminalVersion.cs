@@ -3,7 +3,7 @@ using session;
 using CoreLogic;
 using ErrorOr;
 using System.Globalization;
-using AC = AnsiiColors;
+using AC = AnsiColors;
 
 internal class TerminalVersion {
 	private ISession<(uint, uint)> session { get; }
@@ -16,58 +16,58 @@ internal class TerminalVersion {
 	private static readonly Dictionary<Terrain, string[][]> backgrounds = new() {
 		{
 			Terrain.Plain, [
-				[$"{AC.BG_GRASS_MED} {AC.RESET}", $"{AC.BG_GRASS_MED} {AC.RESET}", $"{AC.FG_OLIVE_GREEN}{AC.BG_GRASS_MED}.{AC.RESET}", $"{AC.BG_GRASS_MED} {AC.RESET}", $"{AC.BG_GRASS_MED} {AC.RESET}"],
-				[$"{AC.BG_GRASS_LIGHT} {AC.RESET}", $"{AC.FG_DARK_YELLOW}{AC.BG_GRASS_LIGHT}~{AC.RESET}", $"{AC.BG_GRASS_LIGHT} {AC.RESET}", $"{AC.BG_GRASS_LIGHT} {AC.RESET}", $"{AC.BG_GRASS_LIGHT} {AC.RESET}"],
-				[$"{AC.BG_GRASS_MED} {AC.RESET}", $"{AC.BG_GRASS_MED} {AC.RESET}", $"{AC.BG_GRASS_MED} {AC.RESET}", $"{AC.FG_OLIVE_GREEN}{AC.BG_GRASS_MED}.{AC.RESET}", $"{AC.BG_GRASS_MED} {AC.RESET}"],
-				[$"{AC.BG_SANDY_BROWN} {AC.RESET}", $"{AC.BG_SANDY_BROWN} {AC.RESET}", $"{AC.BG_SANDY_BROWN} {AC.RESET}", $"{AC.BG_SANDY_BROWN} {AC.RESET}", $"{AC.BG_SANDY_BROWN} {AC.RESET}"]
-			]
-		},
-		{
-			Terrain.Forest, [
-				[$"{AC.FG_DARK_GREEN}{AC.BG_FOREST_MED}▲{AC.RESET}", $"{AC.FG_MED_GREEN}{AC.BG_FOREST_DARK} {AC.RESET}", $"{AC.FG_DARK_GREEN}{AC.BG_FOREST_MED}▲{AC.RESET}", $"{AC.FG_MED_GREEN}{AC.BG_FOREST_DARK} {AC.RESET}", $"{AC.FG_DARK_GREEN}{AC.BG_FOREST_MED}▲{AC.RESET}"],
-				[$"{AC.FG_LIGHT_GREEN}{AC.BG_FOREST_DARK} {AC.RESET}", $"{AC.FG_DARK_GREEN}{AC.BG_FOREST_LIGHT}▲{AC.RESET}", $"{AC.FG_LIGHT_GREEN}{AC.BG_FOREST_DARK} {AC.RESET}", $"{AC.FG_DARK_GREEN}{AC.BG_FOREST_LIGHT}▲{AC.RESET}", $"{AC.FG_LIGHT_GREEN}{AC.BG_FOREST_DARK} {AC.RESET}"],
-				[$"{AC.FG_DARK_GREEN}{AC.BG_FOREST_MED}▲{AC.RESET}", $"{AC.FG_MED_GREEN}{AC.BG_FOREST_DARK} {AC.RESET}", $"{AC.FG_DARK_GREEN}{AC.BG_FOREST_MED}▲{AC.RESET}", $"{AC.FG_MED_GREEN}{AC.BG_FOREST_DARK} {AC.RESET}", $"{AC.FG_DARK_GREEN}{AC.BG_FOREST_MED}▲{AC.RESET}"],
-				[$"{AC.FG_MUD_BROWN}{AC.BG_FOREST_DARK}▄{AC.RESET}", $"{AC.FG_MUD_BROWN}{AC.BG_FOREST_DARK}▄{AC.RESET}", $"{AC.FG_MUD_BROWN}{AC.BG_FOREST_DARK}▄{AC.RESET}", $"{AC.FG_MUD_BROWN}{AC.BG_FOREST_DARK}▄{AC.RESET}", $"{AC.FG_MUD_BROWN}{AC.BG_FOREST_DARK}▄{AC.RESET}"]
-			]
-		},
-		{
-			Terrain.Desert, [
-				[$"{AC.BG_DESERT_LIGHT} {AC.RESET}", $"{AC.BG_DESERT_LIGHT} {AC.RESET}", $"{AC.FG_LIGHT_ORANGE}{AC.BG_DESERT_LIGHT}~{AC.RESET}", $"{AC.BG_DESERT_LIGHT} {AC.RESET}", $"{AC.BG_DESERT_LIGHT} {AC.RESET}"],
-				[$"{AC.FG_SAND_YELLOW}{AC.BG_DESERT_SAND}▄{AC.RESET}", $"{AC.FG_SAND_YELLOW}{AC.BG_DESERT_SAND}█{AC.RESET}", $"{AC.BG_DESERT_SAND} {AC.RESET}", $"{AC.BG_DESERT_SAND} {AC.RESET}", $"{AC.FG_SAND_YELLOW}{AC.BG_DESERT_SAND}▄{AC.RESET}"],
-				[$"{AC.BG_DESERT_MID} {AC.RESET}", $"{AC.BG_DESERT_MID} {AC.RESET}", $"{AC.FG_GOLD_ORANGE}{AC.BG_DESERT_MID}~{AC.RESET}", $"{AC.BG_DESERT_MID} {AC.RESET}", $"{AC.BG_DESERT_MID} {AC.RESET}"],
-				[$"{AC.BG_DARK_BROWN} {AC.RESET}", $"{AC.BG_DARK_BROWN} {AC.RESET}", $"{AC.BG_DARK_BROWN} {AC.RESET}", $"{AC.BG_DARK_BROWN} {AC.RESET}", $"{AC.BG_DARK_BROWN} {AC.RESET}"]
-			]
-		},
-		{
-			Terrain.Tundra, [
-				[$"{AC.BG_TUNDRA_LIGHT} {AC.RESET}", $"{AC.FG_WHITE}{AC.BG_TUNDRA_LIGHT}*{AC.RESET}", $"{AC.BG_TUNDRA_LIGHT} {AC.RESET}", $"{AC.BG_TUNDRA_LIGHT} {AC.RESET}", $"{AC.BG_TUNDRA_LIGHT} {AC.RESET}"],
-				[$"{AC.BG_ICE_BLUE} {AC.RESET}", $"{AC.BG_ICE_BLUE} {AC.RESET}", $"{AC.FG_WHITE}{AC.BG_ICE_BLUE}-{AC.RESET}", $"{AC.BG_ICE_BLUE} {AC.RESET}", $"{AC.FG_WHITE}{AC.BG_ICE_BLUE}*{AC.RESET}"],
-				[$"{AC.FG_LIGHT_GRAY}{AC.BG_TUNDRA_SNOW}▄{AC.RESET}", $"{AC.BG_TUNDRA_SNOW} {AC.RESET}", $"{AC.BG_TUNDRA_SNOW} {AC.RESET}", $"{AC.FG_LIGHT_GRAY}{AC.BG_TUNDRA_SNOW}▄{AC.RESET}", $"{AC.BG_TUNDRA_SNOW} {AC.RESET}"],
-				[$"{AC.BG_TUNDRA_DARK} {AC.RESET}", $"{AC.BG_TUNDRA_DARK} {AC.RESET}", $"{AC.BG_TUNDRA_DARK} {AC.RESET}", $"{AC.BG_TUNDRA_DARK} {AC.RESET}", $"{AC.BG_TUNDRA_DARK} {AC.RESET}"]
-			]
-		},
-		{
-			Terrain.Savanna, [
-				[$"{AC.BG_SAVANNA_DRY} {AC.RESET}", $"{AC.FG_SANDY_BROWN}{AC.BG_SAVANNA_DRY}┵{AC.RESET}", $"{AC.BG_SAVANNA_DRY} {AC.RESET}", $"{AC.BG_SAVANNA_DRY} {AC.RESET}", $"{AC.BG_SAVANNA_DRY} {AC.RESET}"],
-				[$"{AC.BG_SAVANNA_MED} {AC.RESET}", $"{AC.BG_SAVANNA_MED} {AC.RESET}", $"{AC.BG_SAVANNA_MED} {AC.RESET}", $"{AC.FG_DARK_BROWN}{AC.BG_SAVANNA_MED}┵{AC.RESET}", $"{AC.BG_SAVANNA_MED} {AC.RESET}"],
-				[$"{AC.FG_SANDY_BROWN}{AC.BG_SAVANNA_DRY}┵{AC.RESET}", $"{AC.BG_SAVANNA_DRY} {AC.RESET}", $"{AC.BG_SAVANNA_DRY} {AC.RESET}", $"{AC.BG_SAVANNA_DRY} {AC.RESET}", $"{AC.FG_SANDY_BROWN}{AC.BG_SAVANNA_DRY}┵{AC.RESET}"],
-				[$"{AC.BG_DARK_BROWN} {AC.RESET}", $"{AC.BG_DARK_BROWN} {AC.RESET}", $"{AC.BG_DARK_BROWN} {AC.RESET}", $"{AC.BG_DARK_BROWN} {AC.RESET}", $"{AC.BG_DARK_BROWN} {AC.RESET}"]
+				[$"{AC.BG_PLAIN_1}  ", $"{AC.BG_PLAIN_2}  ", $"{AC.BG_PLAIN_3}  ", $"{AC.BG_PLAIN_4}  ", $"{AC.BG_PLAIN_1}  "],
+				[$"{AC.BG_PLAIN_4}  ", $"{AC.BG_PLAIN_3}  ", $"{AC.BG_PLAIN_2}  ", $"{AC.BG_PLAIN_1}  ", $"{AC.BG_PLAIN_2}  "],
+				[$"{AC.BG_PLAIN_2}  ", $"{AC.BG_PLAIN_1}  ", $"{AC.BG_PLAIN_4}  ", $"{AC.BG_PLAIN_3}  ", $"{AC.BG_PLAIN_4}  "],
+				[$"{AC.BG_PLAIN_3}  ", $"{AC.BG_PLAIN_4}  ", $"{AC.BG_PLAIN_1}  ", $"{AC.BG_PLAIN_2}  ", $"{AC.BG_PLAIN_3}  "]
 			]
 		},
 		{
 			Terrain.Swamp, [
-				[$"{AC.BG_MUD_GRAY} {AC.RESET}", $"{AC.FG_CHARCOAL}{AC.BG_MUD_GRAY}░{AC.RESET}", $"{AC.BG_MUD_GRAY} {AC.RESET}", $"{AC.BG_MUD_GRAY} {AC.RESET}", $"{AC.FG_CHARCOAL}{AC.BG_MUD_GRAY}░{AC.RESET}"],
-				[$"{AC.FG_DARK_GREEN}{AC.BG_SWAMP_WATER}█{AC.RESET}", $"{AC.BG_SWAMP_WATER} {AC.RESET}", $"{AC.FG_DEEP_BLUE}{AC.BG_SWAMP_WATER}~{AC.RESET}", $"{AC.BG_SWAMP_WATER} {AC.RESET}", $"{AC.BG_SWAMP_WATER} {AC.RESET}"],
-				[$"{AC.BG_SWAMP_WATER} {AC.RESET}", $"{AC.BG_SWAMP_WATER} {AC.RESET}", $"{AC.BG_SWAMP_WATER} {AC.RESET}", $"{AC.FG_DARK_GREEN}{AC.BG_SWAMP_WATER}█{AC.RESET}", $"{AC.BG_SWAMP_WATER} {AC.RESET}"],
-				[$"{AC.BG_DEEP_BLUE} {AC.RESET}", $"{AC.BG_DEEP_BLUE} {AC.RESET}", $"{AC.BG_DEEP_BLUE} {AC.RESET}", $"{AC.BG_DEEP_BLUE} {AC.RESET}", $"{AC.BG_DEEP_BLUE} {AC.RESET}"]
+				[$"{AC.BG_SWAMP_1}  ", $"{AC.BG_SWAMP_2}  ", $"{AC.BG_SWAMP_3}  ", $"{AC.BG_SWAMP_4}  ", $"{AC.BG_SWAMP_1}  "],
+				[$"{AC.BG_SWAMP_4}  ", $"{AC.BG_SWAMP_3}  ", $"{AC.BG_SWAMP_2}  ", $"{AC.BG_SWAMP_1}  ", $"{AC.BG_SWAMP_2}  "],
+				[$"{AC.BG_SWAMP_2}  ", $"{AC.BG_SWAMP_1}  ", $"{AC.BG_SWAMP_4}  ", $"{AC.BG_SWAMP_3}  ", $"{AC.BG_SWAMP_4}  "],
+				[$"{AC.BG_SWAMP_3}  ", $"{AC.BG_SWAMP_4}  ", $"{AC.BG_SWAMP_1}  ", $"{AC.BG_SWAMP_2}  ", $"{AC.BG_SWAMP_3}  "]
+			]
+		},
+		{
+			Terrain.Forest, [
+				[$"{AC.BG_FOREST_1}  ", $"{AC.BG_FOREST_2}  ", $"{AC.BG_FOREST_3}  ", $"{AC.BG_FOREST_4}  ", $"{AC.BG_FOREST_1}  "],
+				[$"{AC.BG_FOREST_4}  ", $"{AC.BG_FOREST_3}  ", $"{AC.BG_FOREST_2}  ", $"{AC.BG_FOREST_1}  ", $"{AC.BG_FOREST_2}  "],
+				[$"{AC.BG_FOREST_2}  ", $"{AC.BG_FOREST_1}  ", $"{AC.BG_FOREST_4}  ", $"{AC.BG_FOREST_3}  ", $"{AC.BG_FOREST_4}  "],
+				[$"{AC.BG_FOREST_3}  ", $"{AC.BG_FOREST_4}  ", $"{AC.BG_FOREST_1}  ", $"{AC.BG_FOREST_2}  ", $"{AC.BG_FOREST_3}  "]
+			]
+		},
+		{
+			Terrain.Desert, [
+				[$"{AC.BG_DESERT_1}  ", $"{AC.BG_DESERT_2}  ", $"{AC.BG_DESERT_3}  ", $"{AC.BG_DESERT_4}  ", $"{AC.BG_DESERT_1}  "],
+				[$"{AC.BG_DESERT_4}  ", $"{AC.BG_DESERT_3}  ", $"{AC.BG_DESERT_2}  ", $"{AC.BG_DESERT_1}  ", $"{AC.BG_DESERT_2}  "],
+				[$"{AC.BG_DESERT_2}  ", $"{AC.BG_DESERT_1}  ", $"{AC.BG_DESERT_4}  ", $"{AC.BG_DESERT_3}  ", $"{AC.BG_DESERT_4}  "],
+				[$"{AC.BG_DESERT_3}  ", $"{AC.BG_DESERT_4}  ", $"{AC.BG_DESERT_1}  ", $"{AC.BG_DESERT_2}  ", $"{AC.BG_DESERT_3}  "]
+			]
+		},
+		{
+			Terrain.Tundra, [
+				[$"{AC.BG_TUNDRA_1}  ", $"{AC.BG_TUNDRA_2}  ", $"{AC.BG_TUNDRA_3}  ", $"{AC.BG_TUNDRA_4}  ", $"{AC.BG_TUNDRA_1}  "],
+				[$"{AC.BG_TUNDRA_4}  ", $"{AC.BG_TUNDRA_3}  ", $"{AC.BG_TUNDRA_2}  ", $"{AC.BG_TUNDRA_1}  ", $"{AC.BG_TUNDRA_2}  "],
+				[$"{AC.BG_TUNDRA_2}  ", $"{AC.BG_TUNDRA_1}  ", $"{AC.BG_TUNDRA_4}  ", $"{AC.BG_TUNDRA_3}  ", $"{AC.BG_TUNDRA_4}  "],
+				[$"{AC.BG_TUNDRA_3}  ", $"{AC.BG_TUNDRA_4}  ", $"{AC.BG_TUNDRA_1}  ", $"{AC.BG_TUNDRA_2}  ", $"{AC.BG_TUNDRA_3}  "]
+			]
+		},
+		{
+			Terrain.Savanna, [
+				[$"{AC.BG_SAVANNA_1}  ", $"{AC.BG_SAVANNA_2}  ", $"{AC.BG_SAVANNA_3}  ", $"{AC.BG_SAVANNA_4}  ", $"{AC.BG_SAVANNA_1}  "],
+				[$"{AC.BG_SAVANNA_4}  ", $"{AC.BG_SAVANNA_3}  ", $"{AC.BG_SAVANNA_2}  ", $"{AC.BG_SAVANNA_1}  ", $"{AC.BG_SAVANNA_2}  "],
+				[$"{AC.BG_SAVANNA_2}  ", $"{AC.BG_SAVANNA_1}  ", $"{AC.BG_SAVANNA_4}  ", $"{AC.BG_SAVANNA_3}  ", $"{AC.BG_SAVANNA_4}  "],
+				[$"{AC.BG_SAVANNA_3}  ", $"{AC.BG_SAVANNA_4}  ", $"{AC.BG_SAVANNA_1}  ", $"{AC.BG_SAVANNA_2}  ", $"{AC.BG_SAVANNA_3}  "]
 			]
 		},
 		{
 			Terrain.Jungle, [
-				[$"{AC.FG_MED_GREEN}{AC.BG_FOREST_LIGHT}♣{AC.RESET}", $"{AC.BG_FOREST_LIGHT} {AC.RESET}", $"{AC.FG_DARK_GREEN}{AC.BG_FOREST_LIGHT}▓{AC.RESET}", $"{AC.BG_FOREST_LIGHT} {AC.RESET}", $"{AC.FG_MED_GREEN}{AC.BG_FOREST_LIGHT}♣{AC.RESET}"],
-				[$"{AC.BG_FOREST_MED} {AC.RESET}", $"{AC.FG_LIGHT_GREEN}{AC.BG_FOREST_MED}♣{AC.RESET}", $"{AC.BG_FOREST_MED} {AC.RESET}", $"{AC.BG_FOREST_MED} {AC.RESET}", $"{AC.BG_FOREST_MED} {AC.RESET}"],
-				[$"{AC.FG_DARK_GREEN}{AC.BG_FOREST_LIGHT}▓{AC.RESET}", $"{AC.BG_FOREST_LIGHT} {AC.RESET}", $"{AC.BG_FOREST_LIGHT} {AC.RESET}", $"{AC.FG_MED_GREEN}{AC.BG_FOREST_LIGHT}♣{AC.RESET}", $"{AC.BG_FOREST_LIGHT} {AC.RESET}"],
-				[$"{AC.BG_FOREST_DARK} {AC.RESET}", $"{AC.BG_FOREST_DARK} {AC.RESET}", $"{AC.BG_FOREST_DARK} {AC.RESET}", $"{AC.BG_FOREST_DARK} {AC.RESET}", $"{AC.BG_FOREST_DARK} {AC.RESET}"]
+				[$"{AC.BG_JUNGLE_1}  ", $"{AC.BG_JUNGLE_2}  ", $"{AC.BG_JUNGLE_3}  ", $"{AC.BG_JUNGLE_4}  ", $"{AC.BG_JUNGLE_1}  "],
+				[$"{AC.BG_JUNGLE_4}  ", $"{AC.BG_JUNGLE_3}  ", $"{AC.BG_JUNGLE_2}  ", $"{AC.BG_JUNGLE_1}  ", $"{AC.BG_JUNGLE_2}  "],
+				[$"{AC.BG_JUNGLE_2}  ", $"{AC.BG_JUNGLE_1}  ", $"{AC.BG_JUNGLE_4}  ", $"{AC.BG_JUNGLE_3}  ", $"{AC.BG_JUNGLE_4}  "],
+				[$"{AC.BG_JUNGLE_3}  ", $"{AC.BG_JUNGLE_4}  ", $"{AC.BG_JUNGLE_1}  ", $"{AC.BG_JUNGLE_2}  ", $"{AC.BG_JUNGLE_3}  "]
 			]
 		},
 	};
@@ -117,7 +117,7 @@ internal class TerminalVersion {
 			for (uint yc = 0; yc < cell_size.y; yc++) {
 				List<string[]> line = [];
 				for (uint x = 0; x < map_size.x; x++) {
-					string[] cell_line = [.. backgrounds[cells[x][y].terrain][yc]];
+					string[] cell_line = [.. backgrounds[cells[x][y].terrain][yc].Select(e => $"{e}{AC.RESET}")];
 					uint? current_owner = cells[x][y].ownership;
 
 					if (current_owner.HasValue) {
@@ -125,22 +125,22 @@ internal class TerminalVersion {
 						if (yc == 0) {
 							if (!(y > 0) || cells[x][y - 1].ownership != current_owner) {
 								for (int i = 0; i < cell_line.Length; i++) {
-									cell_line[i] = $"{p_color} {AC.RESET}";
+									cell_line[i] = $"{p_color}  {AC.RESET}";
 								}
 							}
 						}
 						if (yc == cell_size.y - 1) {
 							if (!(y < map_size.y - 1) || cells[x][y + 1].ownership != current_owner) {
 								for (int i = 0; i < cell_line.Length; i++) {
-									cell_line[i] = $"{p_color} {AC.RESET}";
+									cell_line[i] = $"{p_color}  {AC.RESET}";
 								}
 							}
 						}
 						if (!(x > 0) || cells[x - 1][y].ownership != current_owner) {
-							cell_line[0] = $"{p_color} {AC.RESET}";
+							cell_line[0] = $"{p_color}  {AC.RESET}";
 						}
 						if (!(x < map_size.x - 1) || cells[x + 1][y].ownership != current_owner) {
-							cell_line[^1] = $"{p_color} {AC.RESET}";
+							cell_line[^1] = $"{p_color}  {AC.RESET}";
 						}
 					}
 
@@ -160,7 +160,7 @@ internal class TerminalVersion {
 			? contentMenu.Max((cur) => cur.content.Length)
 			: 0;
 		int menuWidth = Math.Max(longest, minMenuWidth);
-		int mapWidth = map_size.x * cell_size.x;
+		int mapWidth = map_size.x * cell_size.x * 2;
 		int mapHeight = map_size.y * cell_size.y;
 		int nbLines = contentMenu.Length > mapHeight ? contentMenu.Length : mapHeight;
 
