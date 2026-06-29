@@ -1,7 +1,6 @@
 using System.Text;
 using session;
 using CoreLogic;
-using ErrorOr;
 using System.Globalization;
 using AC = AnsiColors;
 
@@ -9,44 +8,55 @@ internal class TerminalVersion {
 	private ISession<(uint, uint)> session { get; }
 	private (int x, int y) map_size { get; }
 	private Dictionary<uint, IPlayer> players;
+	private readonly SimpleMenu menu;
 
 	private static readonly (int x, int y) cell_size = (5, 4);
 	private const int minMenuWidth = 32;
-
-	private readonly SimpleMenu menu = new("Choose your option :", "", true, [
-		new ExecuteOption("End Turn", () => MenuResult.ExitAll),
-		new DynamicMenu<string>(
-			"Select Unit",
-			"Move Units",
-			[
-				new GoBackOption("Go Back"),
-			],
-			(arg) => new DynamicMenu<(uint, uint)>(
-				$"From {arg} to:", $"From {arg}", [
-					new GoBackOption("Go Back"),
-				],
-				((uint x, uint y) c) =>
-					new ExecuteOption($"Unit {arg} to ({c.x}, {c.y})", () => MenuResult.GoBackToRoot
-				),
-				() => [(1,1),(1,2),(1,3),(1,4)]
-			),
-			() => ["Hello", "World", "Stupid"]
-		),
-		new SimpleMenu("Unit Queue actions:", "Unit Queue", false, [
-			new GoBackOption("Go Back"),
-			new ExecuteOption("New Unit Queue", () => MenuResult.GoBackToRoot),
-			new ExecuteOption("Add new unit to unit Queue", () => MenuResult.GoBackToRoot),
-			new ExecuteOption("Deploy Unit Queue", () => MenuResult.GoBackToRoot),
-		]),
-	]);
 
 	public TerminalVersion(ISession<(uint, uint)> session, (int, int) map_size) {
 		this.session = session;
 		this.map_size = map_size;
 		players = session.getAllPlayers();
+		menu = new("Choose your option :", "", true, [
+			new ExecuteAndExitOption("End Turn", () => {}),
+			new DynamicMenu<string>(
+				"Select Unit",
+				"Move Units",
+				[
+					new GoBackOption("Go Back"),
+				],
+				(arg) => new DynamicMenu<(uint, uint)>(
+					$"From {arg} to:", $"From {arg}", [
+						new GoBackOption("Go Back"),
+					],
+					((uint x, uint y) c) =>
+						new ExecuteAndContinueOption($"Unit {arg} to ({c.x}, {c.y})", () => {}
+					),
+					() => [(1,1),(1,2),(1,3),(1,4)],
+					defaultMenu
+				),
+				() => ["Hello", "World", "Stupid"],
+				defaultMenu
+			),
+			new SimpleMenu("Unit Queue actions:", "Unit Queue", false, [
+				new GoBackOption("Go Back"),
+				new ExecuteAndContinueOption("New Unit Queue", () => {}),
+				new ExecuteAndContinueOption("Add new unit to unit Queue", () => {}),
+				new ExecuteAndContinueOption("Deploy Unit Queue", () => {}),
+			], defaultMenu),
+		], defaultMenu);
 	}
 
-	private void print((string content, string color)[] contentMenu, IPlayer player) {
+	private void defaultMenu(string name, (string option, int index)[] options, int selected) {
+		print(
+			[
+				(name, ""),
+				..options.Select((option, index) => (option.option, option.index == selected ? AC.BG_STD_GOLD : ""))
+			]
+		);
+	}
+
+	private void print((string content, string color)[] contentMenu) {
 		int longest = (contentMenu.Length != 0)
 			? contentMenu.Max((cur) => cur.content.Length)
 			: 0;
@@ -58,7 +68,7 @@ internal class TerminalVersion {
 		List<string> map = TerminalMap.printMap(
 			map_size,
 			playerId => players[playerId].color,
-			c => session.getCell(player.id, c)
+			c => session.getCell(1, c) // TODO fix player id !!!!!
 		);
 
 		StringBuilder sb = new();
@@ -109,7 +119,6 @@ internal class TerminalVersion {
 	public void start() {
 		IPlayer testPlayer = players[1];
 		_ = menu.display();
-		print([("Test", ""), ("Hello World", "\x1b[48;5;214m")], testPlayer);
 		// print(["Test", "Hello World", "Hello World", "Hello World", "Hello World", "Hello World", "Hello World", "Hello World", "Hello World", "Hello World", "Hello World", "Hello World", "Hello World", "Hello World", "Hello World", "Hello World", "Hello World", "Hello World", "Hello World", "Hello World"], testPlayer);
 		// while (true) {
 		// 	// foreach ((_, IPlayer player) in players) {

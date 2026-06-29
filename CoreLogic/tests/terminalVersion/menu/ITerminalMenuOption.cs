@@ -13,19 +13,48 @@ internal class GoBackOption : ITerminalMenuOption {
 	}
 }
 
-internal class ExecuteOption : ITerminalMenuOption {
+internal class ExitOption : ITerminalMenuOption {
 	public string name { get; }
-	private readonly Func<MenuResult?> func;
 
-	public ExecuteOption(
+	public ExitOption(string name) => this.name = name;
+
+	public MenuResult execute() {
+		return MenuResult.ExitAll;
+	}
+}
+
+internal class ExecuteAndContinueOption : ITerminalMenuOption {
+	public string name { get; }
+	private readonly Action func;
+
+	public ExecuteAndContinueOption(
 		string name,
-		Func<MenuResult?> func
+		Action func
 	) {
 		this.name = name;
 		this.func = func;
 	}
 
 	public MenuResult execute() {
-		return func() ?? MenuResult.GoBackToRoot;
+		func();
+		return MenuResult.GoBackToRoot;
+	}
+}
+
+internal class ExecuteAndExitOption : ITerminalMenuOption {
+	public string name { get; }
+	private readonly Action func;
+
+	public ExecuteAndExitOption(
+		string name,
+		Action func
+	) {
+		this.name = name;
+		this.func = func;
+	}
+
+	public MenuResult execute() {
+		func();
+		return MenuResult.ExitAll;
 	}
 }

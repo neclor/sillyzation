@@ -6,7 +6,6 @@ internal enum MenuResult {
 }
 
 internal interface ITerminalMenu {
-	// returns whether it successfully ran a command
 	MenuResult display();
 }
 
@@ -14,8 +13,9 @@ internal class SimpleMenu : ITerminalMenu, ITerminalMenuOption {
 	public readonly string name;
 	private readonly string option_name;
 	private readonly ITerminalMenuOption[] options;
-	private int option_index;
 	private readonly bool is_root;
+	private readonly Action<string, (string option, int index)[], int> display_func;
+	private int option_index;
 
 	string ITerminalMenuOption.name => option_name;
 
@@ -23,12 +23,14 @@ internal class SimpleMenu : ITerminalMenu, ITerminalMenuOption {
 		string name,
 		string option_name,
 		bool is_root,
-		ITerminalMenuOption[] options
+		ITerminalMenuOption[] options,
+		Action<string, (string option, int index)[], int> display_func
 	) {
 		this.name = name;
 		this.option_name = option_name;
 		this.options = options;
 		this.is_root = is_root;
+		this.display_func = display_func;
 		option_index = 0;
 	}
 
@@ -40,15 +42,7 @@ internal class SimpleMenu : ITerminalMenu, ITerminalMenuOption {
 	public MenuResult display() {
 		while (true) {
 			clear();
-			Console.WriteLine(name);
-			foreach ((var opt, int i) in options.Select((value, i) => (value, i))) {
-				if (i == option_index) {
-					Console.WriteLine($"> {opt.name}");
-				}
-				else {
-					Console.WriteLine($"  {opt.name}");
-				}
-			}
+			display_func(name, [.. options.Select((value, index) => (value.name, index))], option_index);
 			ConsoleKey input = Console.ReadKey().Key;
 			MenuResult status = handleKey(input);
 			switch (status) {
@@ -73,7 +67,6 @@ internal class SimpleMenu : ITerminalMenu, ITerminalMenuOption {
 		return display();
 	}
 
-	// returns whether to stop the loop of this menu
 	private MenuResult handleKey(ConsoleKey input) {
 #pragma warning disable IDE0010 // Add missing cases
 		switch (input) {
@@ -101,19 +94,22 @@ internal class DynamicMenu<T> : ITerminalMenu, ITerminalMenuOption {
 	private readonly ITerminalMenuOption[] static_options;
 	private readonly Func<T, ITerminalMenuOption> factory;
 	private readonly Func<T[]> get_values;
+	private readonly Action<string, (string option, int index)[], int> display_func;
 
 	public DynamicMenu(
 		string name,
 		string option_name,
 		ITerminalMenuOption[] static_options,
 		Func<T, ITerminalMenuOption> factory,
-		Func<T[]> get_values
+		Func<T[]> get_values,
+		Action<string, (string option, int index)[], int> display_func
 	) {
 		this.name = name;
 		this.option_name = option_name;
 		this.static_options = static_options;
 		this.factory = factory;
 		this.get_values = get_values;
+		this.display_func = display_func;
 	}
 
 	string ITerminalMenuOption.name => option_name;
@@ -122,7 +118,7 @@ internal class DynamicMenu<T> : ITerminalMenu, ITerminalMenuOption {
 		T[] values = get_values();
 		IEnumerable<ITerminalMenuOption> dynamic_options = values.Select(e => factory(e));
 		return new SimpleMenu(
-			name, "", false, [.. static_options, .. dynamic_options]
+			name, "", false, [.. static_options, .. dynamic_options], display_func
 		).display();
 	}
 

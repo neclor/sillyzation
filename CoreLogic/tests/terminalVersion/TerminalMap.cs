@@ -82,8 +82,6 @@ internal class TerminalMap {
 			}
 		}
 
-		// const string reset = "\u001b[0m";
-
 		List<List<string[]>> map = [];
 		for (uint y = 0; y < map_size.y; y++) {
 			for (uint yc = 0; yc < cell_size.y; yc++) {
