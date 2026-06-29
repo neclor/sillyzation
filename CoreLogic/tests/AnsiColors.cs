@@ -1,5 +1,4 @@
-internal class AnsiColors
-{
+internal class AnsiColors {
 	public const string RESET = "\x1b[0m";
 
 	// High-Intensity Solid Entity Backgrounds (Guaranteed to pop)
