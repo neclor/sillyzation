@@ -16,6 +16,20 @@ internal class AnsiColors {
 	public const string BG_STD_GRAY = "\x1b[48;5;250m";
 	public const string BG_STD_BROWN = "\x1b[48;5;172m";
 
+	public const string FG_STD_RED = "\x1b[38;5;196m";
+	public const string FG_STD_GOLD = "\x1b[38;5;220m";
+	public const string FG_STD_ORANGE = "\x1b[38;5;208m";
+	public const string FG_STD_YELLOW = "\x1b[38;5;226m";
+	public const string FG_STD_LIGHT_GREEN = "\x1b[38;5;119m";
+	public const string FG_STD_DARK_GREEN = "\x1b[38;5;40m";
+	public const string FG_STD_GREEN = "\x1b[38;5;46m";
+	public const string FG_STD_CYAN = "\x1b[38;5;87m";
+	public const string FG_STD_BLUE = "\x1b[38;5;27m";
+	public const string FG_STD_PURPLE = "\x1b[38;5;201m";
+	public const string FG_STD_WHITE = "\x1b[38;5;255m";
+	public const string FG_STD_GRAY = "\x1b[38;5;250m";
+	public const string FG_STD_BROWN = "\x1b[38;5;172m";
+
 	// --- Terrain Background Truecolor Variants ---
 	// Plain
 	public const string BG_PLAIN_1 = "\x1b[48;2;35;48;35m";

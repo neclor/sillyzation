@@ -18,7 +18,7 @@ internal class TerminalVersion {
 		this.map_size = map_size;
 		players = session.getAllPlayers();
 		menu = new("Choose your option :", "", true, [
-			new ExecuteAndExitOption("End Turn", () => {}),
+			new ExecuteAndExitOption("End Turn", session.endTurn),
 			new DynamicMenu<string>(
 				"Select Unit",
 				"Move Units",
@@ -56,6 +56,23 @@ internal class TerminalVersion {
 		);
 	}
 
+	public static string getAnsiTextColor(Color color) => color switch {
+		Color.Red => AC.FG_STD_RED,
+		Color.Gold => AC.FG_STD_GOLD,
+		Color.Orange => AC.FG_STD_ORANGE,
+		Color.Yellow => AC.FG_STD_YELLOW,
+		Color.LightGreen => AC.FG_STD_LIGHT_GREEN,
+		Color.DarkGreen => AC.FG_STD_DARK_GREEN,
+		Color.Green => AC.FG_STD_GREEN,
+		Color.LightBlue => AC.FG_STD_CYAN,
+		Color.Blue => AC.FG_STD_BLUE,
+		Color.Purple => AC.FG_STD_PURPLE,
+		Color.White => AC.FG_STD_WHITE,
+		Color.Gray => AC.FG_STD_GRAY,
+		Color.Brown => AC.FG_STD_BROWN,
+		_ => AC.RESET
+	};
+
 	private void print((string content, string color)[] contentMenu) {
 		int longest = (contentMenu.Length != 0)
 			? contentMenu.Max((cur) => cur.content.Length)
@@ -68,43 +85,39 @@ internal class TerminalVersion {
 		List<string> map = TerminalMap.printMap(
 			map_size,
 			playerId => players[playerId].color,
-			c => session.getCell(1, c) // TODO fix player id !!!!!
+			c => session.getCell(session.currentPlayerId, c)
 		);
 
+		string textColor = getAnsiTextColor(session.currentPlayer.color);
 		StringBuilder sb = new();
-		_ = sb
-			.Append('╔')
-			.Append('═', menuWidth)
-			.Append('╦')
-			.Append('═', mapWidth)
-			.AppendLine("╗");
+		_ = sb.AppendLine(
+			CultureInfo.InvariantCulture,
+			$"{textColor}╔{new string('═', menuWidth)}╦{new string('═', mapWidth)}╗{AC.RESET}"
+		);
 		foreach (((string content, string color), int i) in contentMenu.Select((value, index) => (value, index))) {
-			_ = sb.Append(CultureInfo.InvariantCulture, $"║{color}{content.PadRight(menuWidth)}{AC.RESET}║");
+			_ = sb.Append(CultureInfo.InvariantCulture, $"{textColor}║{AC.RESET}{color}{content.PadRight(menuWidth)}{AC.RESET}{textColor}║{AC.RESET}");
 			if (i >= mapHeight) {
-				_ = sb
-					.Append(' ', mapWidth)
-					.AppendLine("║");
+				_ = sb.Append(' ', mapWidth);
 			}
 			else {
-				_ = sb
-					.Append(map[i])
-					.AppendLine("║");
+				_ = sb.Append(map[i]);
 			}
+			_ = sb.AppendLine(CultureInfo.InvariantCulture, $"{textColor}║{AC.RESET}");
 		}
 		if (contentMenu.Length < mapHeight) {
+			string leftPad = $"{textColor}║{AC.RESET}{new string(' ', menuWidth)}{textColor}║{AC.RESET}";
+			string rightPad = $"{textColor}║{AC.RESET}";
+
 			for (int i = contentMenu.Length; i < mapHeight; i++) {
-				_ = sb
-					.Append('║')
-					.Append(' ', menuWidth)
-					.AppendLine(CultureInfo.InvariantCulture, $"║{map[i]}║");
+				_ = sb.Append(leftPad)
+					.Append(map[i])
+					.AppendLine(rightPad);
 			}
 		}
-		_ = sb
-			.Append('╚')
-			.Append('═', menuWidth)
-			.Append('╩')
-			.Append('═', mapWidth)
-			.AppendLine("╝");
+		_ = sb.AppendLine(
+			CultureInfo.InvariantCulture,
+			$"{textColor}╚{new string('═', menuWidth)}╩{new string('═', mapWidth)}╝{AC.RESET}"
+		);
 
 		string res = sb.ToString();
 		clear();
@@ -117,15 +130,10 @@ internal class TerminalVersion {
 	}
 
 	public void start() {
-		IPlayer testPlayer = players[1];
-		_ = menu.display();
-		// print(["Test", "Hello World", "Hello World", "Hello World", "Hello World", "Hello World", "Hello World", "Hello World", "Hello World", "Hello World", "Hello World", "Hello World", "Hello World", "Hello World", "Hello World", "Hello World", "Hello World", "Hello World", "Hello World", "Hello World"], testPlayer);
-		// while (true) {
-		// 	// foreach ((_, IPlayer player) in players) {
-		// 	// 	// printTurn(player, players, core);
-		// 	// 	char input = Console.ReadKey().KeyChar;
-		// 	// }
-
-		// }
+		while (true) {
+			IPlayer player = session.currentPlayer;
+			Console.WriteLine("Player : " + player.name);
+			_ = menu.display();
+		}
 	}
 }

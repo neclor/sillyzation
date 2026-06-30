@@ -7,34 +7,6 @@ internal class Program {
 	private static void Main() {
 		Console.WriteLine("\n\n\nStarting tests\n");
 
-		// SimpleMenu menu = new("Choose your option :", "", true, [
-		// 	new ExecuteOption("End Turn", () => MenuResult.ExitAll),
-		// 	new DynamicMenu<string>(
-		// 		"Select Unit",
-		// 		"Move Units",
-		// 		[
-		// 			new GoBackOption("Go Back"),
-		// 		],
-		// 		(arg) => new DynamicMenu<(uint, uint)>(
-		// 			$"From {arg} to:", $"From {arg}", [
-		// 				new GoBackOption("Go Back"),
-		// 			],
-		// 			((uint x, uint y) c) =>
-		// 				new ExecuteOption($"Unit {arg} to ({c.x}, {c.y})", () => MenuResult.GoBackToRoot
-		// 			),
-		// 			() => [(1,1),(1,2),(1,3),(1,4)]
-		// 		),
-		// 		() => ["Hello", "World", "Stupid"]
-		// 	),
-		// 	new SimpleMenu("Unit Queue actions:", "Unit Queue", false, [
-		// 		new GoBackOption("Go Back"),
-		// 		new ExecuteOption("New Unit Queue", () => MenuResult.GoBackToRoot),
-		// 		new ExecuteOption("Add new unit to unit Queue", () => MenuResult.GoBackToRoot),
-		// 		new ExecuteOption("Deploy Unit Queue", () => MenuResult.GoBackToRoot),
-		// 	]),
-		// ]);
-		// _ = menu.display();
-
 		lanchTerminalTestApp();
 
 		Console.WriteLine("\nEnding tests");
@@ -43,7 +15,7 @@ internal class Program {
 	private static void lanchTerminalTestApp() {
 		LocalSession<(uint, uint)> session = new(
 			[
-				// (new HumanPlayer(), Country.France, [(1,1)]),
+				(new HumanPlayer(), Country.France, [(1,1)]),
 				(new HumanPlayer(), Country.England, [(2,4)]),
 			],
 			[

@@ -4,11 +4,14 @@ using ErrorOr;
 namespace session;
 
 internal class LocalSession<TCellKey> : ISession<TCellKey> where TCellKey : notnull {
-	public IPlayer currentPlayer => throw new NotImplementedException();
+	private uint currentPlayerId;
+	public IPlayer currentPlayer => players[currentPlayerId];
+	private readonly IPlayer[] players;
+	private readonly ICore<TCellKey> core;
 
 	public bool gameState => throw new NotImplementedException();
 
-	private ICore<TCellKey> core;
+	uint ISession<TCellKey>.currentPlayerId => currentPlayerId;
 
 	public LocalSession(
 		IEnumerable<(ISessionPlayer session, Country country, TCellKey[] start)> players,
@@ -25,8 +28,9 @@ internal class LocalSession<TCellKey> : ISession<TCellKey> where TCellKey : notn
 			cells,
 			connexions
 		);
-
-		// Dictionary<uint, IPlayer> core_players = core.getAllPlayers();
+		this.players = [.. getAllPlayers().Select(v => v.Value).OrderBy(p => p.id)];
+		currentPlayerId = 0;
+		Console.WriteLine(this.players.Length + " " + currentPlayerId);
 	}
 
 
@@ -40,5 +44,13 @@ internal class LocalSession<TCellKey> : ISession<TCellKey> where TCellKey : notn
 
 	public Dictionary<uint, IPlayer> getAllPlayers() {
 		return core.getAllPlayers();
+	}
+
+	public void endTurn() {
+		currentPlayerId++;
+		if (currentPlayerId == players.Length) {
+			currentPlayerId = 0;
+			// Process Turn
+		}
 	}
 }
