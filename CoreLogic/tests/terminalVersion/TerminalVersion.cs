@@ -5,15 +5,15 @@ using System.Globalization;
 using AC = AnsiColors;
 
 internal class TerminalVersion {
-	private ISession<(uint, uint)> session { get; }
+	private ISession<Coord> session { get; }
 	private (int x, int y) map_size { get; }
-	private Dictionary<uint, IPlayer> players;
+	private readonly Dictionary<uint, IPlayer> players;
 	private readonly SimpleMenu menu;
 
 	private static readonly (int x, int y) cell_size = (5, 4);
 	private const int minMenuWidth = 32;
 
-	public TerminalVersion(ISession<(uint, uint)> session, (int, int) map_size) {
+	public TerminalVersion(ISession<Coord> session, (int, int) map_size) {
 		this.session = session;
 		this.map_size = map_size;
 		players = session.getAllPlayers();
@@ -25,15 +25,12 @@ internal class TerminalVersion {
 				[
 					new GoBackOption("Go Back"),
 				],
-				(arg) => new DynamicMenu<(uint, uint)>(
-					$"From {arg} to:", $"From {arg}", [
-						new GoBackOption("Go Back"),
-					],
-					((uint x, uint y) c) =>
-						new ExecuteAndContinueOption($"Unit {arg} to ({c.x}, {c.y})", () => {}
-					),
-					() => [(1,1),(1,2),(1,3),(1,4)],
-					defaultMenu
+				(arg) => new SelectCellMenu(
+					"Move unit to :",
+					((uint) this.map_size.x, (uint) this.map_size.y),
+					(0, 0),
+					c => new ExecuteAndContinueOption($"Unit {arg} to ({c.x}, {c.y})", () => {}),
+					printSelectCellMenu
 				),
 				() => ["Hello", "World", "Stupid"],
 				defaultMenu
@@ -56,6 +53,15 @@ internal class TerminalVersion {
 		);
 	}
 
+	private void printSelectCellMenu(string title, Coord initial_coord, Coord coord) {
+		print([
+			(title, "")
+		], [
+			(initial_coord, AC.BG_STD_GRAY),
+			(coord, AC.BG_STD_WHITE),
+		]);
+	}
+
 	public static string getAnsiTextColor(Color color) => color switch {
 		Color.Red => AC.FG_STD_RED,
 		Color.Gold => AC.FG_STD_GOLD,
@@ -73,7 +79,7 @@ internal class TerminalVersion {
 		_ => AC.RESET
 	};
 
-	private void print((string content, string color)[] contentMenu) {
+	private void print((string content, string color)[] contentMenu, (Coord coord, string color)[]? highlighted_coords = null) {
 		int longest = (contentMenu.Length != 0)
 			? contentMenu.Max((cur) => cur.content.Length)
 			: 0;
@@ -85,7 +91,8 @@ internal class TerminalVersion {
 		List<string> map = TerminalMap.printMap(
 			map_size,
 			playerId => players[playerId].color,
-			c => session.getCell(session.currentPlayerId, c)
+			c => session.getCell(session.currentPlayerId, c),
+			highlighted_coords
 		);
 
 		string textColor = getAnsiTextColor(session.currentPlayer.color);

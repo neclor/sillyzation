@@ -66,7 +66,8 @@ internal class TerminalMap {
 	public static List<string> printMap(
 		(int x, int y) map_size,
 		Func<uint, Color> getPlayerColor,
-		Func<(uint x, uint y), ErrorOr<ICell<(uint, uint)>>> getCell
+		Func<Coord, ErrorOr<ICell<(uint, uint)>>> getCell,
+		(Coord coord, string color)[]? highlighted_coord = null
 	) {
 		var cells = new (Terrain terrain, uint? ownership)[map_size.x][];
 		for (uint x = 0; x < map_size.x; x++) {
@@ -82,6 +83,11 @@ internal class TerminalMap {
 			}
 		}
 
+		Dictionary<Coord, string> highlighted_coord_set = highlighted_coord?
+			.GroupBy(v => v.coord)
+			.ToDictionary(g => g.Key, g => g.Last().color)
+			?? [];
+
 		List<List<string[]>> map = [];
 		for (uint y = 0; y < map_size.y; y++) {
 			for (uint yc = 0; yc < cell_size.y; yc++) {
@@ -90,7 +96,16 @@ internal class TerminalMap {
 					string[] cell_line = [.. backgrounds[cells[x][y].terrain][yc].Select(e => $"{e}{AC.RESET}")];
 					uint? current_owner = cells[x][y].ownership;
 
-					if (current_owner.HasValue) {
+					if (highlighted_coord_set.TryGetValue((x, y), out string? color)) {
+						if (yc == 0 || yc == cell_size.y - 1) {
+							for (int i = 0; i < cell_line.Length; i++) {
+								cell_line[i] = $"{color}  {AC.RESET}";
+							}
+						}
+						cell_line[0] = $"{color}  {AC.RESET}";
+						cell_line[^1] = $"{color}  {AC.RESET}";
+					}
+					else if (current_owner.HasValue) {
 						string p_color = getAnsiBackgroundColor(getPlayerColor(current_owner.Value));
 						if (yc == 0) {
 							if (!(y > 0) || cells[x][y - 1].ownership != current_owner) {

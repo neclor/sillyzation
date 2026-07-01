@@ -2,7 +2,7 @@ global using PlayerKey = uint;
 global using UnitKey = uint;
 global using FrontKey = uint;
 global using IGameTick = bool;
-
+global using Coord = (uint x, uint y);
 
 using ErrorOr;
 
