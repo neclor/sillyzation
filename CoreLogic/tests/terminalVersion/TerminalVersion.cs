@@ -98,14 +98,14 @@ internal class TerminalVersion {
 			? contentMenu.Max((cur) => cur.content.Length)
 			: 0;
 		int menuWidth = Math.Max(longest, minMenuWidth);
-		int mapWidth = map_size.x * cell_size.x * 2;
+		int mapWidth = map_size.x * cell_size.x * TerminalMap.cell_width_ration;
 		int mapHeight = map_size.y * cell_size.y;
 		int nbLines = contentMenu.Length > mapHeight ? contentMenu.Length : mapHeight;
 
 		List<string> map_res = map_mode switch {
 			0 => map.printDefaultMap(highlighted_coords),
 			1 => map.printPopMap(highlighted_coords),
-			2 => map.printDefaultMap(highlighted_coords),
+			2 => map.printRessourceMap(highlighted_coords),
 			_ => throw new InvalidDataException("Invalid map mode index"),
 		};
 

@@ -6,61 +6,63 @@ using CoreLogic;
 
 internal class TerminalMap {
 	private static readonly (int x, int y) cell_size = (5, 4);
+	public const int cell_width_ration = 2;
+	private static readonly string cell_block = new(' ', cell_width_ration);
 	private static readonly Dictionary<Terrain, string[][]> backgrounds = new() {
 		{
 			Terrain.Plain, [
-				[$"{AC.BG_PLAIN_1}  ", $"{AC.BG_PLAIN_2}  ", $"{AC.BG_PLAIN_3}  ", $"{AC.BG_PLAIN_4}  ", $"{AC.BG_PLAIN_1}  "],
-				[$"{AC.BG_PLAIN_4}  ", $"{AC.BG_PLAIN_3}  ", $"{AC.BG_PLAIN_2}  ", $"{AC.BG_PLAIN_1}  ", $"{AC.BG_PLAIN_2}  "],
-				[$"{AC.BG_PLAIN_2}  ", $"{AC.BG_PLAIN_1}  ", $"{AC.BG_PLAIN_4}  ", $"{AC.BG_PLAIN_3}  ", $"{AC.BG_PLAIN_4}  "],
-				[$"{AC.BG_PLAIN_3}  ", $"{AC.BG_PLAIN_4}  ", $"{AC.BG_PLAIN_1}  ", $"{AC.BG_PLAIN_2}  ", $"{AC.BG_PLAIN_3}  "]
+				[$"{AC.BG_PLAIN_1}{cell_block}", $"{AC.BG_PLAIN_2}{cell_block}", $"{AC.BG_PLAIN_3}{cell_block}", $"{AC.BG_PLAIN_4}{cell_block}", $"{AC.BG_PLAIN_1}{cell_block}"],
+				[$"{AC.BG_PLAIN_4}{cell_block}", $"{AC.BG_PLAIN_3}{cell_block}", $"{AC.BG_PLAIN_2}{cell_block}", $"{AC.BG_PLAIN_1}{cell_block}", $"{AC.BG_PLAIN_2}{cell_block}"],
+				[$"{AC.BG_PLAIN_2}{cell_block}", $"{AC.BG_PLAIN_1}{cell_block}", $"{AC.BG_PLAIN_4}{cell_block}", $"{AC.BG_PLAIN_3}{cell_block}", $"{AC.BG_PLAIN_4}{cell_block}"],
+				[$"{AC.BG_PLAIN_3}{cell_block}", $"{AC.BG_PLAIN_4}{cell_block}", $"{AC.BG_PLAIN_1}{cell_block}", $"{AC.BG_PLAIN_2}{cell_block}", $"{AC.BG_PLAIN_3}{cell_block}"]
 			]
 		},
 		{
 			Terrain.Swamp, [
-				[$"{AC.BG_SWAMP_1}  ", $"{AC.BG_SWAMP_2}  ", $"{AC.BG_SWAMP_3}  ", $"{AC.BG_SWAMP_4}  ", $"{AC.BG_SWAMP_1}  "],
-				[$"{AC.BG_SWAMP_4}  ", $"{AC.BG_SWAMP_3}  ", $"{AC.BG_SWAMP_2}  ", $"{AC.BG_SWAMP_1}  ", $"{AC.BG_SWAMP_2}  "],
-				[$"{AC.BG_SWAMP_2}  ", $"{AC.BG_SWAMP_1}  ", $"{AC.BG_SWAMP_4}  ", $"{AC.BG_SWAMP_3}  ", $"{AC.BG_SWAMP_4}  "],
-				[$"{AC.BG_SWAMP_3}  ", $"{AC.BG_SWAMP_4}  ", $"{AC.BG_SWAMP_1}  ", $"{AC.BG_SWAMP_2}  ", $"{AC.BG_SWAMP_3}  "]
+				[$"{AC.BG_SWAMP_1}{cell_block}", $"{AC.BG_SWAMP_2}{cell_block}", $"{AC.BG_SWAMP_3}{cell_block}", $"{AC.BG_SWAMP_4}{cell_block}", $"{AC.BG_SWAMP_1}{cell_block}"],
+				[$"{AC.BG_SWAMP_4}{cell_block}", $"{AC.BG_SWAMP_3}{cell_block}", $"{AC.BG_SWAMP_2}{cell_block}", $"{AC.BG_SWAMP_1}{cell_block}", $"{AC.BG_SWAMP_2}{cell_block}"],
+				[$"{AC.BG_SWAMP_2}{cell_block}", $"{AC.BG_SWAMP_1}{cell_block}", $"{AC.BG_SWAMP_4}{cell_block}", $"{AC.BG_SWAMP_3}{cell_block}", $"{AC.BG_SWAMP_4}{cell_block}"],
+				[$"{AC.BG_SWAMP_3}{cell_block}", $"{AC.BG_SWAMP_4}{cell_block}", $"{AC.BG_SWAMP_1}{cell_block}", $"{AC.BG_SWAMP_2}{cell_block}", $"{AC.BG_SWAMP_3}{cell_block}"]
 			]
 		},
 		{
 			Terrain.Forest, [
-				[$"{AC.BG_FOREST_1}  ", $"{AC.BG_FOREST_2}  ", $"{AC.BG_FOREST_3}  ", $"{AC.BG_FOREST_4}  ", $"{AC.BG_FOREST_1}  "],
-				[$"{AC.BG_FOREST_4}  ", $"{AC.BG_FOREST_3}  ", $"{AC.BG_FOREST_2}  ", $"{AC.BG_FOREST_1}  ", $"{AC.BG_FOREST_2}  "],
-				[$"{AC.BG_FOREST_2}  ", $"{AC.BG_FOREST_1}  ", $"{AC.BG_FOREST_4}  ", $"{AC.BG_FOREST_3}  ", $"{AC.BG_FOREST_4}  "],
-				[$"{AC.BG_FOREST_3}  ", $"{AC.BG_FOREST_4}  ", $"{AC.BG_FOREST_1}  ", $"{AC.BG_FOREST_2}  ", $"{AC.BG_FOREST_3}  "]
+				[$"{AC.BG_FOREST_1}{cell_block}", $"{AC.BG_FOREST_2}{cell_block}", $"{AC.BG_FOREST_3}{cell_block}", $"{AC.BG_FOREST_4}{cell_block}", $"{AC.BG_FOREST_1}{cell_block}"],
+				[$"{AC.BG_FOREST_4}{cell_block}", $"{AC.BG_FOREST_3}{cell_block}", $"{AC.BG_FOREST_2}{cell_block}", $"{AC.BG_FOREST_1}{cell_block}", $"{AC.BG_FOREST_2}{cell_block}"],
+				[$"{AC.BG_FOREST_2}{cell_block}", $"{AC.BG_FOREST_1}{cell_block}", $"{AC.BG_FOREST_4}{cell_block}", $"{AC.BG_FOREST_3}{cell_block}", $"{AC.BG_FOREST_4}{cell_block}"],
+				[$"{AC.BG_FOREST_3}{cell_block}", $"{AC.BG_FOREST_4}{cell_block}", $"{AC.BG_FOREST_1}{cell_block}", $"{AC.BG_FOREST_2}{cell_block}", $"{AC.BG_FOREST_3}{cell_block}"]
 			]
 		},
 		{
 			Terrain.Desert, [
-				[$"{AC.BG_DESERT_1}  ", $"{AC.BG_DESERT_2}  ", $"{AC.BG_DESERT_3}  ", $"{AC.BG_DESERT_4}  ", $"{AC.BG_DESERT_1}  "],
-				[$"{AC.BG_DESERT_4}  ", $"{AC.BG_DESERT_3}  ", $"{AC.BG_DESERT_2}  ", $"{AC.BG_DESERT_1}  ", $"{AC.BG_DESERT_2}  "],
-				[$"{AC.BG_DESERT_2}  ", $"{AC.BG_DESERT_1}  ", $"{AC.BG_DESERT_4}  ", $"{AC.BG_DESERT_3}  ", $"{AC.BG_DESERT_4}  "],
-				[$"{AC.BG_DESERT_3}  ", $"{AC.BG_DESERT_4}  ", $"{AC.BG_DESERT_1}  ", $"{AC.BG_DESERT_2}  ", $"{AC.BG_DESERT_3}  "]
+				[$"{AC.BG_DESERT_1}{cell_block}", $"{AC.BG_DESERT_2}{cell_block}", $"{AC.BG_DESERT_3}{cell_block}", $"{AC.BG_DESERT_4}{cell_block}", $"{AC.BG_DESERT_1}{cell_block}"],
+				[$"{AC.BG_DESERT_4}{cell_block}", $"{AC.BG_DESERT_3}{cell_block}", $"{AC.BG_DESERT_2}{cell_block}", $"{AC.BG_DESERT_1}{cell_block}", $"{AC.BG_DESERT_2}{cell_block}"],
+				[$"{AC.BG_DESERT_2}{cell_block}", $"{AC.BG_DESERT_1}{cell_block}", $"{AC.BG_DESERT_4}{cell_block}", $"{AC.BG_DESERT_3}{cell_block}", $"{AC.BG_DESERT_4}{cell_block}"],
+				[$"{AC.BG_DESERT_3}{cell_block}", $"{AC.BG_DESERT_4}{cell_block}", $"{AC.BG_DESERT_1}{cell_block}", $"{AC.BG_DESERT_2}{cell_block}", $"{AC.BG_DESERT_3}{cell_block}"]
 			]
 		},
 		{
 			Terrain.Tundra, [
-				[$"{AC.BG_TUNDRA_1}  ", $"{AC.BG_TUNDRA_2}  ", $"{AC.BG_TUNDRA_3}  ", $"{AC.BG_TUNDRA_4}  ", $"{AC.BG_TUNDRA_1}  "],
-				[$"{AC.BG_TUNDRA_4}  ", $"{AC.BG_TUNDRA_3}  ", $"{AC.BG_TUNDRA_2}  ", $"{AC.BG_TUNDRA_1}  ", $"{AC.BG_TUNDRA_2}  "],
-				[$"{AC.BG_TUNDRA_2}  ", $"{AC.BG_TUNDRA_1}  ", $"{AC.BG_TUNDRA_4}  ", $"{AC.BG_TUNDRA_3}  ", $"{AC.BG_TUNDRA_4}  "],
-				[$"{AC.BG_TUNDRA_3}  ", $"{AC.BG_TUNDRA_4}  ", $"{AC.BG_TUNDRA_1}  ", $"{AC.BG_TUNDRA_2}  ", $"{AC.BG_TUNDRA_3}  "]
+				[$"{AC.BG_TUNDRA_1}{cell_block}", $"{AC.BG_TUNDRA_2}{cell_block}", $"{AC.BG_TUNDRA_3}{cell_block}", $"{AC.BG_TUNDRA_4}{cell_block}", $"{AC.BG_TUNDRA_1}{cell_block}"],
+				[$"{AC.BG_TUNDRA_4}{cell_block}", $"{AC.BG_TUNDRA_3}{cell_block}", $"{AC.BG_TUNDRA_2}{cell_block}", $"{AC.BG_TUNDRA_1}{cell_block}", $"{AC.BG_TUNDRA_2}{cell_block}"],
+				[$"{AC.BG_TUNDRA_2}{cell_block}", $"{AC.BG_TUNDRA_1}{cell_block}", $"{AC.BG_TUNDRA_4}{cell_block}", $"{AC.BG_TUNDRA_3}{cell_block}", $"{AC.BG_TUNDRA_4}{cell_block}"],
+				[$"{AC.BG_TUNDRA_3}{cell_block}", $"{AC.BG_TUNDRA_4}{cell_block}", $"{AC.BG_TUNDRA_1}{cell_block}", $"{AC.BG_TUNDRA_2}{cell_block}", $"{AC.BG_TUNDRA_3}{cell_block}"]
 			]
 		},
 		{
 			Terrain.Savanna, [
-				[$"{AC.BG_SAVANNA_1}  ", $"{AC.BG_SAVANNA_2}  ", $"{AC.BG_SAVANNA_3}  ", $"{AC.BG_SAVANNA_4}  ", $"{AC.BG_SAVANNA_1}  "],
-				[$"{AC.BG_SAVANNA_4}  ", $"{AC.BG_SAVANNA_3}  ", $"{AC.BG_SAVANNA_2}  ", $"{AC.BG_SAVANNA_1}  ", $"{AC.BG_SAVANNA_2}  "],
-				[$"{AC.BG_SAVANNA_2}  ", $"{AC.BG_SAVANNA_1}  ", $"{AC.BG_SAVANNA_4}  ", $"{AC.BG_SAVANNA_3}  ", $"{AC.BG_SAVANNA_4}  "],
-				[$"{AC.BG_SAVANNA_3}  ", $"{AC.BG_SAVANNA_4}  ", $"{AC.BG_SAVANNA_1}  ", $"{AC.BG_SAVANNA_2}  ", $"{AC.BG_SAVANNA_3}  "]
+				[$"{AC.BG_SAVANNA_1}{cell_block}", $"{AC.BG_SAVANNA_2}{cell_block}", $"{AC.BG_SAVANNA_3}{cell_block}", $"{AC.BG_SAVANNA_4}{cell_block}", $"{AC.BG_SAVANNA_1}{cell_block}"],
+				[$"{AC.BG_SAVANNA_4}{cell_block}", $"{AC.BG_SAVANNA_3}{cell_block}", $"{AC.BG_SAVANNA_2}{cell_block}", $"{AC.BG_SAVANNA_1}{cell_block}", $"{AC.BG_SAVANNA_2}{cell_block}"],
+				[$"{AC.BG_SAVANNA_2}{cell_block}", $"{AC.BG_SAVANNA_1}{cell_block}", $"{AC.BG_SAVANNA_4}{cell_block}", $"{AC.BG_SAVANNA_3}{cell_block}", $"{AC.BG_SAVANNA_4}{cell_block}"],
+				[$"{AC.BG_SAVANNA_3}{cell_block}", $"{AC.BG_SAVANNA_4}{cell_block}", $"{AC.BG_SAVANNA_1}{cell_block}", $"{AC.BG_SAVANNA_2}{cell_block}", $"{AC.BG_SAVANNA_3}{cell_block}"]
 			]
 		},
 		{
 			Terrain.Jungle, [
-				[$"{AC.BG_JUNGLE_1}  ", $"{AC.BG_JUNGLE_2}  ", $"{AC.BG_JUNGLE_3}  ", $"{AC.BG_JUNGLE_4}  ", $"{AC.BG_JUNGLE_1}  "],
-				[$"{AC.BG_JUNGLE_4}  ", $"{AC.BG_JUNGLE_3}  ", $"{AC.BG_JUNGLE_2}  ", $"{AC.BG_JUNGLE_1}  ", $"{AC.BG_JUNGLE_2}  "],
-				[$"{AC.BG_JUNGLE_2}  ", $"{AC.BG_JUNGLE_1}  ", $"{AC.BG_JUNGLE_4}  ", $"{AC.BG_JUNGLE_3}  ", $"{AC.BG_JUNGLE_4}  "],
-				[$"{AC.BG_JUNGLE_3}  ", $"{AC.BG_JUNGLE_4}  ", $"{AC.BG_JUNGLE_1}  ", $"{AC.BG_JUNGLE_2}  ", $"{AC.BG_JUNGLE_3}  "]
+				[$"{AC.BG_JUNGLE_1}{cell_block}", $"{AC.BG_JUNGLE_2}{cell_block}", $"{AC.BG_JUNGLE_3}{cell_block}", $"{AC.BG_JUNGLE_4}{cell_block}", $"{AC.BG_JUNGLE_1}{cell_block}"],
+				[$"{AC.BG_JUNGLE_4}{cell_block}", $"{AC.BG_JUNGLE_3}{cell_block}", $"{AC.BG_JUNGLE_2}{cell_block}", $"{AC.BG_JUNGLE_1}{cell_block}", $"{AC.BG_JUNGLE_2}{cell_block}"],
+				[$"{AC.BG_JUNGLE_2}{cell_block}", $"{AC.BG_JUNGLE_1}{cell_block}", $"{AC.BG_JUNGLE_4}{cell_block}", $"{AC.BG_JUNGLE_3}{cell_block}", $"{AC.BG_JUNGLE_4}{cell_block}"],
+				[$"{AC.BG_JUNGLE_3}{cell_block}", $"{AC.BG_JUNGLE_4}{cell_block}", $"{AC.BG_JUNGLE_1}{cell_block}", $"{AC.BG_JUNGLE_2}{cell_block}", $"{AC.BG_JUNGLE_3}{cell_block}"]
 			]
 		},
 	};
@@ -79,7 +81,7 @@ internal class TerminalMap {
 	}
 
 	private static void hightlightSingleCell(string[] cell_line, uint yc, string color) {
-		string hightlight_str = $"{color}  {AC.RESET}";
+		string hightlight_str = $"{color}{cell_block}{AC.RESET}";
 
 		if (yc == 0 || yc == cell_size.y - 1) {
 			for (int i = 0; i < cell_line.Length; i++) {
@@ -98,7 +100,7 @@ internal class TerminalMap {
 		(TCell? top, TCell? bot, TCell? left, TCell? right) neighbours,
 		Func<TCell, TCell?, bool> condition
 	) {
-		string hightlight_str = $"{color}  {AC.RESET}";
+		string hightlight_str = $"{color}{cell_block}{AC.RESET}";
 
 		if (yc == 0) {
 			if (condition(cell, neighbours.top)) {
@@ -153,6 +155,49 @@ internal class TerminalMap {
 	}
 
 	public List<string> printPopMap(
+		(Coord coord, string color, uint priority)[]? highlighted_coord = null
+	) {
+		Dictionary<Coord, string> highlighted_coord_set = highlighted_coord?
+			.GroupBy(v => v.coord)
+			.ToDictionary(
+				g => g.Key,
+				g => g.MaxBy(v => v.priority).color
+			) ?? [];
+
+		uint max_pop = 1;
+
+		for (uint x = 0; x < map_size.x; x++) {
+			for (uint y = 0; y < map_size.y; y++) {
+				uint pop = getCell((x + 1, y + 1)).Value.population;
+				if (pop > max_pop) {
+					max_pop = pop;
+				}
+			}
+		}
+
+		return printMap((cell, yc, neighbours) => {
+			float pop_ratio = (float) cell.population / max_pop;
+			int red_value = (int) (pop_ratio * 255);
+			string[] cell_line = [.. Enumerable.Repeat($"\x1b[48;2;{red_value};0;0m{cell_block}{AC.RESET}", cell_size.x)];
+
+			if (highlighted_coord_set.TryGetValue(cell.id, out string? color)) {
+				hightlightSingleCell(cell_line, yc, color);
+			}
+			else if (cell.owner.HasValue) {
+				hightlightMultipleCell(
+					cell_line,
+					yc,
+					getAnsiBackgroundColor(getPlayerColor(cell.owner.Value)),
+					cell,
+					neighbours,
+					(cell, other) => other == null || other.owner != cell.owner
+				);
+			}
+			return cell_line;
+		});
+	}
+
+	public List<string> printRessourceMap(
 		(Coord coord, string color, uint priority)[]? highlighted_coord = null
 	) {
 		Dictionary<Coord, string> highlighted_coord_set = highlighted_coord?

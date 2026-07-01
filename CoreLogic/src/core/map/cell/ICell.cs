@@ -20,5 +20,6 @@ public interface ICell<TCellKey> where TCellKey : notnull {
 	string name { get; }
 	PlayerKey? owner { get; set; }
 	Terrain terrain { get; }
+	uint population { get; }
 	IEnumerable<(Ressource res, uint amount)> ressources { get; }
 };
