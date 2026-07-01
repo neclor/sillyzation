@@ -59,8 +59,8 @@ internal class Core<TCellKey> : ICore<TCellKey> where TCellKey : notnull {
 
 
 	// Unit Queue
-	public ErrorOr<IUnitQueue> getUnitQueue(PlayerKey playerId) {
-		return new UnitQueue();
+	public ErrorOr<IUnitQueue<TCellKey>> getUnitQueue(PlayerKey playerId) {
+		return new UnitQueue<TCellKey>();
 	}
 
 	public ErrorOr<bool> createUnitQueueGroup(PlayerKey playerId) {
@@ -82,12 +82,14 @@ internal class Core<TCellKey> : ICore<TCellKey> where TCellKey : notnull {
 
 
 	// Unit
-	public ErrorOr<IUnit> getUnit(PlayerKey playerId, uint unitId) {
-		return new Unit();
+	public ErrorOr<IUnit<TCellKey>> getUnit(PlayerKey playerId, uint unitId) {
+		throw new NotImplementedException();
+		// return new Infantry<TCellKey>();
 	}
 
-	public ErrorOr<IEnumerable<IUnit>> getAllUnits(PlayerKey playerId) {
-		return new[] { new Unit() };
+	public ErrorOr<IEnumerable<IUnit<TCellKey>>> getAllUnits(PlayerKey playerId) {
+		throw new NotImplementedException();
+		// return new[] { new Unit<TCellKey>() };
 	}
 
 	public ErrorOr<bool> moveUnit(PlayerKey playerId, uint unitId, TCellKey cellId) {
@@ -105,15 +107,15 @@ internal class Core<TCellKey> : ICore<TCellKey> where TCellKey : notnull {
 
 
 	// Combat
-	public ErrorOr<ICombat> getCombatInfo(PlayerKey playerId, uint combatId) {
-		return new Combat();
+	public ErrorOr<ICombat<TCellKey>> getCombatInfo(PlayerKey playerId, uint combatId) {
+		return new Combat<TCellKey>();
 	}
 
 
 
 	// Front
-	public ErrorOr<IFront> getFront(PlayerKey playerId, uint frontId) {
-		return new Front();
+	public ErrorOr<IFront<TCellKey>> getFront(PlayerKey playerId, uint frontId) {
+		throw new NotImplementedException();
 	}
 
 	public ErrorOr<bool> createFront(PlayerKey playerId, TCellKey cellId1, TCellKey cellId2) {

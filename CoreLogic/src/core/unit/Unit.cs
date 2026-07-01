@@ -1,15 +1,31 @@
 namespace CoreLogic;
 
-internal class Unit : IUnit {
-	public uint id => throw new NotImplementedException();
+internal class Infantry<TCellKey> : IUnit<TCellKey> {
+	public uint id => 0;
+	public string name => "Infantry Division";
+	public uint baseHealth => 50;
+	public uint health => 50;
+	public uint speed => 1;
+	public PlayerKey owner { get; }
+	public TCellKey position { get; }
 
-	public uint baseHealth => throw new NotImplementedException();
+	public Infantry(TCellKey position, PlayerKey owner) {
+		this.position = position;
+		this.owner = owner;
+	}
+}
 
-	public uint health => throw new NotImplementedException();
+internal class Tank<TCellKey> : IUnit<TCellKey> {
+	public uint id => 0;
+	public string name => "Tank Division";
+	public uint baseHealth => 200;
+	public uint health => 200;
+	public uint speed => 1;
+	public PlayerKey owner { get; }
+	public TCellKey position { get; }
 
-	public uint speed => throw new NotImplementedException();
-
-	public uint owner => throw new NotImplementedException();
-
-	public uint position => throw new NotImplementedException();
+	public Tank(TCellKey position, PlayerKey owner) {
+		this.position = position;
+		this.owner = owner;
+	}
 }

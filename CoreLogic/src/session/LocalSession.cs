@@ -14,6 +14,8 @@ internal class LocalSession<TCellKey> : ISession<TCellKey> where TCellKey : notn
 
 	uint ISession<TCellKey>.currentPlayerId => currentPlayerId;
 
+	public IUnit<TCellKey>[] current_player_units => throw new NotImplementedException();
+
 	public LocalSession(
 		IEnumerable<(ISessionPlayer player, TCellKey[] start)> players,
 		IEnumerable<(TCellKey key, ICell<TCellKey> cell)> cells,

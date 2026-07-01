@@ -1,5 +1,3 @@
-global using TCell = CoreLogic.ICell<(uint x, uint y)>;
-
 using AC = AnsiColors;
 using ErrorOr;
 using CoreLogic;

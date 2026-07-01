@@ -23,24 +23,24 @@ public interface ICore<TCellKey> where TCellKey : notnull {
 	ErrorOr<ICell<TCellKey>> getCell(uint playerId, TCellKey cellId);
 
 	// Unit Queue
-	ErrorOr<IUnitQueue> getUnitQueue(PlayerKey playerId);
+	ErrorOr<IUnitQueue<TCellKey>> getUnitQueue(PlayerKey playerId);
 	ErrorOr<bool> createUnitQueueGroup(PlayerKey playerId);
 	ErrorOr<bool> deployUnitQueueGroup(PlayerKey playerId, uint queueGroupId);
 	ErrorOr<bool> addUnitToQueueGroup(PlayerKey playerId);
 	ErrorOr<bool> removeUnitToQueueGroup(PlayerKey playerId, UnitKey unitInQueueGroupId);
 
 	// Unit
-	ErrorOr<IUnit> getUnit(PlayerKey playerId, UnitKey unitId);
-	ErrorOr<IEnumerable<IUnit>> getAllUnits(PlayerKey playerId);
+	ErrorOr<IUnit<TCellKey>> getUnit(PlayerKey playerId, UnitKey unitId);
+	ErrorOr<IEnumerable<IUnit<TCellKey>>> getAllUnits(PlayerKey playerId);
 	ErrorOr<bool> moveUnit(PlayerKey playerId, UnitKey unitId, TCellKey cellId);
 	ErrorOr<bool> assignUnitToFront(PlayerKey playerId, UnitKey unitId, FrontKey frontId);
 	ErrorOr<bool> deleteUnit(PlayerKey playerId, UnitKey unitId);
 
 	// Combat
-	ErrorOr<ICombat> getCombatInfo(PlayerKey playerId, uint combatId);
+	ErrorOr<ICombat<TCellKey>> getCombatInfo(PlayerKey playerId, uint combatId);
 
 	// Front
-	ErrorOr<IFront> getFront(PlayerKey playerId, FrontKey frontId);
+	ErrorOr<IFront<TCellKey>> getFront(PlayerKey playerId, FrontKey frontId);
 	ErrorOr<bool> createFront(PlayerKey playerId, TCellKey cellId1, TCellKey cellId2);
 	ErrorOr<bool> moveFront(PlayerKey playerId, FrontKey frontId, TCellKey cellId, bool side);
 }

@@ -1,3 +1,5 @@
+global using TCell = CoreLogic.ICell<(uint x, uint y)>;
+global using TUnit = CoreLogic.IUnit<(uint x, uint y)>;
 using System.Text;
 using session;
 using CoreLogic;
@@ -6,7 +8,7 @@ using AC = AnsiColors;
 internal class TerminalVersion {
 	private ISession<Coord> session { get; }
 	private (int x, int y) map_size { get; }
-	private readonly Dictionary<uint, ISessionPlayer> players;
+	private readonly Dictionary<PlayerKey, ISessionPlayer> players;
 	private readonly SimpleMenu menu;
 	private readonly TerminalMap map;
 	private uint map_mode;
@@ -26,21 +28,21 @@ internal class TerminalVersion {
 				new ExecuteAndContinueOption("Population map mode", () => map_mode = 1),
 				new ExecuteAndContinueOption("Ressource map mode", () => map_mode = 2),
 			], defaultMenu),
-			new DynamicMenu<string>(
+			new DynamicMenu<TUnit>(
 				"Select Unit",
 				"Move Units",
 				[
 					new GoBackOption("Go Back"),
 				],
 				(arg) => new SelectCellMenu(
-					$"Unit {arg}",
+					$"{arg.name} at {arg.position}",
 					"Move unit to :",
 					((uint) this.map_size.x, (uint) this.map_size.y),
 					(2, 2),
 					c => new ExecuteAndContinueOption($"Unit {arg} to ({c.x}, {c.y})", () => {}),
 					printSelectCellMenu
 				),
-				() => ["Hello", "World", "Stupid"],
+				() => session.current_player_units,
 				defaultMenu
 			),
 			new SimpleMenu("Unit Queue actions:", "Unit Queue", false, [

@@ -1,7 +1,7 @@
 namespace CoreLogic;
 
-public interface IFront {
+public interface IFront<TCellKey> {
 	uint id { get; }
-	IEnumerable<(uint cellId1, uint cellId2)> edges { get; }
-	IEnumerable<(uint cellId1, uint cellId2)> extremities { get; }
+	IEnumerable<(TCellKey cellId1, TCellKey cellId2)> edges { get; }
+	IEnumerable<(TCellKey cellId1, TCellKey cellId2)> extremities { get; }
 };
