@@ -128,14 +128,18 @@ internal class DynamicMenu<T> : ITerminalMenu, ITerminalMenuOption {
 }
 
 internal class SelectCellMenu : ITerminalMenu, ITerminalMenuOption {
-	public string name { get; }
+	private readonly string name;
+	private readonly string option_name;
 	private Coord coord;
 	private readonly Coord map_size;
 	private readonly Coord initial_coord;
 	private readonly Func<Coord, ITerminalMenuOption> factory;
 	private readonly Action<string, Coord, Coord> display_func;
 
+	string ITerminalMenuOption.name => option_name;
+
 	public SelectCellMenu(
+		string option_name,
 		string name,
 		Coord map_size,
 		Coord initial_coord,
@@ -143,8 +147,10 @@ internal class SelectCellMenu : ITerminalMenu, ITerminalMenuOption {
 		Action<string, Coord, Coord> display_func
 	) {
 		this.name = name;
+		this.option_name = option_name;
 		this.map_size = map_size;
 		this.initial_coord = initial_coord;
+		this.coord = initial_coord;
 		this.factory = factory;
 		this.display_func = display_func;
 	}
@@ -179,25 +185,25 @@ internal class SelectCellMenu : ITerminalMenu, ITerminalMenuOption {
 #pragma warning disable IDE0010 // Add missing cases
 		switch (input) {
 			case ConsoleKey.UpArrow:
-				if (coord.y > 0) {
+				if (coord.y > 1) {
 					coord.y--;
 				}
 				Console.WriteLine($"selected coord {coord}");
 				return MenuResult.Continue;
 			case ConsoleKey.DownArrow:
-				if (coord.y < map_size.y - 1) {
+				if (coord.y < map_size.y) {
 					coord.y++;
 				}
 				Console.WriteLine($"selected coord {coord}");
 				return MenuResult.Continue;
 			case ConsoleKey.LeftArrow:
-				if (coord.x > 0) {
+				if (coord.x > 1) {
 					coord.x--;
 				}
 				Console.WriteLine($"selected coord {coord}");
 				return MenuResult.Continue;
 			case ConsoleKey.RightArrow:
-				if (coord.x < map_size.x - 1) {
+				if (coord.x < map_size.x) {
 					coord.x++;
 				}
 				Console.WriteLine($"selected coord {coord}");

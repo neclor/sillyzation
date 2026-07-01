@@ -9,16 +9,24 @@ internal class TerminalVersion {
 	private (int x, int y) map_size { get; }
 	private readonly Dictionary<uint, IPlayer> players;
 	private readonly SimpleMenu menu;
+	private readonly TerminalMap map;
+	private uint map_mode;
 
 	private static readonly (int x, int y) cell_size = (5, 4);
 	private const int minMenuWidth = 32;
 
-	public TerminalVersion(ISession<Coord> session, (int, int) map_size) {
+	public TerminalVersion(ISession<Coord> session, (int x, int y) map_size) {
 		this.session = session;
 		this.map_size = map_size;
 		players = session.getAllPlayers();
 		menu = new("Choose your option :", "", true, [
 			new ExecuteAndExitOption("End Turn", session.endTurn),
+			new SimpleMenu("Choose your map mode", "Change map mode", false, [
+				new GoBackOption("Go Back"),
+				new ExecuteAndContinueOption("Default map mode", () => map_mode = 0),
+				new ExecuteAndContinueOption("Population map mode", () => map_mode = 1),
+				new ExecuteAndContinueOption("Ressource map mode", () => map_mode = 2),
+			], defaultMenu),
 			new DynamicMenu<string>(
 				"Select Unit",
 				"Move Units",
@@ -26,9 +34,10 @@ internal class TerminalVersion {
 					new GoBackOption("Go Back"),
 				],
 				(arg) => new SelectCellMenu(
+					$"Unit {arg}",
 					"Move unit to :",
 					((uint) this.map_size.x, (uint) this.map_size.y),
-					(0, 0),
+					(2, 2),
 					c => new ExecuteAndContinueOption($"Unit {arg} to ({c.x}, {c.y})", () => {}),
 					printSelectCellMenu
 				),
@@ -42,6 +51,11 @@ internal class TerminalVersion {
 				new ExecuteAndContinueOption("Deploy Unit Queue", () => {}),
 			], defaultMenu),
 		], defaultMenu);
+		map = new(
+			((uint) map_size.x, (uint) map_size.y),
+			playerId => players[playerId].color,
+			c => session.getCell(session.currentPlayerId, c)
+		);
 	}
 
 	private void defaultMenu(string name, (string option, int index)[] options, int selected) {
@@ -57,8 +71,8 @@ internal class TerminalVersion {
 		print([
 			(title, "")
 		], [
-			(initial_coord, AC.BG_STD_GRAY),
-			(coord, AC.BG_STD_WHITE),
+			(coord, AC.BG_STD_WHITE, 1),
+			(initial_coord, AC.BG_STD_GRAY, 0),
 		]);
 	}
 
@@ -79,7 +93,7 @@ internal class TerminalVersion {
 		_ => AC.RESET
 	};
 
-	private void print((string content, string color)[] contentMenu, (Coord coord, string color)[]? highlighted_coords = null) {
+	private void print((string content, string color)[] contentMenu, (Coord coord, string color, uint priority)[]? highlighted_coords = null) {
 		int longest = (contentMenu.Length != 0)
 			? contentMenu.Max((cur) => cur.content.Length)
 			: 0;
@@ -88,12 +102,12 @@ internal class TerminalVersion {
 		int mapHeight = map_size.y * cell_size.y;
 		int nbLines = contentMenu.Length > mapHeight ? contentMenu.Length : mapHeight;
 
-		List<string> map = TerminalMap.printMap(
-			map_size,
-			playerId => players[playerId].color,
-			c => session.getCell(session.currentPlayerId, c),
-			highlighted_coords
-		);
+		List<string> map_res = map_mode switch {
+			0 => map.printDefaultMap(highlighted_coords),
+			1 => map.printPopMap(highlighted_coords),
+			2 => map.printDefaultMap(highlighted_coords),
+			_ => throw new InvalidDataException("Invalid map mode index"),
+		};
 
 		string textColor = getAnsiTextColor(session.currentPlayer.color);
 		StringBuilder sb = new();
@@ -107,7 +121,7 @@ internal class TerminalVersion {
 				_ = sb.Append(' ', mapWidth);
 			}
 			else {
-				_ = sb.Append(map[i]);
+				_ = sb.Append(map_res[i]);
 			}
 			_ = sb.AppendLine(CultureInfo.InvariantCulture, $"{textColor}║{AC.RESET}");
 		}
@@ -117,7 +131,7 @@ internal class TerminalVersion {
 
 			for (int i = contentMenu.Length; i < mapHeight; i++) {
 				_ = sb.Append(leftPad)
-					.Append(map[i])
+					.Append(map_res[i])
 					.AppendLine(rightPad);
 			}
 		}

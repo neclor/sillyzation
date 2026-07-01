@@ -13,20 +13,20 @@ internal class Program {
 	}
 
 	private static void lanchTerminalTestApp() {
-		LocalSession<(uint, uint)> session = new(
+		LocalSession<Coord> session = new(
 			[
-				(new HumanPlayer(), Country.France, [(1,1)]),
-				(new HumanPlayer(), Country.England, [(2,4)]),
+				(new HumanPlayer(), Country.France, [(1,1), (2,1)]),
+				(new AiPlayer(), Country.England, [(2,4),(2,3)]),
 			],
 			[
-				((1, 1), new Cell<(uint, uint)>((1, 1), "Bruxelles", Terrain.Swamp, 10000000, [])),
-				((2, 1), new Cell<(uint, uint)>((2, 1), "Namur", Terrain.Forest, 3000000, [])),
-				((2, 2), new Cell<(uint, uint)>((2, 2), "Liege", Terrain.Desert, 5000000, [])),
-				((1, 2), new Cell<(uint, uint)>((1, 2), "Leuven", Terrain.Plain, 2000000, [])),
-				((1, 3), new Cell<(uint, uint)>((1, 3), "Charleroi", Terrain.Savanna, 2000000, [])),
-				((2, 3), new Cell<(uint, uint)>((2, 3), "Brugge", Terrain.Jungle, 2000000, [])),
-				((1, 4), new Cell<(uint, uint)>((1, 4), "Charleroi", Terrain.Tundra, 2000000, [])),
-				((2, 4), new Cell<(uint, uint)>((2, 4), "Brugge", Terrain.Jungle, 2000000, [])),
+				((1, 1), new Cell<Coord>((1, 1), "Bruxelles", Terrain.Swamp, 10000000, [])),
+				((2, 1), new Cell<Coord>((2, 1), "Namur", Terrain.Forest, 3000000, [])),
+				((2, 2), new Cell<Coord>((2, 2), "Liege", Terrain.Desert, 5000000, [])),
+				((1, 2), new Cell<Coord>((1, 2), "Leuven", Terrain.Plain, 2000000, [])),
+				((1, 3), new Cell<Coord>((1, 3), "Charleroi", Terrain.Savanna, 2000000, [])),
+				((2, 3), new Cell<Coord>((2, 3), "Brugge", Terrain.Jungle, 2000000, [])),
+				((1, 4), new Cell<Coord>((1, 4), "Charleroi", Terrain.Tundra, 2000000, [])),
+				((2, 4), new Cell<Coord>((2, 4), "Brugge", Terrain.Jungle, 2000000, [])),
 			],
 			[
 				((1, 1), (2, 1)),

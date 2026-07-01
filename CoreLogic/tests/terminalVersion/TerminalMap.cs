@@ -1,3 +1,5 @@
+global using TCell = CoreLogic.ICell<(uint x, uint y)>;
+
 using AC = AnsiColors;
 using ErrorOr;
 using CoreLogic;
@@ -62,72 +64,152 @@ internal class TerminalMap {
 			]
 		},
 	};
+	private readonly Coord map_size;
+	private readonly Func<PlayerKey, Color> getPlayerColor;
+	private readonly Func<Coord, ErrorOr<TCell>> getCell;
 
-	public static List<string> printMap(
-		(int x, int y) map_size,
-		Func<uint, Color> getPlayerColor,
-		Func<Coord, ErrorOr<ICell<(uint, uint)>>> getCell,
-		(Coord coord, string color)[]? highlighted_coord = null
+	public TerminalMap(
+		Coord map_size,
+		Func<PlayerKey, Color> getPlayerColor,
+		Func<Coord, ErrorOr<TCell>> getCell
 	) {
-		var cells = new (Terrain terrain, uint? ownership)[map_size.x][];
-		for (uint x = 0; x < map_size.x; x++) {
-			cells[x] = new (Terrain terrain, uint? ownership)[map_size.y];
-			for (uint y = 0; y < map_size.y; y++) {
-				ErrorOr<ICell<(uint, uint)>> cell = getCell((x + 1, y + 1));
-				if (!cell.IsError) {
-					cells[x][y] = (cell.Value.terrain, cell.Value.owner);
-				}
-				else {
-					cells[x][y] = (Terrain.Plain, null);
+		this.map_size = map_size;
+		this.getPlayerColor = getPlayerColor;
+		this.getCell = getCell;
+	}
+
+	private static void hightlightSingleCell(string[] cell_line, uint yc, string color) {
+		string hightlight_str = $"{color}  {AC.RESET}";
+
+		if (yc == 0 || yc == cell_size.y - 1) {
+			for (int i = 0; i < cell_line.Length; i++) {
+				cell_line[i] = hightlight_str;
+			}
+		}
+		cell_line[0] = hightlight_str;
+		cell_line[^1] = hightlight_str;
+	}
+
+	private static void hightlightMultipleCell(
+		string[] cell_line,
+		uint yc,
+		string color,
+		TCell cell,
+		(TCell? top, TCell? bot, TCell? left, TCell? right) neighbours,
+		Func<TCell, TCell?, bool> condition
+	) {
+		string hightlight_str = $"{color}  {AC.RESET}";
+
+		if (yc == 0) {
+			if (condition(cell, neighbours.top)) {
+				for (int i = 0; i < cell_line.Length; i++) {
+					cell_line[i] = hightlight_str;
 				}
 			}
 		}
+		if (yc == cell_size.y - 1) {
+			if (condition(cell, neighbours.bot)) {
+				for (int i = 0; i < cell_line.Length; i++) {
+					cell_line[i] = hightlight_str;
+				}
+			}
+		}
+		if (condition(cell, neighbours.left)) {
+			cell_line[0] = hightlight_str;
+		}
+		if (condition(cell, neighbours.right)) {
+			cell_line[^1] = hightlight_str;
+		}
+	}
 
+	public List<string> printDefaultMap(
+		(Coord coord, string color, uint priority)[]? highlighted_coord = null
+	) {
 		Dictionary<Coord, string> highlighted_coord_set = highlighted_coord?
 			.GroupBy(v => v.coord)
-			.ToDictionary(g => g.Key, g => g.Last().color)
-			?? [];
+			.ToDictionary(
+				g => g.Key,
+				g => g.MaxBy(v => v.priority).color
+			) ?? [];
+
+		return printMap((cell, yc, neighbours) => {
+			string[] cell_line = [.. backgrounds[cell.terrain][yc].Select(e => $"{e}{AC.RESET}")];
+
+			if (highlighted_coord_set.TryGetValue(cell.id, out string? color)) {
+				hightlightSingleCell(cell_line, yc, color);
+			}
+			else if (cell.owner.HasValue) {
+				hightlightMultipleCell(
+					cell_line,
+					yc,
+					getAnsiBackgroundColor(getPlayerColor(cell.owner.Value)),
+					cell,
+					neighbours,
+					(cell, other) => other == null || other.owner != cell.owner
+				);
+			}
+			return cell_line;
+		});
+	}
+
+	public List<string> printPopMap(
+		(Coord coord, string color, uint priority)[]? highlighted_coord = null
+	) {
+		Dictionary<Coord, string> highlighted_coord_set = highlighted_coord?
+			.GroupBy(v => v.coord)
+			.ToDictionary(
+				g => g.Key,
+				g => g.MaxBy(v => v.priority).color
+			) ?? [];
+
+		return printMap((cell, yc, neighbours) => {
+			string[] cell_line = [.. Enumerable.Repeat("  ", cell_size.x)];
+
+			if (highlighted_coord_set.TryGetValue(cell.id, out string? color)) {
+				hightlightSingleCell(cell_line, yc, color);
+			}
+			else if (cell.owner.HasValue) {
+				hightlightMultipleCell(
+					cell_line,
+					yc,
+					getAnsiBackgroundColor(getPlayerColor(cell.owner.Value)),
+					cell,
+					neighbours,
+					(cell, other) => other == null || other.owner != cell.owner
+				);
+			}
+			return cell_line;
+		});
+	}
+
+	private List<string> printMap(
+		Func<TCell, uint, (TCell? top, TCell? bot, TCell? left, TCell? right), string[]> displayCell
+	) {
+		TCell[][] cells = new TCell[map_size.x][];
+		for (uint x = 0; x < map_size.x; x++) {
+			cells[x] = new TCell[map_size.y];
+			for (uint y = 0; y < map_size.y; y++) {
+				cells[x][y] = getCell((x + 1, y + 1)).Value;
+			}
+		}
 
 		List<List<string[]>> map = [];
 		for (uint y = 0; y < map_size.y; y++) {
 			for (uint yc = 0; yc < cell_size.y; yc++) {
 				List<string[]> line = [];
 				for (uint x = 0; x < map_size.x; x++) {
-					string[] cell_line = [.. backgrounds[cells[x][y].terrain][yc].Select(e => $"{e}{AC.RESET}")];
-					uint? current_owner = cells[x][y].ownership;
-
-					if (highlighted_coord_set.TryGetValue((x, y), out string? color)) {
-						if (yc == 0 || yc == cell_size.y - 1) {
-							for (int i = 0; i < cell_line.Length; i++) {
-								cell_line[i] = $"{color}  {AC.RESET}";
-							}
-						}
-						cell_line[0] = $"{color}  {AC.RESET}";
-						cell_line[^1] = $"{color}  {AC.RESET}";
-					}
-					else if (current_owner.HasValue) {
-						string p_color = getAnsiBackgroundColor(getPlayerColor(current_owner.Value));
-						if (yc == 0) {
-							if (!(y > 0) || cells[x][y - 1].ownership != current_owner) {
-								for (int i = 0; i < cell_line.Length; i++) {
-									cell_line[i] = $"{p_color}  {AC.RESET}";
-								}
-							}
-						}
-						if (yc == cell_size.y - 1) {
-							if (!(y < map_size.y - 1) || cells[x][y + 1].ownership != current_owner) {
-								for (int i = 0; i < cell_line.Length; i++) {
-									cell_line[i] = $"{p_color}  {AC.RESET}";
-								}
-							}
-						}
-						if (!(x > 0) || cells[x - 1][y].ownership != current_owner) {
-							cell_line[0] = $"{p_color}  {AC.RESET}";
-						}
-						if (!(x < map_size.x - 1) || cells[x + 1][y].ownership != current_owner) {
-							cell_line[^1] = $"{p_color}  {AC.RESET}";
-						}
-					}
+					string[] cell_line = displayCell(
+						cells[x][y],
+						yc,
+#pragma warning disable format
+						(
+							y > 0              ? cells[x][y - 1] : null,
+							y < map_size.y - 1 ? cells[x][y + 1] : null,
+							x > 0              ? cells[x - 1][y] : null,
+							x < map_size.x - 1 ? cells[x + 1][y] : null
+						)
+#pragma warning restore format
+					);
 
 					line.AddRange(cell_line);
 				}
