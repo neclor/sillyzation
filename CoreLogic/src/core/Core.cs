@@ -8,19 +8,14 @@ internal class Core<TCellKey> : ICore<TCellKey> where TCellKey : notnull {
 	private readonly Game game;
 
 	public Core(
-		IEnumerable<(string name, Color color, TCellKey[] ownership)> players,
+		IEnumerable<(IPlayer player, TCellKey[] ownership)> players,
 		IEnumerable<(TCellKey key, ICell<TCellKey> cell)> cells,
 		IEnumerable<(TCellKey key1, TCellKey key2)> connexions
 	) {
-		game = new(players.Select(p => (p.name, p.color)));
+		game = new(players.Select(p => p.player));
 
 		IEnumerable<(uint playerId, TCellKey[] cells)> ownerships = players
-			.Join(
-				game.getAllPlayers(),
-				playerInput => playerInput.name,
-				playerDict => playerDict.Value.name,
-				(playerInput, playerDict) => (playerId: playerDict.Key, cells: playerInput.ownership)
-			);
+			.Select((x, _) => (x.player.id, x.ownership));
 
 		// Map
 		map = new(cells, connexions, ownerships);

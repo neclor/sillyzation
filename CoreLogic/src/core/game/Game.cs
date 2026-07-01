@@ -3,20 +3,12 @@ using ErrorOr;
 namespace CoreLogic;
 
 internal class Game : IGame {
-	private Dictionary<uint, IPlayer> players = [];
+	private readonly Dictionary<uint, IPlayer> players;
 	private PlayerKey playerId = 1;
 
 
 
-	public Game(IEnumerable<(string name, Color color)> players) {
-		foreach (var player in players) {
-			Console.WriteLine(player);
-			var status = addPlayer(player.name, player.color);
-			if (status.IsError) {
-				throw new InvalidDataException("Failed to insert players");
-			}
-		}
-	}
+	public Game(IEnumerable<IPlayer> players) => this.players = players.ToDictionary(p => p.id);
 
 
 

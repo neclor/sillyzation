@@ -72,11 +72,11 @@ internal class SimpleMenu : ITerminalMenu, ITerminalMenuOption {
 		switch (input) {
 			case ConsoleKey.UpArrow:
 				option_index = Math.Max(option_index - 1, 0);
-				Console.WriteLine($"index {option_index}");
+				Console.WriteLine($"menu index {option_index}");
 				return MenuResult.Continue;
 			case ConsoleKey.DownArrow:
 				option_index = Math.Min(option_index + 1, options.Length - 1);
-				Console.WriteLine($"index {option_index}");
+				Console.WriteLine($"menu index {option_index}");
 				return MenuResult.Continue;
 			case ConsoleKey.Enter:
 				ITerminalMenuOption option = options[option_index];

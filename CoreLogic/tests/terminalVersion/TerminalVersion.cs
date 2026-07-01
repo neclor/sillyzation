@@ -7,7 +7,7 @@ using AC = AnsiColors;
 internal class TerminalVersion {
 	private ISession<Coord> session { get; }
 	private (int x, int y) map_size { get; }
-	private readonly Dictionary<uint, IPlayer> players;
+	private readonly Dictionary<uint, ISessionPlayer> players;
 	private readonly SimpleMenu menu;
 	private readonly TerminalMap map;
 	private uint map_mode;
@@ -152,8 +152,6 @@ internal class TerminalVersion {
 
 	public void start() {
 		while (true) {
-			IPlayer player = session.currentPlayer;
-			Console.WriteLine("Player : " + player.name);
 			_ = menu.display();
 		}
 	}

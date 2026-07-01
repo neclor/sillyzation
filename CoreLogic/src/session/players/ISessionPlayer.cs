@@ -1,3 +1,5 @@
-internal interface ISessionPlayer {
+using CoreLogic;
 
+internal interface ISessionPlayer : IPlayer {
+	bool isAI();
 }
