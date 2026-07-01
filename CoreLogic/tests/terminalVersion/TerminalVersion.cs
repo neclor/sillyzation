@@ -1,7 +1,6 @@
 using System.Text;
 using session;
 using CoreLogic;
-using System.Globalization;
 using AC = AnsiColors;
 
 internal class TerminalVersion {
@@ -111,34 +110,31 @@ internal class TerminalVersion {
 
 		string textColor = getAnsiTextColor(session.currentPlayer.color);
 		StringBuilder sb = new();
-		_ = sb.AppendLine(
-			CultureInfo.InvariantCulture,
-			$"{textColor}╔{new string('═', menuWidth)}╦{new string('═', mapWidth)}╗{AC.RESET}"
-		);
+#pragma warning disable IDE0058 // Expression value is never used
+
+		sb.AppendLine($"{textColor}╔{new('═', menuWidth + 1 + mapWidth)}╗{AC.RESET}");
+		sb.AppendLine($"{textColor}║{AC.RESET}{$" Country: {textColor}{session.currentPlayer.name}{AC.RESET}   Population: 10000   Iron: 6769{new(' ', menuWidth + 1 + mapWidth - session.currentPlayer.name.Length - 43)}"}{textColor}║{AC.RESET}");
+		sb.AppendLine($"{textColor}╠{new('═', menuWidth)}╦{new('═', mapWidth)}╣{AC.RESET}");
 		foreach (((string content, string color), int i) in contentMenu.Select((value, index) => (value, index))) {
-			_ = sb.Append(CultureInfo.InvariantCulture, $"{textColor}║{AC.RESET}{color}{content.PadRight(menuWidth)}{AC.RESET}{textColor}║{AC.RESET}");
+			sb.Append($"{textColor}║{AC.RESET}{color}{content.PadRight(menuWidth)}{AC.RESET}{textColor}║{AC.RESET}");
 			if (i >= mapHeight) {
-				_ = sb.Append(' ', mapWidth);
+				sb.Append(' ', mapWidth);
 			}
 			else {
-				_ = sb.Append(map_res[i]);
+				sb.Append(map_res[i]);
 			}
-			_ = sb.AppendLine(CultureInfo.InvariantCulture, $"{textColor}║{AC.RESET}");
+			sb.AppendLine($"{textColor}║{AC.RESET}");
 		}
 		if (contentMenu.Length < mapHeight) {
-			string leftPad = $"{textColor}║{AC.RESET}{new string(' ', menuWidth)}{textColor}║{AC.RESET}";
+			string leftPad = $"{textColor}║{AC.RESET}{new(' ', menuWidth)}{textColor}║{AC.RESET}";
 			string rightPad = $"{textColor}║{AC.RESET}";
 
 			for (int i = contentMenu.Length; i < mapHeight; i++) {
-				_ = sb.Append(leftPad)
-					.Append(map_res[i])
-					.AppendLine(rightPad);
+				sb.AppendLine($"{leftPad}{map_res[i]}{rightPad}");
 			}
 		}
-		_ = sb.AppendLine(
-			CultureInfo.InvariantCulture,
-			$"{textColor}╚{new string('═', menuWidth)}╩{new string('═', mapWidth)}╝{AC.RESET}"
-		);
+		sb.AppendLine($"{textColor}╚{new('═', menuWidth)}╩{new('═', mapWidth)}╝{AC.RESET}");
+#pragma warning restore IDE0058 // Expression value is never used
 
 		string res = sb.ToString();
 		clear();

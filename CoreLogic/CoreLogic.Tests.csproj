@@ -17,6 +17,7 @@
 
     <RootNamespace>CoreLogic.Tests</RootNamespace>
     <NoWarn>$(NoWarn);CS0219;CA1859;CA1852;CA1823</NoWarn>
+    <InvariantGlobalization>true</InvariantGlobalization>
   </PropertyGroup>
 
   <ItemGroup>
