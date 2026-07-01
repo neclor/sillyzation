@@ -4,10 +4,10 @@ using ErrorOr;
 namespace session;
 
 internal class LocalSession<TCellKey> : ISession<TCellKey> where TCellKey : notnull {
-	private uint currentPlayerId;
+	private PlayerKey currentPlayerId;
 	public IPlayer currentPlayer => players[currentPlayerId];
 	private readonly IPlayer[] players;
-	private readonly ICore<TCellKey> core;
+	private readonly Core<TCellKey> core;
 
 	public bool gameState => throw new NotImplementedException();
 

@@ -6,16 +6,16 @@ namespace session;
 internal interface ISession<TCellKey> where TCellKey : notnull {
 	// Give the UI the player to display (will always be the same if you are in
 	// multiplayer on the internet or on a singleplayer game)
-	uint currentPlayerId { get; }
+	PlayerKey currentPlayerId { get; }
 	IPlayer currentPlayer { get; }
 
 	// Give the current map state
 	bool gameState { get; }
 
 	ErrorOr<IPlayer> getPlayer(PlayerKey playerId);
-	Dictionary<uint, IPlayer> getAllPlayers();
+	Dictionary<PlayerKey, IPlayer> getAllPlayers();
 
-	ErrorOr<ICell<TCellKey>> getCell(uint playerId, TCellKey cellId);
+	ErrorOr<ICell<TCellKey>> getCell(PlayerKey playerId, TCellKey cellId);
 
 	void endTurn();
 }
