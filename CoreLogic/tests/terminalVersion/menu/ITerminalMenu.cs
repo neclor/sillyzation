@@ -20,8 +20,8 @@ internal class SimpleMenu : ITerminalMenu, ITerminalMenuOption {
 	string ITerminalMenuOption.name => option_name;
 
 	public SimpleMenu(
-		string name,
 		string option_name,
+		string name,
 		bool is_root,
 		ITerminalMenuOption[] options,
 		Action<string, (string option, int index)[], int> display_func
@@ -97,8 +97,8 @@ internal class DynamicMenu<T> : ITerminalMenu, ITerminalMenuOption {
 	private readonly Action<string, (string option, int index)[], int> display_func;
 
 	public DynamicMenu(
-		string name,
 		string option_name,
+		string name,
 		ITerminalMenuOption[] static_options,
 		Func<T, ITerminalMenuOption> factory,
 		Func<T[]> get_values,

@@ -15,7 +15,7 @@ internal class Core<TCellKey> : ICore<TCellKey> where TCellKey : notnull {
 		game = new(players.Select(p => p.player));
 
 		IEnumerable<(uint playerId, TCellKey[] cells)> ownerships = players
-			.Select((x, _) => (x.player.id, x.ownership));
+			.Select((x, _) => (x.player.id.value, x.ownership));
 
 		// Map
 		map = new(cells, connexions, ownerships);
@@ -36,7 +36,7 @@ internal class Core<TCellKey> : ICore<TCellKey> where TCellKey : notnull {
 		return game.getPlayer(playerId);
 	}
 
-	public Dictionary<uint, IPlayer> getAllPlayers() {
+	public Dictionary<PlayerKey, IPlayer> getAllPlayers() {
 		return game.getAllPlayers();
 	}
 
@@ -67,22 +67,22 @@ internal class Core<TCellKey> : ICore<TCellKey> where TCellKey : notnull {
 		return true;
 	}
 
-	public ErrorOr<bool> deployUnitQueueGroup(PlayerKey playerId, uint queueGroupId) {
+	public ErrorOr<bool> deployUnitQueueGroup(PlayerKey playerId, QueueKey queueGroupId) {
 		return true;
 	}
 
-	public ErrorOr<bool> addUnitToQueueGroup(PlayerKey playerId) {
+	public ErrorOr<bool> addUnitToQueueGroup(PlayerKey playerId, QueueKey queueGroupId, IUnit<TCellKey> unit) {
 		return true;
 	}
 
-	public ErrorOr<bool> removeUnitToQueueGroup(PlayerKey playerId, uint unitInQueueGroupId) {
+	public ErrorOr<bool> removeUnitToQueueGroup(PlayerKey playerId, UnitKey unitInQueueGroupId) {
 		return true;
 	}
 
 
 
 	// Unit
-	public ErrorOr<IUnit<TCellKey>> getUnit(PlayerKey playerId, uint unitId) {
+	public ErrorOr<IUnit<TCellKey>> getUnit(PlayerKey playerId, UnitKey unitId) {
 		throw new NotImplementedException();
 		// return new Infantry<TCellKey>();
 	}
@@ -92,15 +92,15 @@ internal class Core<TCellKey> : ICore<TCellKey> where TCellKey : notnull {
 		// return new[] { new Unit<TCellKey>() };
 	}
 
-	public ErrorOr<bool> moveUnit(PlayerKey playerId, uint unitId, TCellKey cellId) {
+	public ErrorOr<bool> moveUnit(PlayerKey playerId, UnitKey unitId, TCellKey cellId) {
 		return true;
 	}
 
-	public ErrorOr<bool> assignUnitToFront(PlayerKey playerId, uint unitId, uint frontId) {
+	public ErrorOr<bool> assignUnitToFront(PlayerKey playerId, UnitKey unitId, FrontKey frontId) {
 		return true;
 	}
 
-	public ErrorOr<bool> deleteUnit(PlayerKey playerId, uint unitId) {
+	public ErrorOr<bool> deleteUnit(PlayerKey playerId, UnitKey unitId) {
 		return true;
 	}
 
@@ -114,7 +114,7 @@ internal class Core<TCellKey> : ICore<TCellKey> where TCellKey : notnull {
 
 
 	// Front
-	public ErrorOr<IFront<TCellKey>> getFront(PlayerKey playerId, uint frontId) {
+	public ErrorOr<IFront<TCellKey>> getFront(PlayerKey playerId, FrontKey frontId) {
 		throw new NotImplementedException();
 	}
 
@@ -122,7 +122,7 @@ internal class Core<TCellKey> : ICore<TCellKey> where TCellKey : notnull {
 		return true;
 	}
 
-	public ErrorOr<bool> moveFront(PlayerKey playerId, uint frontId, TCellKey cellId, bool side) {
+	public ErrorOr<bool> moveFront(PlayerKey playerId, FrontKey frontId, TCellKey cellId, bool side) {
 		return true;
 	}
 }

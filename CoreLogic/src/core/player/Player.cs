@@ -1,12 +1,12 @@
 namespace CoreLogic;
 
 internal class Player : IPlayer {
-	public uint id { get; }
+	public PlayerKey id { get; }
 	public string name { get; }
 	public Color color { get; }
 
 	public Player(
-		uint id,
+		PlayerKey id,
 		string name,
 		Color color
 	) {

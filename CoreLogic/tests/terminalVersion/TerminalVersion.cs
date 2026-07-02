@@ -20,24 +20,26 @@ internal class TerminalVersion {
 	public TerminalVersion(ISession<Coord> session, (int x, int y) map_size) {
 		this.session = session;
 		this.map_size = map_size;
+
 		players = session.getAllPlayers();
-		menu = new("Choose your option :", "", true, [
+
+		menu = new("", "Choose your option :", true, [
 			new ExecuteAndExitOption("End Turn", session.endTurn),
-			new SimpleMenu("Choose your map mode", "Change map mode", false, [
+			new SimpleMenu("Change map mode", "Choose your map mode", false, [
 				new GoBackOption("Go Back"),
 				new ExecuteAndContinueOption("Default map mode", () => map_mode = 0),
 				new ExecuteAndContinueOption("Population map mode", () => map_mode = 1),
 				new ExecuteAndContinueOption("Ressource map mode", () => map_mode = 2),
 			], defaultMenu),
 			new DynamicMenu<TUnit>(
-				"Select Unit",
 				"Move Units",
+				"Select Unit",
 				[
 					new GoBackOption("Go Back"),
 				],
 				(arg) => new SelectCellMenu(
-					$"{arg.name} at {arg.position}",
 					"Move unit to :",
+					$"{arg.name} at {arg.position}",
 					((uint) this.map_size.x, (uint) this.map_size.y),
 					(2, 2),
 					c => new ExecuteAndContinueOption($"Unit {arg} to ({c.x}, {c.y})", () => {}),
@@ -46,13 +48,27 @@ internal class TerminalVersion {
 				() => session.current_player_units,
 				defaultMenu
 			),
-			new SimpleMenu("Unit Queue actions:", "Unit Queue", false, [
-				new GoBackOption("Go Back"),
-				new ExecuteAndContinueOption("New Unit Queue", () => {}),
-				new ExecuteAndContinueOption("Add new unit to unit Queue", () => {}),
-				new ExecuteAndContinueOption("Deploy Unit Queue", () => {}),
-			], defaultMenu),
+			new DynamicMenu<string>(
+				"Unit Queue",
+				"Select Unit Queue",
+				[
+					new GoBackOption("Go Back"),
+					new ExecuteAndContinueOption("New Unit Queue", () => {}),
+				],
+				(arg) => new SimpleMenu($"(1) {arg}", $"Unit Queue : {arg}", false, [
+					new GoBackOption("Go Back"),
+					new SimpleMenu("Add new unit to unit Queue", "Select new unit type", false, [
+						new GoBackOption("Go Back"),
+						new ExecuteAndContinueOption("Infantry", () => { }),
+						new ExecuteAndContinueOption("Tank", () => {}),
+					], defaultMenu),
+					new ExecuteAndContinueOption("Deploy Unit Queue", () => {}),
+				], defaultMenu),
+				() => ["Queue1"],
+				defaultMenu
+			),
 		], defaultMenu);
+
 		map = new(
 			((uint) map_size.x, (uint) map_size.y),
 			playerId => players[playerId].color,

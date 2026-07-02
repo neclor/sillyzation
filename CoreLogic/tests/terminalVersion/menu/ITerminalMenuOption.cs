@@ -13,16 +13,6 @@ internal class GoBackOption : ITerminalMenuOption {
 	}
 }
 
-internal class ExitOption : ITerminalMenuOption {
-	public string name { get; }
-
-	public ExitOption(string name) => this.name = name;
-
-	public MenuResult execute() {
-		return MenuResult.ExitAll;
-	}
-}
-
 internal class ExecuteAndContinueOption : ITerminalMenuOption {
 	public string name { get; }
 	private readonly Action func;

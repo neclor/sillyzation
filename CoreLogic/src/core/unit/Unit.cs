@@ -1,7 +1,7 @@
 namespace CoreLogic;
 
 internal class Infantry<TCellKey> : IUnit<TCellKey> {
-	public uint id => 0;
+	public UnitKey id => new(0);
 	public string name => "Infantry Division";
 	public uint baseHealth => 50;
 	public uint health => 50;
@@ -16,7 +16,7 @@ internal class Infantry<TCellKey> : IUnit<TCellKey> {
 }
 
 internal class Tank<TCellKey> : IUnit<TCellKey> {
-	public uint id => 0;
+	public UnitKey id => new(0);
 	public string name => "Tank Division";
 	public uint baseHealth => 200;
 	public uint health => 200;

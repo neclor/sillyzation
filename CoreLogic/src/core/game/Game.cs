@@ -3,7 +3,7 @@ using ErrorOr;
 namespace CoreLogic;
 
 internal class Game : IGame {
-	private readonly Dictionary<uint, IPlayer> players;
+	private readonly Dictionary<PlayerKey, IPlayer> players;
 	private PlayerKey playerId = 1;
 
 
@@ -23,7 +23,7 @@ internal class Game : IGame {
 
 
 
-	public Dictionary<uint, IPlayer> getAllPlayers() {
+	public Dictionary<PlayerKey, IPlayer> getAllPlayers() {
 		return players;
 	}
 

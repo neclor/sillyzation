@@ -1,6 +1,3 @@
-global using PlayerKey = uint;
-global using UnitKey = uint;
-global using FrontKey = uint;
 global using IGameTick = bool;
 global using Coord = (uint x, uint y);
 
@@ -15,18 +12,18 @@ public interface ICore<TCellKey> where TCellKey : notnull {
 
 	// Player
 	ErrorOr<IPlayer> getPlayer(PlayerKey playerId);
-	Dictionary<uint, IPlayer> getAllPlayers();
+	Dictionary<PlayerKey, IPlayer> getAllPlayers();
 	ErrorOr<bool> addPlayer(string name, Color color);
 	ErrorOr<bool> kickPlayer(PlayerKey playerId);
 
 	// Cells
-	ErrorOr<ICell<TCellKey>> getCell(uint playerId, TCellKey cellId);
+	ErrorOr<ICell<TCellKey>> getCell(PlayerKey playerId, TCellKey cellId);
 
 	// Unit Queue
 	ErrorOr<IUnitQueue<TCellKey>> getUnitQueue(PlayerKey playerId);
 	ErrorOr<bool> createUnitQueueGroup(PlayerKey playerId);
-	ErrorOr<bool> deployUnitQueueGroup(PlayerKey playerId, uint queueGroupId);
-	ErrorOr<bool> addUnitToQueueGroup(PlayerKey playerId);
+	ErrorOr<bool> deployUnitQueueGroup(PlayerKey playerId, QueueKey queueGroupId);
+	ErrorOr<bool> addUnitToQueueGroup(PlayerKey playerId, QueueKey queueGroupId, IUnit<TCellKey> unit);
 	ErrorOr<bool> removeUnitToQueueGroup(PlayerKey playerId, UnitKey unitInQueueGroupId);
 
 	// Unit
