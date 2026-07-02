@@ -31,40 +31,40 @@ internal class TerminalVersion {
 				new ExecuteAndContinueOption("Population map mode", () => map_mode = 1),
 				new ExecuteAndContinueOption("Ressource map mode", () => map_mode = 2),
 			], defaultMenu),
-			new DynamicMenu<TUnit>(
+			new DynamicMenu<string>(
 				"Move Units",
 				"Select Unit",
 				[
 					new GoBackOption("Go Back"),
 				],
 				(arg) => new SelectCellMenu(
+					$"{arg}-0",
 					"Move unit to :",
-					$"{arg.name} at {arg.position}",
 					((uint) this.map_size.x, (uint) this.map_size.y),
 					(2, 2),
 					c => new ExecuteAndContinueOption($"Unit {arg} to ({c.x}, {c.y})", () => {}),
 					printSelectCellMenu
 				),
-				() => session.current_player_units,
+				() => [ "xd", "xd2", "xd3" ],
 				defaultMenu
 			),
-			new DynamicMenu<string>(
+			new DynamicMenu<QueueKey>(
 				"Unit Queue",
 				"Select Unit Queue",
 				[
 					new GoBackOption("Go Back"),
-					new ExecuteAndContinueOption("New Unit Queue", () => {}),
+					new ExecuteAndContinueOption("New Unit Queue", () => session.createUnitQueueGroup(session.currentPlayerId)),
 				],
-				(arg) => new SimpleMenu($"(1) {arg}", $"Unit Queue : {arg}", false, [
+				(arg) => new SimpleMenu($"(1) {arg.value}", $"Unit Queue : {arg.value}", false, [
 					new GoBackOption("Go Back"),
 					new SimpleMenu("Add new unit to unit Queue", "Select new unit type", false, [
 						new GoBackOption("Go Back"),
-						new ExecuteAndContinueOption("Infantry", () => { }),
-						new ExecuteAndContinueOption("Tank", () => {}),
+						new ExecuteAndContinueOption("Infantry", () => session.addUnitToQueueGroup(session.currentPlayerId, arg, new Infantry<Coord>(session.currentPlayerId))),
+						new ExecuteAndContinueOption("Tank", () => session.addUnitToQueueGroup(session.currentPlayerId, arg, new Tank<Coord>(session.currentPlayerId))),
 					], defaultMenu),
 					new ExecuteAndContinueOption("Deploy Unit Queue", () => {}),
 				], defaultMenu),
-				() => ["Queue1"],
+				() => [ 0 ],
 				defaultMenu
 			),
 		], defaultMenu);
@@ -135,28 +135,28 @@ internal class TerminalVersion {
 		StringBuilder sb = new();
 #pragma warning disable IDE0058 // Expression value is never used
 
-		sb.AppendLine($"{textColor}╔{new('═', menuWidth + 1 + mapWidth)}╗{AC.RESET}");
-		sb.AppendLine($"{textColor}║{AC.RESET}{$" Country: {textColor}{session.currentPlayer.name}{AC.RESET}   Population: 10000   Iron: 6769{new(' ', menuWidth + 1 + mapWidth - session.currentPlayer.name.Length - 43)}"}{textColor}║{AC.RESET}");
-		sb.AppendLine($"{textColor}╠{new('═', menuWidth)}╦{new('═', mapWidth)}╣{AC.RESET}");
+		sb.AppendLine($"{textColor}╔{new('═', menuWidth + mapWidth)}═══╗{AC.RESET}");
+		sb.AppendLine($"{textColor}║{AC.RESET}{$" Country: {textColor}{session.currentPlayer.name}{AC.RESET}   Population: 10000   Iron: 6769{new(' ', menuWidth + 1 + mapWidth - session.currentPlayer.name.Length - 41)}"}{textColor}║{AC.RESET}");
+		sb.AppendLine($"{textColor}╠{new('═', menuWidth)}╦{new('═', mapWidth)}══╣{AC.RESET}");
 		foreach (((string content, string color), int i) in contentMenu.Select((value, index) => (value, index))) {
-			sb.Append($"{textColor}║{AC.RESET}{color}{content.PadRight(menuWidth)}{AC.RESET}{textColor}║{AC.RESET}");
+			sb.Append($"{textColor}║{AC.RESET}{color}{content.PadRight(menuWidth)}{AC.RESET}{textColor}║{AC.RESET} ");
 			if (i >= mapHeight) {
 				sb.Append(' ', mapWidth);
 			}
 			else {
 				sb.Append(map_res[i]);
 			}
-			sb.AppendLine($"{textColor}║{AC.RESET}");
+			sb.AppendLine($" {textColor}║{AC.RESET}");
 		}
 		if (contentMenu.Length < mapHeight) {
 			string leftPad = $"{textColor}║{AC.RESET}{new(' ', menuWidth)}{textColor}║{AC.RESET}";
 			string rightPad = $"{textColor}║{AC.RESET}";
 
 			for (int i = contentMenu.Length; i < mapHeight; i++) {
-				sb.AppendLine($"{leftPad}{map_res[i]}{rightPad}");
+				sb.AppendLine($"{leftPad} {map_res[i]} {rightPad}");
 			}
 		}
-		sb.AppendLine($"{textColor}╚{new('═', menuWidth)}╩{new('═', mapWidth)}╝{AC.RESET}");
+		sb.AppendLine($"{textColor}╚{new('═', menuWidth)}╩{new('═', mapWidth)}══╝{AC.RESET}");
 #pragma warning restore IDE0058 // Expression value is never used
 
 		string res = sb.ToString();

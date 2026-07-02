@@ -59,8 +59,12 @@ internal class Core<TCellKey> : ICore<TCellKey> where TCellKey : notnull {
 
 
 	// Unit Queue
-	public ErrorOr<IUnitQueue<TCellKey>> getUnitQueue(PlayerKey playerId) {
-		return new UnitQueue<TCellKey>();
+	public ErrorOr<IEnumerable<IUnitQueue<TCellKey>>> getAllUnitQueue(PlayerKey playerId) {
+		throw new NotImplementedException();
+	}
+
+	public ErrorOr<IUnitQueue<TCellKey>> getUnitQueue(PlayerKey playerId, QueueKey queueGroupId) {
+		throw new NotImplementedException();
 	}
 
 	public ErrorOr<bool> createUnitQueueGroup(PlayerKey playerId) {

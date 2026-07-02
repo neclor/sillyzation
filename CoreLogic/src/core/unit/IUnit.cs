@@ -7,5 +7,5 @@ public interface IUnit<TCellKey> {
 	uint health { get; }
 	uint speed { get; }
 	PlayerKey owner { get; }
-	TCellKey position { get; }
+	TCellKey? position { get; }
 };

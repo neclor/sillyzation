@@ -89,7 +89,7 @@ internal class SimpleMenu : ITerminalMenu, ITerminalMenuOption {
 }
 
 internal class DynamicMenu<T> : ITerminalMenu, ITerminalMenuOption {
-	private readonly string name;
+	private readonly string title;
 	private readonly string option_name;
 	private readonly ITerminalMenuOption[] static_options;
 	private readonly Func<T, ITerminalMenuOption> factory;
@@ -98,13 +98,13 @@ internal class DynamicMenu<T> : ITerminalMenu, ITerminalMenuOption {
 
 	public DynamicMenu(
 		string option_name,
-		string name,
+		string title,
 		ITerminalMenuOption[] static_options,
 		Func<T, ITerminalMenuOption> factory,
 		Func<T[]> get_values,
 		Action<string, (string option, int index)[], int> display_func
 	) {
-		this.name = name;
+		this.title = title;
 		this.option_name = option_name;
 		this.static_options = static_options;
 		this.factory = factory;
@@ -118,7 +118,7 @@ internal class DynamicMenu<T> : ITerminalMenu, ITerminalMenuOption {
 		T[] values = get_values();
 		IEnumerable<ITerminalMenuOption> dynamic_options = values.Select(e => factory(e));
 		return new SimpleMenu(
-			name, "", false, [.. static_options, .. dynamic_options], display_func
+			"", title, false, [.. static_options, .. dynamic_options], display_func
 		).display();
 	}
 

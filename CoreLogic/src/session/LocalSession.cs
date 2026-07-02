@@ -52,7 +52,11 @@ internal class LocalSession<TCellKey> : ISession<TCellKey> where TCellKey : notn
 		return core.getCell(playerId, cellId);
 	}
 
-	public ErrorOr<IUnitQueue<TCellKey>> getUnitQueue(PlayerKey playerId) {
+	public ErrorOr<IEnumerable<IUnitQueue<TCellKey>>> getAllUnitQueue(PlayerKey playerId) {
+		throw new NotImplementedException();
+	}
+
+	public ErrorOr<IUnitQueue<TCellKey>> getUnitQueue(PlayerKey playerId, QueueKey queueGroupId) {
 		throw new NotImplementedException();
 	}
 
