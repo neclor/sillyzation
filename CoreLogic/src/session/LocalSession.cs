@@ -48,9 +48,17 @@ internal class LocalSession<TCellKey> : ISession<TCellKey> where TCellKey : notn
 		throw new NotImplementedException();
 	}
 
+
+
+	// Cells
+
 	public ErrorOr<ICell<TCellKey>> getCell(PlayerKey playerId, TCellKey cellId) {
 		return core.getCell(playerId, cellId);
 	}
+
+
+
+	// Unit Queue
 
 	public ErrorOr<IEnumerable<IUnitQueue<TCellKey>>> getAllUnitQueue(PlayerKey playerId) {
 		throw new NotImplementedException();
@@ -64,7 +72,7 @@ internal class LocalSession<TCellKey> : ISession<TCellKey> where TCellKey : notn
 		throw new NotImplementedException();
 	}
 
-	public ErrorOr<bool> deployUnitQueueGroup(PlayerKey playerId, QueueKey queueGroupId) {
+	public ErrorOr<bool> deployUnitQueueGroup(PlayerKey playerId, QueueKey queueGroupId, Coord coord) {
 		throw new NotImplementedException();
 	}
 
@@ -75,6 +83,10 @@ internal class LocalSession<TCellKey> : ISession<TCellKey> where TCellKey : notn
 	public ErrorOr<bool> removeUnitToQueueGroup(PlayerKey playerId, UnitKey unitInQueueGroupId) {
 		throw new NotImplementedException();
 	}
+
+
+
+	// Unit
 
 	public ErrorOr<IUnit<TCellKey>> getUnit(PlayerKey playerId, UnitKey unitId) {
 		throw new NotImplementedException();
@@ -88,10 +100,6 @@ internal class LocalSession<TCellKey> : ISession<TCellKey> where TCellKey : notn
 		throw new NotImplementedException();
 	}
 
-	public ErrorOr<bool> assignUnitToFront(PlayerKey playerId, UnitKey unitId, FrontKey frontId) {
-		throw new NotImplementedException();
-	}
-
 	public ErrorOr<bool> deleteUnit(PlayerKey playerId, UnitKey unitId) {
 		throw new NotImplementedException();
 	}
@@ -100,17 +108,9 @@ internal class LocalSession<TCellKey> : ISession<TCellKey> where TCellKey : notn
 		throw new NotImplementedException();
 	}
 
-	public ErrorOr<IFront<TCellKey>> getFront(PlayerKey playerId, FrontKey frontId) {
-		throw new NotImplementedException();
-	}
 
-	public ErrorOr<bool> createFront(PlayerKey playerId, TCellKey cellId1, TCellKey cellId2) {
-		throw new NotImplementedException();
-	}
 
-	public ErrorOr<bool> moveFront(PlayerKey playerId, FrontKey frontId, TCellKey cellId, bool side) {
-		throw new NotImplementedException();
-	}
+	// Combat
 
 	public void endTurn() {
 		currentPlayerId++;

@@ -88,19 +88,13 @@ internal class Core<TCellKey> : ICore<TCellKey> where TCellKey : notnull {
 	// Unit
 	public ErrorOr<IUnit<TCellKey>> getUnit(PlayerKey playerId, UnitKey unitId) {
 		throw new NotImplementedException();
-		// return new Infantry<TCellKey>();
 	}
 
 	public ErrorOr<IEnumerable<IUnit<TCellKey>>> getAllUnits(PlayerKey playerId) {
 		throw new NotImplementedException();
-		// return new[] { new Unit<TCellKey>() };
 	}
 
 	public ErrorOr<bool> moveUnit(PlayerKey playerId, UnitKey unitId, TCellKey cellId) {
-		return true;
-	}
-
-	public ErrorOr<bool> assignUnitToFront(PlayerKey playerId, UnitKey unitId, FrontKey frontId) {
 		return true;
 	}
 
@@ -113,20 +107,5 @@ internal class Core<TCellKey> : ICore<TCellKey> where TCellKey : notnull {
 	// Combat
 	public ErrorOr<ICombat<TCellKey>> getCombatInfo(PlayerKey playerId, uint combatId) {
 		return new Combat<TCellKey>();
-	}
-
-
-
-	// Front
-	public ErrorOr<IFront<TCellKey>> getFront(PlayerKey playerId, FrontKey frontId) {
-		throw new NotImplementedException();
-	}
-
-	public ErrorOr<bool> createFront(PlayerKey playerId, TCellKey cellId1, TCellKey cellId2) {
-		return true;
-	}
-
-	public ErrorOr<bool> moveFront(PlayerKey playerId, FrontKey frontId, TCellKey cellId, bool side) {
-		return true;
 	}
 }

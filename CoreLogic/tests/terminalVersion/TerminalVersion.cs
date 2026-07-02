@@ -9,6 +9,7 @@ using AC = AnsiColors;
 internal class TerminalVersion {
 	private ISession<Coord> session { get; }
 	private (int x, int y) map_size { get; }
+	private Coord map_size_u { get; }
 	private readonly Dictionary<PlayerKey, ISessionPlayer> players;
 	private readonly SimpleMenu menu;
 	private readonly TerminalMap map;
@@ -20,6 +21,7 @@ internal class TerminalVersion {
 	public TerminalVersion(ISession<Coord> session, (int x, int y) map_size) {
 		this.session = session;
 		this.map_size = map_size;
+		map_size_u = ((uint) this.map_size.x, (uint) this.map_size.y);
 
 		players = session.getAllPlayers();
 
@@ -37,11 +39,7 @@ internal class TerminalVersion {
 				[
 					new GoBackOption("Go Back"),
 				],
-				(arg) => new SelectCellMenu(
-					$"{arg}-0",
-					"Move unit to :",
-					((uint) this.map_size.x, (uint) this.map_size.y),
-					(2, 2),
+				(arg) => new SelectCellMenu($"{arg}-0", "Move unit to :", map_size_u, (2, 2),
 					c => new ExecuteAndContinueOption($"Unit {arg} to ({c.x}, {c.y})", () => {}),
 					printSelectCellMenu
 				),
@@ -55,14 +53,17 @@ internal class TerminalVersion {
 					new GoBackOption("Go Back"),
 					new ExecuteAndContinueOption("New Unit Queue", () => session.createUnitQueueGroup(session.currentPlayerId)),
 				],
-				(arg) => new SimpleMenu($"(1) {arg.value}", $"Unit Queue : {arg.value}", false, [
+				queue => new SimpleMenu($"(1) {queue}", $"Unit Queue : {queue}", false, [
 					new GoBackOption("Go Back"),
 					new SimpleMenu("Add new unit to unit Queue", "Select new unit type", false, [
 						new GoBackOption("Go Back"),
-						new ExecuteAndContinueOption("Infantry", () => session.addUnitToQueueGroup(session.currentPlayerId, arg, new Infantry<Coord>(session.currentPlayerId))),
-						new ExecuteAndContinueOption("Tank", () => session.addUnitToQueueGroup(session.currentPlayerId, arg, new Tank<Coord>(session.currentPlayerId))),
+						new ExecuteAndContinueOption("Infantry", () => session.addUnitToQueueGroup(session.currentPlayerId, queue, new Infantry<Coord>(session.currentPlayerId))),
+						new ExecuteAndContinueOption("Tank", () => session.addUnitToQueueGroup(session.currentPlayerId, queue, new Tank<Coord>(session.currentPlayerId))),
 					], defaultMenu),
-					new ExecuteAndContinueOption("Deploy Unit Queue", () => {}),
+					new SelectCellMenu("Deploy Unit Queue", "Select cell to deploy to", map_size_u, null,
+						c => new ExecuteAndContinueOption($"Deploy to {c}", () => session.deployUnitQueueGroup(session.currentPlayerId, queue, c)),
+						printSelectCellMenu
+					),
 				], defaultMenu),
 				() => [ 0 ],
 				defaultMenu
@@ -85,13 +86,22 @@ internal class TerminalVersion {
 		);
 	}
 
-	private void printSelectCellMenu(string title, Coord initial_coord, Coord coord) {
-		print([
-			(title, "")
-		], [
-			(coord, AC.BG_STD_WHITE, 1, null),
-			(initial_coord, AC.BG_STD_GRAY, 0, null),
-		]);
+	private void printSelectCellMenu(string title, Coord? initial_coord, Coord coord) {
+		if (initial_coord.HasValue) {
+			print([
+				(title, "")
+			], [
+				(coord, AC.BG_STD_WHITE, 1, null),
+				(initial_coord.Value, AC.BG_STD_GRAY, 0, null)
+			]);
+		}
+		else {
+			print([
+				(title, "")
+			], [
+				(coord, AC.BG_STD_WHITE, 1, null),
+			]);
+		}
 	}
 
 	public static string getAnsiTextColor(Color color) => color switch {

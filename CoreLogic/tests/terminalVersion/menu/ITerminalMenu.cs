@@ -132,9 +132,9 @@ internal class SelectCellMenu : ITerminalMenu, ITerminalMenuOption {
 	private readonly string option_name;
 	private Coord coord;
 	private readonly Coord map_size;
-	private readonly Coord initial_coord;
+	private readonly Coord? initial_coord;
 	private readonly Func<Coord, ITerminalMenuOption> factory;
-	private readonly Action<string, Coord, Coord> display_func;
+	private readonly Action<string, Coord?, Coord> display_func;
 
 	string ITerminalMenuOption.name => option_name;
 
@@ -142,15 +142,15 @@ internal class SelectCellMenu : ITerminalMenu, ITerminalMenuOption {
 		string option_name,
 		string name,
 		Coord map_size,
-		Coord initial_coord,
+		Coord? initial_coord,
 		Func<Coord, ITerminalMenuOption> factory,
-		Action<string, Coord, Coord> display_func
+		Action<string, Coord?, Coord> display_func
 	) {
 		this.name = name;
 		this.option_name = option_name;
 		this.map_size = map_size;
 		this.initial_coord = initial_coord;
-		this.coord = initial_coord;
+		this.coord = initial_coord ?? (1, 1);
 		this.factory = factory;
 		this.display_func = display_func;
 	}
