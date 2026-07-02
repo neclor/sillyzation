@@ -1,9 +1,8 @@
 namespace CoreLogic;
 
-internal class Front : IFront {
+internal class Front<TCellKey> : IFront<TCellKey> {
 	public uint id => throw new NotImplementedException();
 
-	public IEnumerable<(uint cellId1, uint cellId2)> edges => throw new NotImplementedException();
-
-	public IEnumerable<(uint cellId1, uint cellId2)> extremities => throw new NotImplementedException();
+	public IEnumerable<(TCellKey cellId1, TCellKey cellId2)> edges => throw new NotImplementedException();
+	public IEnumerable<(TCellKey cellId1, TCellKey cellId2)> extremities => throw new NotImplementedException();
 }

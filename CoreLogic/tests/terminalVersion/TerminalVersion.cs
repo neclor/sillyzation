@@ -1,5 +1,6 @@
-global using TCell = CoreLogic.ICell<(uint x, uint y)>;
 global using TUnit = CoreLogic.IUnit<(uint x, uint y)>;
+global using TCell = CoreLogic.ICell<(uint x, uint y)>;
+global using Neighbours = (CoreLogic.ICell<(uint x, uint y)>? top, CoreLogic.ICell<(uint x, uint y)>? bot, CoreLogic.ICell<(uint x, uint y)>? left, CoreLogic.ICell<(uint x, uint y)>? right);
 using System.Text;
 using session;
 using CoreLogic;
@@ -72,8 +73,8 @@ internal class TerminalVersion {
 		print([
 			(title, "")
 		], [
-			(coord, AC.BG_STD_WHITE, 1),
-			(initial_coord, AC.BG_STD_GRAY, 0),
+			(coord, AC.BG_STD_WHITE, 1, null),
+			(initial_coord, AC.BG_STD_GRAY, 0, null),
 		]);
 	}
 
@@ -94,7 +95,11 @@ internal class TerminalVersion {
 		_ => AC.RESET
 	};
 
-	private void print((string content, string color)[] contentMenu, (Coord coord, string color, uint priority)[]? highlighted_coords = null) {
+	private void print(
+		(string content,
+		string color)[] contentMenu,
+		(Coord coord, string color, uint priority, Func<TCell, TCell?, bool>? highligh)[]? highlighted_coords = null
+	) {
 		int longest = (contentMenu.Length != 0)
 			? contentMenu.Max((cur) => cur.content.Length)
 			: 0;

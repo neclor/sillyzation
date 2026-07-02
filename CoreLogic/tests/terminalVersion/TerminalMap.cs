@@ -95,7 +95,7 @@ internal class TerminalMap {
 		uint yc,
 		string color,
 		TCell cell,
-		(TCell? top, TCell? bot, TCell? left, TCell? right) neighbours,
+		Neighbours neighbours,
 		Func<TCell, TCell?, bool> condition
 	) {
 		string hightlight_str = $"{color}{cell_block}{AC.RESET}";
@@ -123,47 +123,21 @@ internal class TerminalMap {
 	}
 
 	public List<string> printDefaultMap(
-		(Coord coord, string color, uint priority)[]? highlighted_coord = null
+		(Coord, string, uint, Func<TCell, TCell?, bool>?)[]? highlighted_coord = null
 	) {
-		Dictionary<Coord, string> highlighted_coord_set = highlighted_coord?
-			.GroupBy(v => v.coord)
-			.ToDictionary(
-				g => g.Key,
-				g => g.MaxBy(v => v.priority).color
-			) ?? [];
-
-		return printMap((cell, yc, neighbours) => {
-			string[] cell_line = [.. backgrounds[cell.terrain][yc].Select(e => $"{e}{AC.RESET}")];
-
-			if (highlighted_coord_set.TryGetValue(cell.id, out string? color)) {
-				hightlightSingleCell(cell_line, yc, color);
-			}
-			else if (cell.owner.HasValue) {
-				hightlightMultipleCell(
-					cell_line,
-					yc,
-					getAnsiBackgroundColor(getPlayerColor(cell.owner.Value)),
-					cell,
-					neighbours,
-					(cell, other) => other == null || other.owner != cell.owner
-				);
-			}
-			return cell_line;
-		});
+		return printMap(
+			(cell, yc, neighbours) => {
+				string[] cell_line = [.. backgrounds[cell.terrain][yc].Select(e => $"{e}{AC.RESET}")];
+				return cell_line;
+			},
+			highlighted_coord
+		);
 	}
 
 	public List<string> printPopMap(
-		(Coord coord, string color, uint priority)[]? highlighted_coord = null
+		(Coord, string, uint, Func<TCell, TCell?, bool>?)[]? highlighted_coord = null
 	) {
-		Dictionary<Coord, string> highlighted_coord_set = highlighted_coord?
-			.GroupBy(v => v.coord)
-			.ToDictionary(
-				g => g.Key,
-				g => g.MaxBy(v => v.priority).color
-			) ?? [];
-
 		uint max_pop = 1;
-
 		for (uint x = 0; x < map_size.x; x++) {
 			for (uint y = 0; y < map_size.y; y++) {
 				uint pop = getCell((x + 1, y + 1)).Value.population;
@@ -173,61 +147,43 @@ internal class TerminalMap {
 			}
 		}
 
-		return printMap((cell, yc, neighbours) => {
-			float pop_ratio = (float) cell.population / max_pop;
-			int red_value = (int) (pop_ratio * 255);
-			string[] cell_line = [.. Enumerable.Repeat($"\x1b[48;2;{red_value};0;0m{cell_block}{AC.RESET}", cell_size.x)];
-
-			if (highlighted_coord_set.TryGetValue(cell.id, out string? color)) {
-				hightlightSingleCell(cell_line, yc, color);
-			}
-			else if (cell.owner.HasValue) {
-				hightlightMultipleCell(
-					cell_line,
-					yc,
-					getAnsiBackgroundColor(getPlayerColor(cell.owner.Value)),
-					cell,
-					neighbours,
-					(cell, other) => other == null || other.owner != cell.owner
-				);
-			}
-			return cell_line;
-		});
+		return printMap(
+			(cell, yc, neighbours) => {
+				float pop_ratio = (float) cell.population / max_pop;
+				int red_value = (int) (pop_ratio * 150);
+				string[] cell_line = [.. Enumerable.Repeat($"\x1b[48;2;{red_value};0;0m{cell_block}{AC.RESET}", cell_size.x)];
+				return cell_line;
+			},
+			highlighted_coord
+		);
 	}
 
 	public List<string> printRessourceMap(
-		(Coord coord, string color, uint priority)[]? highlighted_coord = null
+		(Coord, string, uint, Func<TCell, TCell?, bool>?)[]? highlighted_coord = null
 	) {
-		Dictionary<Coord, string> highlighted_coord_set = highlighted_coord?
-			.GroupBy(v => v.coord)
-			.ToDictionary(
-				g => g.Key,
-				g => g.MaxBy(v => v.priority).color
-			) ?? [];
-
-		return printMap((cell, yc, neighbours) => {
-			string[] cell_line = [.. Enumerable.Repeat("  ", cell_size.x)];
-
-			if (highlighted_coord_set.TryGetValue(cell.id, out string? color)) {
-				hightlightSingleCell(cell_line, yc, color);
-			}
-			else if (cell.owner.HasValue) {
-				hightlightMultipleCell(
-					cell_line,
-					yc,
-					getAnsiBackgroundColor(getPlayerColor(cell.owner.Value)),
-					cell,
-					neighbours,
-					(cell, other) => other == null || other.owner != cell.owner
-				);
-			}
-			return cell_line;
-		});
+		return printMap(
+			(cell, yc, neighbours) => {
+				string[] cell_line = [.. Enumerable.Repeat("  ", cell_size.x)];
+				return cell_line;
+			},
+			highlighted_coord
+		);
 	}
 
 	private List<string> printMap(
-		Func<TCell, uint, (TCell? top, TCell? bot, TCell? left, TCell? right), string[]> displayCell
+		Func<TCell, uint, Neighbours, string[]> displayCell,
+		(Coord coord, string color, uint priority, Func<TCell, TCell?, bool>? condition_neighbours)[]? highlighted_coord = null
 	) {
+		Dictionary<Coord, (string color, Func<TCell, TCell?, bool>? condition_neighbours)> highlighted_coord_set = highlighted_coord?
+			.GroupBy(v => v.coord)
+			.ToDictionary(
+				g => g.Key,
+				g => {
+					var (_, color, priority, link_multiple) = g.MaxBy(v => v.priority);
+					return (color, link_multiple);
+				}
+			) ?? [];
+
 		TCell[][] cells = new TCell[map_size.x][];
 		for (uint x = 0; x < map_size.x; x++) {
 			cells[x] = new TCell[map_size.y];
@@ -241,19 +197,26 @@ internal class TerminalMap {
 			for (uint yc = 0; yc < cell_size.y; yc++) {
 				List<string[]> line = [];
 				for (uint x = 0; x < map_size.x; x++) {
-					string[] cell_line = displayCell(
-						cells[x][y],
-						yc,
-#pragma warning disable format
-						(
-							y > 0              ? cells[x][y - 1] : null,
-							y < map_size.y - 1 ? cells[x][y + 1] : null,
-							x > 0              ? cells[x - 1][y] : null,
-							x < map_size.x - 1 ? cells[x + 1][y] : null
-						)
-#pragma warning restore format
+					TCell cell = cells[x][y];
+					Neighbours neighbours = (
+						y > 0 ? cells[x][y - 1] : null,
+						y < map_size.y - 1 ? cells[x][y + 1] : null,
+						x > 0 ? cells[x - 1][y] : null,
+						x < map_size.x - 1 ? cells[x + 1][y] : null
 					);
-
+					string[] cell_line = displayCell(cell, yc, neighbours);
+					if (highlighted_coord_set.TryGetValue(cell.id, out (string color, Func<TCell, TCell?, bool>? condition_neighbours) highlight)) {
+						if (highlight.condition_neighbours != null) {
+							hightlightMultipleCell(cell_line, yc, highlight.color, cell, neighbours, highlight.condition_neighbours);
+						}
+						else {
+							hightlightSingleCell(cell_line, yc, highlight.color);
+						}
+					}
+					else if (cell.owner != null) {
+						string owner_color = getAnsiBackgroundColor(getPlayerColor(cell.owner.Value));
+						hightlightMultipleCell(cell_line, yc, owner_color, cell, neighbours, (cell, other) => other == null || other.owner != cell.owner);
+					}
 					line.AddRange(cell_line);
 				}
 				map.Add(line);
