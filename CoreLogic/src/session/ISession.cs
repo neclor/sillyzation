@@ -22,6 +22,7 @@ internal interface ISession<TCellKey> where TCellKey : notnull {
 	ErrorOr<IUnitQueue<TCellKey>[]> getAllUnitQueue(PlayerKey playerId);
 	ErrorOr<QueueKey[]> getAllUnitQueueId(PlayerKey playerId);
 	ErrorOr<IUnitQueue<TCellKey>> getUnitQueue(PlayerKey playerId, QueueKey queueGroupId);
+	ErrorOr<IUnit<TCellKey>[]> getAllUnitInQueue(PlayerKey playerId, QueueKey queueGroupId);
 	ErrorOr<Success> createUnitQueueGroup(PlayerKey playerId);
 	ErrorOr<Success> deployUnitQueueGroup(PlayerKey playerId, QueueKey queueGroupId, TCellKey pos);
 	ErrorOr<Success> addUnitToQueue(PlayerKey playerId, QueueKey queueGroupId, IUnit<TCellKey> unit);
@@ -30,7 +31,7 @@ internal interface ISession<TCellKey> where TCellKey : notnull {
 
 	// Unit
 	ErrorOr<IUnit<TCellKey>> getUnit(PlayerKey playerId, UnitKey unitId);
-	ErrorOr<IEnumerable<IUnit<TCellKey>>> getAllUnits(PlayerKey playerId);
+	ErrorOr<IUnit<TCellKey>[]> getAllUnits(PlayerKey playerId);
 	ErrorOr<Success> moveUnit(PlayerKey playerId, UnitKey unitId, TCellKey cellId);
 	ErrorOr<Success> deleteUnit(PlayerKey playerId, UnitKey unitId);
 

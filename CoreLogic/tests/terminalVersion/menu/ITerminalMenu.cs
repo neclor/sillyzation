@@ -88,14 +88,13 @@ internal class SimpleMenu : BaseMenu {
 		switch (input) {
 			case ConsoleKey.UpArrow:
 				option_index = Math.Max(option_index - 1, 0);
-				Console.WriteLine($"menu index {option_index}");
 				return MenuResult.Continue;
 			case ConsoleKey.DownArrow:
 				option_index = Math.Min(option_index + 1, options.Length - 1);
-				Console.WriteLine($"menu index {option_index}");
 				return MenuResult.Continue;
 			case ConsoleKey.Enter:
 				ITerminalMenuOption option = options[option_index];
+				option_index = 0;
 				return option.execute();
 			default:
 				return MenuResult.Continue;
@@ -150,14 +149,13 @@ internal class DynamicMenu<T> : BaseMenu {
 		switch (input) {
 			case ConsoleKey.UpArrow:
 				option_index = Math.Max(option_index - 1, 0);
-				Console.WriteLine($"menu index {option_index}");
 				return MenuResult.Continue;
 			case ConsoleKey.DownArrow:
 				option_index = Math.Min(option_index + 1, options.Length - 1);
-				Console.WriteLine($"menu index {option_index}");
 				return MenuResult.Continue;
 			case ConsoleKey.Enter:
 				ITerminalMenuOption option = options[option_index];
+				option_index = 0;
 				return option.execute();
 			default:
 				return MenuResult.Continue;
@@ -205,25 +203,21 @@ internal class SelectCellMenu : BaseMenu {
 				if (coord.y > 1) {
 					coord.y--;
 				}
-				Console.WriteLine($"selected coord {coord}");
 				return MenuResult.Continue;
 			case ConsoleKey.DownArrow:
 				if (coord.y < map_size.y) {
 					coord.y++;
 				}
-				Console.WriteLine($"selected coord {coord}");
 				return MenuResult.Continue;
 			case ConsoleKey.LeftArrow:
 				if (coord.x > 1) {
 					coord.x--;
 				}
-				Console.WriteLine($"selected coord {coord}");
 				return MenuResult.Continue;
 			case ConsoleKey.RightArrow:
 				if (coord.x < map_size.x) {
 					coord.x++;
 				}
-				Console.WriteLine($"selected coord {coord}");
 				return MenuResult.Continue;
 			case ConsoleKey.Enter:
 

@@ -27,52 +27,48 @@ internal class TerminalVersion {
 		players = session.getAllPlayers();
 
 		menu = new("", "Choose your option :", true, [
-			new ExecuteAndExitOption("End Turn", session.endTurn),
-			new SimpleMenu("Change map mode", "Choose your map mode", false, [
-				new GoBackOption("Go Back"),
-				new ExecuteAndContinueOption("Default map mode", () => map_mode = 0),
-				new ExecuteAndContinueOption("Population map mode", () => map_mode = 1),
-				new ExecuteAndContinueOption("Ressource map mode", () => map_mode = 2),
+			new ExecuteAndExitOption(" ⏎ End Turn", session.endTurn),
+			new SimpleMenu(" ○ Change map mode", "Choose your map mode", false, [
+				new GoBackOption(" ↩ Go Back"),
+				new ExecuteAndContinueOption(" ○ Default map mode", () => map_mode = 0),
+				new ExecuteAndContinueOption(" ○ Population map mode", () => map_mode = 1),
+				new ExecuteAndContinueOption(" ○ Ressource map mode", () => map_mode = 2),
 			], defaultMenu),
-			new DynamicMenu<string>("Move Units", "Select Unit", false, [
-					new GoBackOption("Go Back"),
+			new DynamicMenu<TUnit>(" ○ Move Units", "Select Unit", false, [
+					new GoBackOption(" ↩ Go Back"),
 				],
-				(arg) => new SelectCellMenu($"{arg}-0", "Move unit to :", false, map_size_u, (2, 2),
+				(arg) => new SelectCellMenu($" ○ {arg}-0", "Move unit to :", false, map_size_u, (2, 2),
 					c => new ExecuteAndContinueOption($"Unit {arg} to ({c.x}, {c.y})", () => {}),
 					printSelectCellMenu
 				),
-#pragma warning disable CA1861 // Avoid constant arrays as arguments
-				() => new string[] { "xd", "xd2", "xd3" }.ToErrorOr(),
-#pragma warning restore CA1861 // Avoid constant arrays as arguments
+				() => session.getAllUnits(session.currentPlayerId),
 				defaultMenu
 			),
-			new DynamicMenu<QueueKey>(
-				"Unit Queue",
-				"Select Unit Queue",
-				false,
+			new DynamicMenu<QueueKey>(" ○ Unit Queue", "Select Unit Queue", true,
 				[
-					new GoBackOption("Go Back"),
-					new ExecuteAndContinueOption("New Unit Queue", () => session.createUnitQueueGroup(session.currentPlayerId)),
+					new GoBackOption(" ↩ Go Back"),
+					new ExecuteAndContinueOption(" + New Unit Queue", () => session.createUnitQueueGroup(session.currentPlayerId)),
 				],
-				queue => new SimpleMenu($"(1) {queue}", $"Unit Queue : {queue}", false, [
-					new GoBackOption("Go Back"),
-					new SimpleMenu("Add new unit to unit Queue", "Select new unit type", false, [
-						new GoBackOption("Go Back"),
-						new ExecuteAndContinueOption("Infantry", () => session.addUnitToQueue(session.currentPlayerId, queue, new Infantry<Coord>(session.currentPlayerId))),
-						new ExecuteAndContinueOption("Tank", () => session.addUnitToQueue(session.currentPlayerId, queue, new Tank<Coord>(session.currentPlayerId))),
-					], defaultMenu),
-					new SelectCellMenu(
-						"Deploy Unit Queue",
-						"Select cell to deploy to",
-						false,
-						map_size_u,
-						null,
-						c => new ExecuteAndContinueOption($"Deploy to {c}",
-							() => session.deployUnitQueueGroup(session.currentPlayerId, queue, c)
+				queue => new DynamicMenu<TUnit>($" ○ {queue}", $"Unit Queue : {queue}", true,
+					[
+						new GoBackOption(" ↩ Go Back"),
+						new SimpleMenu(" + Add new unit to unit Queue", "Select new unit type", false, [
+							new GoBackOption(" ↩ Go Back"),
+							new ExecuteAndContinueOption(" ○ Infantry", () => session.addUnitToQueue(session.currentPlayerId, queue, new Infantry<Coord>(session.currentPlayerId))),
+							new ExecuteAndContinueOption(" ○ Tank", () => session.addUnitToQueue(session.currentPlayerId, queue, new Tank<Coord>(session.currentPlayerId))),
+						], defaultMenu),
+					],
+					(unit) => new SimpleMenu($" ○ Unit {unit.name}", $"Actions for Unit {unit.name}", false, [
+						new GoBackOption(" ↩ Go Back"),
+						new SelectCellMenu(" ○ Deploy", "Choose where to deploy", false, map_size_u, null,
+							(pos) => new ExecuteAndContinueOption(" ○ Deploy", () => session.deployUnitFromQueue(session.currentPlayerId, queue, unit.id, pos)),
+							printSelectCellMenu
 						),
-						printSelectCellMenu
-					),
-				], defaultMenu),
+						new ExecuteAndContinueOption(" ○ Delete", () => session.deleteUnitFromQueue(session.currentPlayerId, queue, unit.id))
+					], defaultMenu),
+					() => session.getAllUnitInQueue(session.currentPlayerId, queue),
+					defaultMenu
+				),
 				() => session.getAllUnitQueueId(session.currentPlayerId),
 				defaultMenu
 			),

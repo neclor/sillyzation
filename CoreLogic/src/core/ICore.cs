@@ -21,6 +21,7 @@ public interface ICore<TCellKey> where TCellKey : notnull {
 	// Unit Queue
 	ErrorOr<IUnitQueue<TCellKey>[]> getAllUnitQueue(PlayerKey playerId);
 	ErrorOr<IUnitQueue<TCellKey>> getUnitQueue(PlayerKey playerId, QueueKey queueGroupId);
+	ErrorOr<IUnit<TCellKey>[]> getAllUnitInQueue(PlayerKey playerId, QueueKey queueGroupId);
 	ErrorOr<Success> createUnitQueue(PlayerKey playerId);
 	ErrorOr<Success> deployUnitQueue(PlayerKey playerId, QueueKey queueGroupId, TCellKey pos);
 	ErrorOr<Success> addUnitToQueue(PlayerKey playerId, QueueKey queueGroupId, IUnit<TCellKey> unit);
@@ -29,7 +30,7 @@ public interface ICore<TCellKey> where TCellKey : notnull {
 
 	// Unit
 	ErrorOr<IUnit<TCellKey>> getUnit(PlayerKey playerId, UnitKey unitId);
-	ErrorOr<IEnumerable<IUnit<TCellKey>>> getAllUnits(PlayerKey playerId);
+	ErrorOr<IUnit<TCellKey>[]> getAllUnits(PlayerKey playerId);
 	ErrorOr<Success> moveUnit(PlayerKey playerId, UnitKey unitId, TCellKey cellId);
 	ErrorOr<Success> deleteUnit(PlayerKey playerId, UnitKey unitId);
 

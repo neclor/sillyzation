@@ -6,7 +6,7 @@ namespace CoreLogic;
 public interface IUnitQueue<TCellKey> {
 #pragma warning restore CA1711 // Identifiers should not have incorrect suffix
 	uint id { get; }
-	IEnumerable<(IUnit<TCellKey> unit, uint progress)> units { get; }
+	(IUnit<TCellKey> unit, uint progress)[] getUnits();
 	ErrorOr<Success> addUnit(IUnit<TCellKey> unit);
 	ErrorOr<Success> removeUnit(UnitKey unitId);
 };

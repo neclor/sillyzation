@@ -72,6 +72,10 @@ internal class LocalSession<TCellKey> : ISession<TCellKey> where TCellKey : notn
 		return core.getUnitQueue(playerId, queueGroupId);
 	}
 
+	public ErrorOr<IUnit<TCellKey>[]> getAllUnitInQueue(PlayerKey playerId, QueueKey queueGroupId) {
+		return core.getAllUnitInQueue(playerId, queueGroupId);
+	}
+
 	public ErrorOr<Success> createUnitQueueGroup(PlayerKey playerId) {
 		return core.createUnitQueue(playerId);
 	}
@@ -85,7 +89,9 @@ internal class LocalSession<TCellKey> : ISession<TCellKey> where TCellKey : notn
 	}
 
 	public ErrorOr<Success> deleteUnitFromQueue(PlayerKey playerId, QueueKey queueGroupId, UnitKey unit) {
-		return core.deleteUnitFromQueue(playerId, queueGroupId, unit);
+		var x = core.deleteUnitFromQueue(playerId, queueGroupId, unit);
+		Console.WriteLine(x);
+		return x;
 	}
 
 	public ErrorOr<Success> deployUnitFromQueue(PlayerKey playerId, QueueKey queueGroupId, UnitKey unit, TCellKey pos) {
@@ -100,8 +106,8 @@ internal class LocalSession<TCellKey> : ISession<TCellKey> where TCellKey : notn
 		throw new NotImplementedException();
 	}
 
-	public ErrorOr<IEnumerable<IUnit<TCellKey>>> getAllUnits(PlayerKey playerId) {
-		throw new NotImplementedException();
+	public ErrorOr<IUnit<TCellKey>[]> getAllUnits(PlayerKey playerId) {
+		return core.getAllUnits(playerId);
 	}
 
 	public ErrorOr<Success> moveUnit(PlayerKey playerId, UnitKey unitId, TCellKey cellId) {

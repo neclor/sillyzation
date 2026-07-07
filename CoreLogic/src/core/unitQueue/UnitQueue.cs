@@ -7,11 +7,16 @@ internal class UnitQueue<TCellKey> : IUnitQueue<TCellKey> {
 	public uint id { get; }
 	public List<(IUnit<TCellKey> unit, uint progress)> units { get; }
 
-	IEnumerable<(IUnit<TCellKey> unit, uint progress)> IUnitQueue<TCellKey>.units => units;
-
 	public UnitQueue() {
 		id = id_counter++;
 		units = [];
+	}
+
+	public (IUnit<TCellKey> unit, uint progress)[] getUnits() {
+		foreach ((IUnit<TCellKey> unit, uint progress) in units) {
+			Console.WriteLine(unit.id + " " + progress);
+		}
+		return [.. units];
 	}
 
 	public ErrorOr<Success> addUnit(IUnit<TCellKey> unit) {
@@ -22,16 +27,16 @@ internal class UnitQueue<TCellKey> : IUnitQueue<TCellKey> {
 	public ErrorOr<Success> removeUnit(UnitKey unit_id) {
 		try {
 			(IUnit<TCellKey> unit, uint progress) elem = units.FirstOrDefault(e => e.unit.id == unit_id);
-			if (elem.progress != 100) {
-				return new Error();
-			}
+			// if (elem.progress != 100) {
+			// 	return Error.Failure("Unit is not ready");
+			// }
 			if (!units.Remove(elem)) {
-				return new Error();
+				return Error.NotFound();
 			}
 			return Result.Success;
 		}
 		catch (ArgumentNullException) {
-			return new Error();
+			return Error.NotFound();
 		}
 	}
 }

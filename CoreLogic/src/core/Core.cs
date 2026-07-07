@@ -106,11 +106,21 @@ internal class Core<TCellKey> : ICore<TCellKey> where TCellKey : notnull {
 		return queue.ToErrorOr();
 	}
 
+	public ErrorOr<IUnit<TCellKey>[]> getAllUnitInQueue(PlayerKey playerId, QueueKey queueGroupId) {
+		if (!players.TryGetValue(playerId, out var player)) {
+			return Error.NotFound();
+		}
+		if (!player.queues.TryGetValue(queueGroupId, out IUnitQueue<TCellKey>? queue)) {
+			return Error.NotFound();
+		}
+		return queue.getUnits().Select(e => e.unit).ToArray();
+	}
+
 	public ErrorOr<Success> createUnitQueue(PlayerKey playerId) {
 		if (!players.TryGetValue(playerId, out var player)) {
 			return Error.NotFound();
 		}
-		IUnitQueue<TCellKey> newQueue = new UnitQueue<TCellKey>();
+		UnitQueue<TCellKey> newQueue = new();
 		if (!player.queues.TryAdd(newQueue.id, newQueue)) {
 			return Error.Conflict();
 		}
@@ -169,7 +179,7 @@ internal class Core<TCellKey> : ICore<TCellKey> where TCellKey : notnull {
 		throw new NotImplementedException();
 	}
 
-	public ErrorOr<IEnumerable<IUnit<TCellKey>>> getAllUnits(PlayerKey playerId) {
+	public ErrorOr<IUnit<TCellKey>[]> getAllUnits(PlayerKey playerId) {
 		throw new NotImplementedException();
 	}
 
