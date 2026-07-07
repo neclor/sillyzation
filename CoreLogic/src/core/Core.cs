@@ -82,10 +82,18 @@ internal class Core<TCellKey> : ICore<TCellKey> where TCellKey : notnull {
 		if (!players.TryGetValue(playerId, out var player)) {
 			return Error.NotFound();
 		}
-		return player.queues
+		Console.WriteLine($"Queue for player : {playerId}");
+		foreach (var q in player.queues) {
+			Console.WriteLine(q.Key);
+		}
+		var res = player.queues
 			.Select(e => new QueueKey(e.Value.id))
 			.ToArray()
 			.ToErrorOr();
+		foreach (var x in res.Value) {
+			Console.WriteLine(x);
+		}
+		return res;
 	}
 
 	public ErrorOr<IUnitQueue<TCellKey>> getUnitQueue(PlayerKey playerId, QueueKey queueGroupId) {
@@ -102,8 +110,8 @@ internal class Core<TCellKey> : ICore<TCellKey> where TCellKey : notnull {
 		if (!players.TryGetValue(playerId, out var player)) {
 			return Error.NotFound();
 		}
-		QueueKey k = 0;
-		if (!player.queues.TryAdd(k, new UnitQueue<TCellKey>())) {
+		IUnitQueue<TCellKey> newQueue = new UnitQueue<TCellKey>();
+		if (!player.queues.TryAdd(newQueue.id, newQueue)) {
 			return Error.Conflict();
 		}
 		return Result.Success;

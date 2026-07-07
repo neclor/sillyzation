@@ -37,6 +37,7 @@ internal class TerminalVersion {
 			new DynamicMenu<string>(
 				"Move Units",
 				"Select Unit",
+				false,
 				[
 					new GoBackOption("Go Back"),
 				],
@@ -52,6 +53,7 @@ internal class TerminalVersion {
 			new DynamicMenu<QueueKey>(
 				"Unit Queue",
 				"Select Unit Queue",
+				false,
 				[
 					new GoBackOption("Go Back"),
 					new ExecuteAndContinueOption("New Unit Queue", () => session.createUnitQueueGroup(session.currentPlayerId)),
@@ -68,7 +70,7 @@ internal class TerminalVersion {
 						printSelectCellMenu
 					),
 				], defaultMenu),
-				() => session.getAllUnitQueueId(session.currentPlayerId).Value,
+				() => session.getAllUnitQueueId(session.currentPlayerId),
 				defaultMenu
 			),
 		], defaultMenu);

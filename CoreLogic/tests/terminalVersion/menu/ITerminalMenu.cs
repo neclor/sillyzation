@@ -93,6 +93,7 @@ internal class SimpleMenu : ITerminalMenu, ITerminalMenuOption {
 internal class DynamicMenu<T> : ITerminalMenu, ITerminalMenuOption {
 	private readonly string title;
 	private readonly string option_name;
+	private readonly bool is_root;
 	private readonly ITerminalMenuOption[] static_options;
 	private readonly Func<T, ITerminalMenuOption> factory;
 	private readonly Func<ErrorOr<T[]>> get_values;
@@ -101,6 +102,7 @@ internal class DynamicMenu<T> : ITerminalMenu, ITerminalMenuOption {
 	public DynamicMenu(
 		string option_name,
 		string title,
+		bool is_root,
 		ITerminalMenuOption[] static_options,
 		Func<T, ITerminalMenuOption> factory,
 		Func<ErrorOr<T[]>> get_values,
@@ -108,6 +110,7 @@ internal class DynamicMenu<T> : ITerminalMenu, ITerminalMenuOption {
 	) {
 		this.title = title;
 		this.option_name = option_name;
+		this.is_root = is_root;
 		this.static_options = static_options;
 		this.factory = factory;
 		this.get_values = get_values;
@@ -118,10 +121,10 @@ internal class DynamicMenu<T> : ITerminalMenu, ITerminalMenuOption {
 
 	public MenuResult display() {
 		ErrorOr<T[]> fetch_values = get_values();
-		T[] values = fetch_values.IsError ? (fetch_values.Value ?? []) : [];
+		T[] values = fetch_values.IsError ? [] : (fetch_values.Value ?? []);
 		IEnumerable<ITerminalMenuOption> dynamic_options = values.Select(e => factory(e));
 		return new SimpleMenu(
-			"", title, false, [.. static_options, .. dynamic_options], display_func
+			"", title, is_root, [.. static_options, .. dynamic_options], display_func
 		).display();
 	}
 

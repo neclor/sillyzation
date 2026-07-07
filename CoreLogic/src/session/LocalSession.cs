@@ -73,9 +73,7 @@ internal class LocalSession<TCellKey> : ISession<TCellKey> where TCellKey : notn
 	}
 
 	public ErrorOr<Success> createUnitQueueGroup(PlayerKey playerId) {
-		var x = core.createUnitQueue(playerId);
-		Console.WriteLine(x);
-		return x;
+		return core.createUnitQueue(playerId);
 	}
 
 	public ErrorOr<Success> deployUnitQueueGroup(PlayerKey playerId, QueueKey queueGroupId, TCellKey pos) {
