@@ -7,45 +7,29 @@ internal enum MenuResult {
 	GoBackToRoot
 }
 
-internal interface ITerminalMenu {
-	MenuResult display();
-}
-
-internal class SimpleMenu : ITerminalMenu, ITerminalMenuOption {
-	public readonly string name;
-	private readonly string option_name;
-	private readonly ITerminalMenuOption[] options;
+internal abstract class BaseMenu : ITerminalMenuOption {
+	public string name { get; }
+	protected readonly string title;
 	private readonly bool is_root;
-	private readonly Action<string, (string option, int index)[], int> display_func;
-	private int option_index;
 
-	string ITerminalMenuOption.name => option_name;
+	protected abstract MenuResult handleKey(ConsoleKey input);
+	protected abstract void displayMenu();
 
-	public SimpleMenu(
-		string option_name,
+	protected BaseMenu(
 		string name,
-		bool is_root,
-		ITerminalMenuOption[] options,
-		Action<string, (string option, int index)[], int> display_func
+		string title,
+		bool is_root
 	) {
 		this.name = name;
-		this.option_name = option_name;
-		this.options = options;
+		this.title = title;
 		this.is_root = is_root;
-		this.display_func = display_func;
-		option_index = 0;
 	}
 
-	private static void clear() {
-		Console.Write(new string('\n', Console.WindowHeight));
-		Console.Write("\x1b[H");
-	}
-
-	public MenuResult display() {
+	public MenuResult execute() {
 		while (true) {
 			clear();
-			display_func(name, [.. options.Select((value, index) => (value.name, index))], option_index);
-			ConsoleKey input = Console.ReadKey().Key;
+			displayMenu();
+			ConsoleKey input = Console.ReadKey(true).Key;
 			MenuResult status = handleKey(input);
 			switch (status) {
 				case MenuResult.GoBack:
@@ -65,11 +49,41 @@ internal class SimpleMenu : ITerminalMenu, ITerminalMenuOption {
 		}
 	}
 
-	public MenuResult execute() {
-		return display();
+	private static void clear() {
+		Console.Write(new string('\n', Console.WindowHeight));
+		Console.Write("\x1b[H");
+	}
+}
+
+
+
+
+
+internal class SimpleMenu : BaseMenu {
+	private readonly ITerminalMenuOption[] options;
+	private int option_index;
+	private readonly Action<string, (string option, bool is_highlighted)[]> display_func;
+
+	public SimpleMenu(
+		string name,
+		string title,
+		bool is_root,
+		ITerminalMenuOption[] options,
+		Action<string, (string option, bool is_highlighted)[]> display_func
+	) : base(name, title, is_root) {
+		option_index = 0;
+		this.options = options;
+		this.display_func = display_func ?? throw new ArgumentNullException(nameof(display_func));
 	}
 
-	private MenuResult handleKey(ConsoleKey input) {
+	protected override void displayMenu() {
+		display_func(
+			title,
+			[.. options.Select((o, i) => (o.name, i == option_index))]
+		);
+	}
+
+	protected override MenuResult handleKey(ConsoleKey input) {
 #pragma warning disable IDE0010 // Add missing cases
 		switch (input) {
 			case ConsoleKey.UpArrow:
@@ -90,104 +104,101 @@ internal class SimpleMenu : ITerminalMenu, ITerminalMenuOption {
 	}
 }
 
-internal class DynamicMenu<T> : ITerminalMenu, ITerminalMenuOption {
-	private readonly string title;
-	private readonly string option_name;
-	private readonly bool is_root;
+
+
+
+
+internal class DynamicMenu<T> : BaseMenu {
+	private int option_index;
+	private ITerminalMenuOption[] options;
 	private readonly ITerminalMenuOption[] static_options;
 	private readonly Func<T, ITerminalMenuOption> factory;
 	private readonly Func<ErrorOr<T[]>> get_values;
-	private readonly Action<string, (string option, int index)[], int> display_func;
+	private readonly Action<string, (string option, bool is_highlighted)[]> display_func;
 
 	public DynamicMenu(
-		string option_name,
+		string name,
 		string title,
 		bool is_root,
 		ITerminalMenuOption[] static_options,
 		Func<T, ITerminalMenuOption> factory,
 		Func<ErrorOr<T[]>> get_values,
-		Action<string, (string option, int index)[], int> display_func
-	) {
-		this.title = title;
-		this.option_name = option_name;
-		this.is_root = is_root;
+		Action<string, (string option, bool is_highlighted)[]> display_func
+	) : base(name, title, is_root) {
+		option_index = 0;
+		options = [];
 		this.static_options = static_options;
 		this.factory = factory;
 		this.get_values = get_values;
 		this.display_func = display_func;
 	}
 
-	string ITerminalMenuOption.name => option_name;
-
-	public MenuResult display() {
+	protected override void displayMenu() {
 		ErrorOr<T[]> fetch_values = get_values();
 		T[] values = fetch_values.IsError ? [] : (fetch_values.Value ?? []);
 		IEnumerable<ITerminalMenuOption> dynamic_options = values.Select(e => factory(e));
-		return new SimpleMenu(
-			"", title, is_root, [.. static_options, .. dynamic_options], display_func
-		).display();
+		options = [.. static_options, .. dynamic_options];
+
+		display_func(
+			title,
+			options.Select((o, i) => (o.name, i == option_index)).ToArray()
+		);
 	}
 
-	public MenuResult execute() {
-		return display();
+	protected override MenuResult handleKey(ConsoleKey input) {
+#pragma warning disable IDE0010 // Add missing cases
+		switch (input) {
+			case ConsoleKey.UpArrow:
+				option_index = Math.Max(option_index - 1, 0);
+				Console.WriteLine($"menu index {option_index}");
+				return MenuResult.Continue;
+			case ConsoleKey.DownArrow:
+				option_index = Math.Min(option_index + 1, options.Length - 1);
+				Console.WriteLine($"menu index {option_index}");
+				return MenuResult.Continue;
+			case ConsoleKey.Enter:
+				ITerminalMenuOption option = options[option_index];
+				return option.execute();
+			default:
+				return MenuResult.Continue;
+		}
+#pragma warning restore IDE0010 // Add missing cases
 	}
 }
 
-internal class SelectCellMenu : ITerminalMenu, ITerminalMenuOption {
-	private readonly string name;
-	private readonly string option_name;
+
+
+
+
+internal class SelectCellMenu : BaseMenu {
 	private Coord coord;
 	private readonly Coord map_size;
 	private readonly Coord? initial_coord;
+
 	private readonly Func<Coord, ITerminalMenuOption> factory;
 	private readonly Action<string, Coord?, Coord> display_func;
 
-	string ITerminalMenuOption.name => option_name;
-
 	public SelectCellMenu(
-		string option_name,
 		string name,
+		string title,
+		bool is_root,
 		Coord map_size,
 		Coord? initial_coord,
 		Func<Coord, ITerminalMenuOption> factory,
 		Action<string, Coord?, Coord> display_func
-	) {
-		this.name = name;
-		this.option_name = option_name;
+	) : base(name, title, is_root) {
 		this.map_size = map_size;
 		this.initial_coord = initial_coord;
-		this.coord = initial_coord ?? (1, 1);
+		coord = this.initial_coord ?? (1, 1);
 		this.factory = factory;
 		this.display_func = display_func;
 	}
 
-	private static void clear() {
-		Console.Write(new string('\n', Console.WindowHeight));
-		Console.Write("\x1b[H");
+	protected override void displayMenu() {
+		display_func(title, initial_coord, coord);
 	}
 
-	public MenuResult display() {
-		while (true) {
-			clear();
-			display_func(name, initial_coord, coord);
-			ConsoleKey input = Console.ReadKey().Key;
-			MenuResult status = handleKey(input);
-			switch (status) {
-				case MenuResult.GoBack:
-					return MenuResult.Continue;
-				case MenuResult.GoBackToRoot:
-					return MenuResult.GoBackToRoot;
-				case MenuResult.ExitAll:
-					return MenuResult.ExitAll;
-				case MenuResult.Continue:
-					break;
-				default:
-					break;
-			}
-		}
-	}
-
-	private MenuResult handleKey(ConsoleKey input) {
+	protected override MenuResult handleKey(ConsoleKey input) {
 #pragma warning disable IDE0010 // Add missing cases
 		switch (input) {
 			case ConsoleKey.UpArrow:
@@ -215,15 +226,13 @@ internal class SelectCellMenu : ITerminalMenu, ITerminalMenuOption {
 				Console.WriteLine($"selected coord {coord}");
 				return MenuResult.Continue;
 			case ConsoleKey.Enter:
+
 				ITerminalMenuOption option = factory(coord);
+				coord = initial_coord ?? (1, 1);
 				return option.execute();
 			default:
 				return MenuResult.Continue;
 		}
 #pragma warning restore IDE0010 // Add missing cases
-	}
-
-	public MenuResult execute() {
-		return display();
 	}
 }

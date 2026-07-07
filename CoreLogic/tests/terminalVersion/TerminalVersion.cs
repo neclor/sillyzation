@@ -34,14 +34,10 @@ internal class TerminalVersion {
 				new ExecuteAndContinueOption("Population map mode", () => map_mode = 1),
 				new ExecuteAndContinueOption("Ressource map mode", () => map_mode = 2),
 			], defaultMenu),
-			new DynamicMenu<string>(
-				"Move Units",
-				"Select Unit",
-				false,
-				[
+			new DynamicMenu<string>("Move Units", "Select Unit", false, [
 					new GoBackOption("Go Back"),
 				],
-				(arg) => new SelectCellMenu($"{arg}-0", "Move unit to :", map_size_u, (2, 2),
+				(arg) => new SelectCellMenu($"{arg}-0", "Move unit to :", false, map_size_u, (2, 2),
 					c => new ExecuteAndContinueOption($"Unit {arg} to ({c.x}, {c.y})", () => {}),
 					printSelectCellMenu
 				),
@@ -65,8 +61,15 @@ internal class TerminalVersion {
 						new ExecuteAndContinueOption("Infantry", () => session.addUnitToQueue(session.currentPlayerId, queue, new Infantry<Coord>(session.currentPlayerId))),
 						new ExecuteAndContinueOption("Tank", () => session.addUnitToQueue(session.currentPlayerId, queue, new Tank<Coord>(session.currentPlayerId))),
 					], defaultMenu),
-					new SelectCellMenu("Deploy Unit Queue", "Select cell to deploy to", map_size_u, null,
-						c => new ExecuteAndContinueOption($"Deploy to {c}", () => session.deployUnitQueueGroup(session.currentPlayerId, queue, c)),
+					new SelectCellMenu(
+						"Deploy Unit Queue",
+						"Select cell to deploy to",
+						false,
+						map_size_u,
+						null,
+						c => new ExecuteAndContinueOption($"Deploy to {c}",
+							() => session.deployUnitQueueGroup(session.currentPlayerId, queue, c)
+						),
 						printSelectCellMenu
 					),
 				], defaultMenu),
@@ -82,11 +85,11 @@ internal class TerminalVersion {
 		);
 	}
 
-	private void defaultMenu(string name, (string option, int index)[] options, int selected) {
+	private void defaultMenu(string name, (string option, bool is_highlighted)[] options) {
 		print(
 			[
 				(name, ""),
-				..options.Select((option, index) => (option.option, option.index == selected ? AC.BG_STD_GOLD : ""))
+				..options.Select((option, index) => (option.option, option.is_highlighted ? AC.BG_STD_GOLD : ""))
 			]
 		);
 	}
@@ -186,7 +189,7 @@ internal class TerminalVersion {
 
 	public void start() {
 		while (true) {
-			_ = menu.display();
+			_ = menu.execute();
 		}
 	}
 }
