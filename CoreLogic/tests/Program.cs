@@ -14,8 +14,8 @@ internal class Program {
 	private static void lanchTerminalTestApp() {
 		LocalSession<Coord> session = new(
 			[
-				(new HumanPlayer(1, Country.France), [(1,1), (2,1), (1,2)]),
-				(new HumanPlayer(2, Country.England), [(4,4), (3,4), (4,3)]),
+				(new HumanPlayer(0, Country.France), [(1,1), (2,1), (1,2)]),
+				(new HumanPlayer(1, Country.England), [(4,4), (3,4), (4,3)]),
 			],
 			[
 				((1, 1), new Cell<Coord>((1, 1), "Arlon", Terrain.Tundra, 2000000, [])),

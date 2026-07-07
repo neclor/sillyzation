@@ -29,7 +29,7 @@ internal class Game : IGame {
 
 
 
-	public ErrorOr<bool> addPlayer(string name, Color color) {
+	public ErrorOr<Success> addPlayer(string name, Color color) {
 		try {
 			players[playerId] = new Player(
 				playerId,
@@ -37,22 +37,22 @@ internal class Game : IGame {
 				color
 			);
 			playerId++;
-			return true;
+			return Result.Success;
 		}
 		catch (ArgumentNullException) {
-			return false;
+			return Error.NotFound();
 		}
 	}
 
 
 
-	public ErrorOr<bool> kickPlayer(PlayerKey playerId) {
+	public ErrorOr<Success> kickPlayer(PlayerKey playerId) {
 		try {
 			_ = players.Remove(playerId);
 		}
 		catch (ArgumentNullException) {
 			return Error.NotFound("Player to remove not found");
 		}
-		return true;
+		return Result.Success;
 	}
 }

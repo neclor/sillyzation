@@ -5,6 +5,7 @@ using System.Text;
 using session;
 using CoreLogic;
 using AC = AnsiColors;
+using ErrorOr;
 
 internal class TerminalVersion {
 	private ISession<Coord> session { get; }
@@ -43,7 +44,9 @@ internal class TerminalVersion {
 					c => new ExecuteAndContinueOption($"Unit {arg} to ({c.x}, {c.y})", () => {}),
 					printSelectCellMenu
 				),
-				() => [ "xd", "xd2", "xd3" ],
+#pragma warning disable CA1861 // Avoid constant arrays as arguments
+				() => new string[] { "xd", "xd2", "xd3" }.ToErrorOr(),
+#pragma warning restore CA1861 // Avoid constant arrays as arguments
 				defaultMenu
 			),
 			new DynamicMenu<QueueKey>(
@@ -57,15 +60,15 @@ internal class TerminalVersion {
 					new GoBackOption("Go Back"),
 					new SimpleMenu("Add new unit to unit Queue", "Select new unit type", false, [
 						new GoBackOption("Go Back"),
-						new ExecuteAndContinueOption("Infantry", () => session.addUnitToQueueGroup(session.currentPlayerId, queue, new Infantry<Coord>(session.currentPlayerId))),
-						new ExecuteAndContinueOption("Tank", () => session.addUnitToQueueGroup(session.currentPlayerId, queue, new Tank<Coord>(session.currentPlayerId))),
+						new ExecuteAndContinueOption("Infantry", () => session.addUnitToQueue(session.currentPlayerId, queue, new Infantry<Coord>(session.currentPlayerId))),
+						new ExecuteAndContinueOption("Tank", () => session.addUnitToQueue(session.currentPlayerId, queue, new Tank<Coord>(session.currentPlayerId))),
 					], defaultMenu),
 					new SelectCellMenu("Deploy Unit Queue", "Select cell to deploy to", map_size_u, null,
 						c => new ExecuteAndContinueOption($"Deploy to {c}", () => session.deployUnitQueueGroup(session.currentPlayerId, queue, c)),
 						printSelectCellMenu
 					),
 				], defaultMenu),
-				() => [ 0 ],
+				() => session.getAllUnitQueueId(session.currentPlayerId).Value,
 				defaultMenu
 			),
 		], defaultMenu);

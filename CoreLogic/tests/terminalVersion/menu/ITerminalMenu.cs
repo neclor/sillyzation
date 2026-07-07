@@ -1,3 +1,5 @@
+using ErrorOr;
+
 internal enum MenuResult {
 	Continue,
 	GoBack,
@@ -93,7 +95,7 @@ internal class DynamicMenu<T> : ITerminalMenu, ITerminalMenuOption {
 	private readonly string option_name;
 	private readonly ITerminalMenuOption[] static_options;
 	private readonly Func<T, ITerminalMenuOption> factory;
-	private readonly Func<T[]> get_values;
+	private readonly Func<ErrorOr<T[]>> get_values;
 	private readonly Action<string, (string option, int index)[], int> display_func;
 
 	public DynamicMenu(
@@ -101,7 +103,7 @@ internal class DynamicMenu<T> : ITerminalMenu, ITerminalMenuOption {
 		string title,
 		ITerminalMenuOption[] static_options,
 		Func<T, ITerminalMenuOption> factory,
-		Func<T[]> get_values,
+		Func<ErrorOr<T[]>> get_values,
 		Action<string, (string option, int index)[], int> display_func
 	) {
 		this.title = title;
@@ -115,7 +117,8 @@ internal class DynamicMenu<T> : ITerminalMenu, ITerminalMenuOption {
 	string ITerminalMenuOption.name => option_name;
 
 	public MenuResult display() {
-		T[] values = get_values();
+		ErrorOr<T[]> fetch_values = get_values();
+		T[] values = fetch_values.IsError ? (fetch_values.Value ?? []) : [];
 		IEnumerable<ITerminalMenuOption> dynamic_options = values.Select(e => factory(e));
 		return new SimpleMenu(
 			"", title, false, [.. static_options, .. dynamic_options], display_func

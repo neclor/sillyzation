@@ -12,25 +12,27 @@ internal interface ISession<TCellKey> where TCellKey : notnull {
 	// Player
 	ErrorOr<ISessionPlayer> getPlayer(PlayerKey playerId);
 	Dictionary<PlayerKey, ISessionPlayer> getAllPlayers();
-	ErrorOr<bool> addPlayer(string name, Color color);
-	ErrorOr<bool> kickPlayer(PlayerKey playerId);
+	ErrorOr<Success> addPlayer(string name, Color color);
+	ErrorOr<Success> kickPlayer(PlayerKey playerId);
 
 	// Cells
 	ErrorOr<ICell<TCellKey>> getCell(PlayerKey playerId, TCellKey cellId);
 
 	// Unit Queue
-	ErrorOr<IEnumerable<IUnitQueue<TCellKey>>> getAllUnitQueue(PlayerKey playerId);
+	ErrorOr<IUnitQueue<TCellKey>[]> getAllUnitQueue(PlayerKey playerId);
+	ErrorOr<QueueKey[]> getAllUnitQueueId(PlayerKey playerId);
 	ErrorOr<IUnitQueue<TCellKey>> getUnitQueue(PlayerKey playerId, QueueKey queueGroupId);
-	ErrorOr<bool> createUnitQueueGroup(PlayerKey playerId);
-	ErrorOr<bool> deployUnitQueueGroup(PlayerKey playerId, QueueKey queueGroupId, Coord coord);
-	ErrorOr<bool> addUnitToQueueGroup(PlayerKey playerId, QueueKey queueGroupId, IUnit<TCellKey> unit);
-	ErrorOr<bool> removeUnitToQueueGroup(PlayerKey playerId, UnitKey unitInQueueGroupId);
+	ErrorOr<Success> createUnitQueueGroup(PlayerKey playerId);
+	ErrorOr<Success> deployUnitQueueGroup(PlayerKey playerId, QueueKey queueGroupId, TCellKey pos);
+	ErrorOr<Success> addUnitToQueue(PlayerKey playerId, QueueKey queueGroupId, IUnit<TCellKey> unit);
+	ErrorOr<Success> deleteUnitFromQueue(PlayerKey playerId, QueueKey queueGroupId, UnitKey unit);
+	ErrorOr<Success> deployUnitFromQueue(PlayerKey playerId, QueueKey queueGroupId, UnitKey unit, TCellKey pos);
 
 	// Unit
 	ErrorOr<IUnit<TCellKey>> getUnit(PlayerKey playerId, UnitKey unitId);
 	ErrorOr<IEnumerable<IUnit<TCellKey>>> getAllUnits(PlayerKey playerId);
-	ErrorOr<bool> moveUnit(PlayerKey playerId, UnitKey unitId, TCellKey cellId);
-	ErrorOr<bool> deleteUnit(PlayerKey playerId, UnitKey unitId);
+	ErrorOr<Success> moveUnit(PlayerKey playerId, UnitKey unitId, TCellKey cellId);
+	ErrorOr<Success> deleteUnit(PlayerKey playerId, UnitKey unitId);
 
 	// Combat
 	ErrorOr<ICombat<TCellKey>> getCombatInfo(PlayerKey playerId, uint combatId);

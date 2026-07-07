@@ -1,4 +1,5 @@
 using ErrorOr;
+using QuikGraph.Collections;
 
 namespace CoreLogic;
 
@@ -6,6 +7,11 @@ internal class Core<TCellKey> : ICore<TCellKey> where TCellKey : notnull {
 
 	private readonly Map<TCellKey> map;
 	private readonly Game game;
+
+	private readonly Dictionary<PlayerKey, (
+		IPlayer player,
+		Dictionary<QueueKey, IUnitQueue<TCellKey>> queues
+	)> players;
 
 	public Core(
 		IEnumerable<(IPlayer player, TCellKey[] ownership)> players,
@@ -19,6 +25,12 @@ internal class Core<TCellKey> : ICore<TCellKey> where TCellKey : notnull {
 
 		// Map
 		map = new(cells, connexions, ownerships);
+
+		this.players = players
+			.ToDictionary(
+				x => x.player.id,
+				x => (x.player, new Dictionary<QueueKey, IUnitQueue<TCellKey>>())
+			);
 	}
 
 	public ErrorOr<IGameTick> nextGameTick() {
@@ -40,11 +52,7 @@ internal class Core<TCellKey> : ICore<TCellKey> where TCellKey : notnull {
 		return game.getAllPlayers();
 	}
 
-	public ErrorOr<bool> addPlayer(string name, Color color) {
-		return game.addPlayer(name, color);
-	}
-
-	public ErrorOr<bool> kickPlayer(PlayerKey playerId) {
+	public ErrorOr<Success> kickPlayer(PlayerKey playerId) {
 		return game.kickPlayer(playerId);
 	}
 
@@ -59,28 +67,91 @@ internal class Core<TCellKey> : ICore<TCellKey> where TCellKey : notnull {
 
 
 	// Unit Queue
-	public ErrorOr<IEnumerable<IUnitQueue<TCellKey>>> getAllUnitQueue(PlayerKey playerId) {
-		throw new NotImplementedException();
+	// ErrorOr<IEnumerable<IUnitQueue<TCellKey>>> getAllUnitQueue(PlayerKey playerId)
+	public ErrorOr<IUnitQueue<TCellKey>[]> getAllUnitQueue(PlayerKey playerId) {
+		if (!players.TryGetValue(playerId, out var player)) {
+			return Error.NotFound();
+		}
+		return player.queues
+			.Select(e => e.Value)
+			.ToArray()
+			.ToErrorOr();
+	}
+
+	public ErrorOr<QueueKey[]> getAllUnitQueueId(PlayerKey playerId) {
+		if (!players.TryGetValue(playerId, out var player)) {
+			return Error.NotFound();
+		}
+		return player.queues
+			.Select(e => new QueueKey(e.Value.id))
+			.ToArray()
+			.ToErrorOr();
 	}
 
 	public ErrorOr<IUnitQueue<TCellKey>> getUnitQueue(PlayerKey playerId, QueueKey queueGroupId) {
-		throw new NotImplementedException();
+		if (!players.TryGetValue(playerId, out var player)) {
+			return Error.NotFound();
+		}
+		if (!player.queues.TryGetValue(queueGroupId, out IUnitQueue<TCellKey>? queue)) {
+			return Error.NotFound();
+		}
+		return queue.ToErrorOr();
 	}
 
-	public ErrorOr<bool> createUnitQueueGroup(PlayerKey playerId) {
-		return true;
+	public ErrorOr<Success> createUnitQueue(PlayerKey playerId) {
+		if (!players.TryGetValue(playerId, out var player)) {
+			return Error.NotFound();
+		}
+		QueueKey k = 0;
+		if (!player.queues.TryAdd(k, new UnitQueue<TCellKey>())) {
+			return Error.Conflict();
+		}
+		return Result.Success;
 	}
 
-	public ErrorOr<bool> deployUnitQueueGroup(PlayerKey playerId, QueueKey queueGroupId) {
-		return true;
+	public ErrorOr<Success> deployUnitQueue(PlayerKey playerId, QueueKey queueGroupId, TCellKey pos) {
+		if (!players.TryGetValue(playerId, out var player)) {
+			return Error.NotFound();
+		}
+		// TODO deploy units
+		if (!player.queues.Remove(queueGroupId)) {
+			return Error.NotFound();
+		}
+		return Result.Success;
 	}
 
-	public ErrorOr<bool> addUnitToQueueGroup(PlayerKey playerId, QueueKey queueGroupId, IUnit<TCellKey> unit) {
-		return true;
+	public ErrorOr<Success> addUnitToQueue(PlayerKey playerId, QueueKey queueGroupId, IUnit<TCellKey> unit) {
+		if (!players.TryGetValue(playerId, out var player)) {
+			return Error.NotFound();
+		}
+		if (!player.queues.TryGetValue(queueGroupId, out IUnitQueue<TCellKey>? queue)) {
+			return Error.NotFound();
+		}
+		return queue.addUnit(unit);
 	}
 
-	public ErrorOr<bool> removeUnitToQueueGroup(PlayerKey playerId, UnitKey unitInQueueGroupId) {
-		return true;
+	public ErrorOr<Success> deleteUnitFromQueue(PlayerKey playerId, QueueKey queueGroupId, UnitKey unit) {
+		if (!players.TryGetValue(playerId, out var player)) {
+			return Error.NotFound();
+		}
+		if (!player.queues.TryGetValue(queueGroupId, out IUnitQueue<TCellKey>? queue)) {
+			return Error.NotFound();
+		}
+		return queue.removeUnit(unit);
+	}
+
+	public ErrorOr<Success> deployUnitFromQueue(PlayerKey playerId, QueueKey queueGroupId, UnitKey unit, TCellKey pos) {
+		if (!players.TryGetValue(playerId, out var player)) {
+			return Error.NotFound();
+		}
+		if (!player.queues.TryGetValue(queueGroupId, out IUnitQueue<TCellKey>? queue)) {
+			return Error.NotFound();
+		}
+		if (queue.removeUnit(unit).IsError) {
+			return Error.NotFound();
+		}
+		// TODO place the unit
+		return Result.Success;
 	}
 
 
@@ -94,12 +165,12 @@ internal class Core<TCellKey> : ICore<TCellKey> where TCellKey : notnull {
 		throw new NotImplementedException();
 	}
 
-	public ErrorOr<bool> moveUnit(PlayerKey playerId, UnitKey unitId, TCellKey cellId) {
-		return true;
+	public ErrorOr<Success> moveUnit(PlayerKey playerId, UnitKey unitId, TCellKey cellId) {
+		return Result.Success;
 	}
 
-	public ErrorOr<bool> deleteUnit(PlayerKey playerId, UnitKey unitId) {
-		return true;
+	public ErrorOr<Success> deleteUnit(PlayerKey playerId, UnitKey unitId) {
+		return Result.Success;
 	}
 
 

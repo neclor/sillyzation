@@ -40,11 +40,11 @@ internal class LocalSession<TCellKey> : ISession<TCellKey> where TCellKey : notn
 		return players_dict;
 	}
 
-	public ErrorOr<bool> addPlayer(string name, Color color) {
+	public ErrorOr<Success> addPlayer(string name, Color color) {
 		throw new NotImplementedException();
 	}
 
-	public ErrorOr<bool> kickPlayer(PlayerKey playerId) {
+	public ErrorOr<Success> kickPlayer(PlayerKey playerId) {
 		throw new NotImplementedException();
 	}
 
@@ -60,28 +60,38 @@ internal class LocalSession<TCellKey> : ISession<TCellKey> where TCellKey : notn
 
 	// Unit Queue
 
-	public ErrorOr<IEnumerable<IUnitQueue<TCellKey>>> getAllUnitQueue(PlayerKey playerId) {
-		throw new NotImplementedException();
+	public ErrorOr<IUnitQueue<TCellKey>[]> getAllUnitQueue(PlayerKey playerId) {
+		return core.getAllUnitQueue(playerId);
+	}
+
+	public ErrorOr<QueueKey[]> getAllUnitQueueId(PlayerKey playerId) {
+		return core.getAllUnitQueueId(playerId);
 	}
 
 	public ErrorOr<IUnitQueue<TCellKey>> getUnitQueue(PlayerKey playerId, QueueKey queueGroupId) {
-		throw new NotImplementedException();
+		return core.getUnitQueue(playerId, queueGroupId);
 	}
 
-	public ErrorOr<bool> createUnitQueueGroup(PlayerKey playerId) {
-		throw new NotImplementedException();
+	public ErrorOr<Success> createUnitQueueGroup(PlayerKey playerId) {
+		var x = core.createUnitQueue(playerId);
+		Console.WriteLine(x);
+		return x;
 	}
 
-	public ErrorOr<bool> deployUnitQueueGroup(PlayerKey playerId, QueueKey queueGroupId, Coord coord) {
-		throw new NotImplementedException();
+	public ErrorOr<Success> deployUnitQueueGroup(PlayerKey playerId, QueueKey queueGroupId, TCellKey pos) {
+		return core.deployUnitQueue(playerId, queueGroupId, pos);
 	}
 
-	public ErrorOr<bool> addUnitToQueueGroup(PlayerKey playerId, QueueKey queueGroupId, IUnit<TCellKey> unit) {
-		throw new NotImplementedException();
+	public ErrorOr<Success> addUnitToQueue(PlayerKey playerId, QueueKey queueGroupId, IUnit<TCellKey> unit) {
+		return core.addUnitToQueue(playerId, queueGroupId, unit);
 	}
 
-	public ErrorOr<bool> removeUnitToQueueGroup(PlayerKey playerId, UnitKey unitInQueueGroupId) {
-		throw new NotImplementedException();
+	public ErrorOr<Success> deleteUnitFromQueue(PlayerKey playerId, QueueKey queueGroupId, UnitKey unit) {
+		return core.deleteUnitFromQueue(playerId, queueGroupId, unit);
+	}
+
+	public ErrorOr<Success> deployUnitFromQueue(PlayerKey playerId, QueueKey queueGroupId, UnitKey unit, TCellKey pos) {
+		return core.deployUnitFromQueue(playerId, queueGroupId, unit, pos);
 	}
 
 
@@ -96,11 +106,11 @@ internal class LocalSession<TCellKey> : ISession<TCellKey> where TCellKey : notn
 		throw new NotImplementedException();
 	}
 
-	public ErrorOr<bool> moveUnit(PlayerKey playerId, UnitKey unitId, TCellKey cellId) {
+	public ErrorOr<Success> moveUnit(PlayerKey playerId, UnitKey unitId, TCellKey cellId) {
 		throw new NotImplementedException();
 	}
 
-	public ErrorOr<bool> deleteUnit(PlayerKey playerId, UnitKey unitId) {
+	public ErrorOr<Success> deleteUnit(PlayerKey playerId, UnitKey unitId) {
 		throw new NotImplementedException();
 	}
 
