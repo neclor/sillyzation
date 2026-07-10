@@ -30,8 +30,8 @@ internal interface ISession<TCellKey> where TCellKey : notnull {
 	ErrorOr<Success> deployUnitFromQueue(PlayerKey playerId, QueueKey queueGroupId, UnitKey unit, TCellKey pos);
 
 	// Unit
-	ErrorOr<Unit<TCellKey>> getUnit(PlayerKey playerId, UnitKey unitId);
-	ErrorOr<Unit<TCellKey>[]> getAllUnits(PlayerKey playerId);
+	ErrorOr<MapUnit<TCellKey>> getUnit(PlayerKey playerId, UnitKey unitId);
+	ErrorOr<MapUnit<TCellKey>[]> getAllUnits(PlayerKey playerId);
 	ErrorOr<Success> moveUnit(PlayerKey playerId, UnitKey unitId, TCellKey cellId);
 	ErrorOr<Success> deleteUnit(PlayerKey playerId, UnitKey unitId);
 

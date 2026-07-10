@@ -102,11 +102,11 @@ internal class LocalSession<TCellKey> : ISession<TCellKey> where TCellKey : notn
 
 	// Unit
 
-	public ErrorOr<Unit<TCellKey>> getUnit(PlayerKey playerId, UnitKey unitId) {
+	public ErrorOr<MapUnit<TCellKey>> getUnit(PlayerKey playerId, UnitKey unitId) {
 		throw new NotImplementedException();
 	}
 
-	public ErrorOr<Unit<TCellKey>[]> getAllUnits(PlayerKey playerId) {
+	public ErrorOr<MapUnit<TCellKey>[]> getAllUnits(PlayerKey playerId) {
 		return core.getAllUnits(playerId);
 	}
 

@@ -6,11 +6,11 @@ namespace CoreLogic;
 internal class Core<TCellKey> : ICore<TCellKey> where TCellKey : notnull {
 
 	private readonly Map<TCellKey> map;
-	private readonly Game game;
 
 	private readonly Dictionary<PlayerKey, (
 		IPlayer player,
-		Dictionary<QueueKey, IUnitQueue<TCellKey>> queues
+		Dictionary<QueueKey, IUnitQueue<TCellKey>> queues,
+		Dictionary<UnitKey, MapUnit<TCellKey>> units
 	)> players;
 
 	public Core(
@@ -18,8 +18,6 @@ internal class Core<TCellKey> : ICore<TCellKey> where TCellKey : notnull {
 		IEnumerable<(TCellKey key, ICell<TCellKey> cell)> cells,
 		IEnumerable<(TCellKey key1, TCellKey key2)> connexions
 	) {
-		game = new(players.Select(p => p.player));
-
 		IEnumerable<(uint playerId, TCellKey[] cells)> ownerships = players
 			.Select((x, _) => (x.player.id.value, x.ownership));
 
@@ -29,7 +27,11 @@ internal class Core<TCellKey> : ICore<TCellKey> where TCellKey : notnull {
 		this.players = players
 			.ToDictionary(
 				x => x.player.id,
-				x => (x.player, new Dictionary<QueueKey, IUnitQueue<TCellKey>>())
+				x => (
+					x.player,
+					new Dictionary<QueueKey, IUnitQueue<TCellKey>>(),
+					new Dictionary<UnitKey, MapUnit<TCellKey>>()
+				)
 			);
 	}
 
@@ -50,15 +52,18 @@ internal class Core<TCellKey> : ICore<TCellKey> where TCellKey : notnull {
 
 	// Player
 	public ErrorOr<IPlayer> getPlayer(PlayerKey playerId) {
-		return game.getPlayer(playerId);
+		if (!players.TryGetValue(playerId, out var player)) {
+			return Error.NotFound();
+		}
+		return player.player.ToErrorOr();
 	}
 
 	public Dictionary<PlayerKey, IPlayer> getAllPlayers() {
-		return game.getAllPlayers();
+		throw new NotImplementedException();
 	}
 
 	public ErrorOr<Success> kickPlayer(PlayerKey playerId) {
-		return game.kickPlayer(playerId);
+		throw new NotImplementedException();
 	}
 
 
@@ -72,7 +77,6 @@ internal class Core<TCellKey> : ICore<TCellKey> where TCellKey : notnull {
 
 
 	// Unit Queue
-	// ErrorOr<IEnumerable<IUnitQueue<TCellKey>>> getAllUnitQueue(PlayerKey playerId)
 	public ErrorOr<IUnitQueue<TCellKey>[]> getAllUnitQueue(PlayerKey playerId) {
 		if (!players.TryGetValue(playerId, out var player)) {
 			return Error.NotFound();
@@ -180,19 +184,34 @@ internal class Core<TCellKey> : ICore<TCellKey> where TCellKey : notnull {
 
 
 	// Unit
-	public ErrorOr<Unit<TCellKey>> getUnit(PlayerKey playerId, UnitKey unitId) {
-		throw new NotImplementedException();
+	public ErrorOr<MapUnit<TCellKey>> getUnit(PlayerKey playerId, UnitKey unitId) {
+		if (!players.TryGetValue(playerId, out var player)) {
+			return Error.NotFound();
+		}
+		if (!player.units.TryGetValue(unitId, out var unit)) {
+			return Error.NotFound();
+		}
+		return unit.ToErrorOr();
 	}
 
-	public ErrorOr<Unit<TCellKey>[]> getAllUnits(PlayerKey playerId) {
-		throw new NotImplementedException();
+	public ErrorOr<MapUnit<TCellKey>[]> getAllUnits(PlayerKey playerId) {
+		if (!players.TryGetValue(playerId, out var player)) {
+			return Error.NotFound();
+		}
+		return player.units.Values.ToArray().ToErrorOr();
 	}
 
 	public ErrorOr<Success> moveUnit(PlayerKey playerId, UnitKey unitId, TCellKey cellId) {
-		return Result.Success;
+		throw new NotImplementedException();
 	}
 
 	public ErrorOr<Success> deleteUnit(PlayerKey playerId, UnitKey unitId) {
+		if (!players.TryGetValue(playerId, out var player)) {
+			return Error.NotFound();
+		}
+		if (!player.units.Remove(unitId)) {
+			return Error.NotFound();
+		}
 		return Result.Success;
 	}
 
@@ -200,6 +219,6 @@ internal class Core<TCellKey> : ICore<TCellKey> where TCellKey : notnull {
 
 	// Combat
 	public ErrorOr<ICombat<TCellKey>> getCombatInfo(PlayerKey playerId, uint combatId) {
-		return new Combat<TCellKey>();
+		throw new NotImplementedException();
 	}
 }

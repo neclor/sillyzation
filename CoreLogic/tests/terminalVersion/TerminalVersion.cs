@@ -1,4 +1,3 @@
-global using TUnit = CoreLogic.Unit<(uint x, uint y)>;
 global using TCell = CoreLogic.ICell<(uint x, uint y)>;
 global using Neighbours = (CoreLogic.ICell<(uint x, uint y)>? top, CoreLogic.ICell<(uint x, uint y)>? bot, CoreLogic.ICell<(uint x, uint y)>? left, CoreLogic.ICell<(uint x, uint y)>? right);
 using System.Text;
@@ -34,7 +33,7 @@ internal class TerminalVersion {
 				new ExecuteAndContinueOption(" ○ Population map mode", () => map_mode = 1),
 				new ExecuteAndContinueOption(" ○ Ressource map mode", () => map_mode = 2),
 			], defaultMenu),
-			new DynamicMenu<TUnit>(" ○ Move Units", "Select Unit", false, [
+			new DynamicMenu<MapUnit<Coord>>(" ○ Move Units", "Select Unit", false, [
 					new GoBackOption(" ↩ Go Back"),
 				],
 				(arg) => new SelectCellMenu($" ○ {arg}-0", "Move unit to :", false, map_size_u, (2, 2),
