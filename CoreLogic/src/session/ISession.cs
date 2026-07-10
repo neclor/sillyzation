@@ -6,7 +6,7 @@ namespace session;
 internal interface ISession<TCellKey> where TCellKey : notnull {
 	PlayerKey currentPlayerId { get; }
 	ISessionPlayer currentPlayer { get; }
-	IUnit<TCellKey>[] current_player_units { get; }
+	Unit<TCellKey>[] current_player_units { get; }
 	bool gameState { get; }
 
 	// Player
@@ -22,16 +22,16 @@ internal interface ISession<TCellKey> where TCellKey : notnull {
 	ErrorOr<IUnitQueue<TCellKey>[]> getAllUnitQueue(PlayerKey playerId);
 	ErrorOr<QueueKey[]> getAllUnitQueueId(PlayerKey playerId);
 	ErrorOr<IUnitQueue<TCellKey>> getUnitQueue(PlayerKey playerId, QueueKey queueGroupId);
-	ErrorOr<IUnit<TCellKey>[]> getAllUnitInQueue(PlayerKey playerId, QueueKey queueGroupId);
+	ErrorOr<Unit<TCellKey>[]> getAllUnitInQueue(PlayerKey playerId, QueueKey queueGroupId);
 	ErrorOr<Success> createUnitQueueGroup(PlayerKey playerId);
 	ErrorOr<Success> deployUnitQueueGroup(PlayerKey playerId, QueueKey queueGroupId, TCellKey pos);
-	ErrorOr<Success> addUnitToQueue(PlayerKey playerId, QueueKey queueGroupId, IUnit<TCellKey> unit);
+	ErrorOr<Success> addUnitToQueue(PlayerKey playerId, QueueKey queueGroupId, Unit<TCellKey> unit);
 	ErrorOr<Success> deleteUnitFromQueue(PlayerKey playerId, QueueKey queueGroupId, UnitKey unit);
 	ErrorOr<Success> deployUnitFromQueue(PlayerKey playerId, QueueKey queueGroupId, UnitKey unit, TCellKey pos);
 
 	// Unit
-	ErrorOr<IUnit<TCellKey>> getUnit(PlayerKey playerId, UnitKey unitId);
-	ErrorOr<IUnit<TCellKey>[]> getAllUnits(PlayerKey playerId);
+	ErrorOr<Unit<TCellKey>> getUnit(PlayerKey playerId, UnitKey unitId);
+	ErrorOr<Unit<TCellKey>[]> getAllUnits(PlayerKey playerId);
 	ErrorOr<Success> moveUnit(PlayerKey playerId, UnitKey unitId, TCellKey cellId);
 	ErrorOr<Success> deleteUnit(PlayerKey playerId, UnitKey unitId);
 

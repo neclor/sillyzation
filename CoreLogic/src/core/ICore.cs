@@ -21,16 +21,16 @@ public interface ICore<TCellKey> where TCellKey : notnull {
 	// Unit Queue
 	ErrorOr<IUnitQueue<TCellKey>[]> getAllUnitQueue(PlayerKey playerId);
 	ErrorOr<IUnitQueue<TCellKey>> getUnitQueue(PlayerKey playerId, QueueKey queueGroupId);
-	ErrorOr<IUnit<TCellKey>[]> getAllUnitInQueue(PlayerKey playerId, QueueKey queueGroupId);
+	ErrorOr<Unit<TCellKey>[]> getAllUnitInQueue(PlayerKey playerId, QueueKey queueGroupId);
 	ErrorOr<Success> createUnitQueue(PlayerKey playerId);
 	ErrorOr<Success> deployUnitQueue(PlayerKey playerId, QueueKey queueGroupId, TCellKey pos);
-	ErrorOr<Success> addUnitToQueue(PlayerKey playerId, QueueKey queueGroupId, IUnit<TCellKey> unit);
+	ErrorOr<Success> addUnitToQueue(PlayerKey playerId, QueueKey queueGroupId, Unit<TCellKey> unit);
 	ErrorOr<Success> deleteUnitFromQueue(PlayerKey playerId, QueueKey queueGroupId, UnitKey unit);
 	ErrorOr<Success> deployUnitFromQueue(PlayerKey playerId, QueueKey queueGroupId, UnitKey unit, TCellKey pos);
 
 	// Unit
-	ErrorOr<IUnit<TCellKey>> getUnit(PlayerKey playerId, UnitKey unitId);
-	ErrorOr<IUnit<TCellKey>[]> getAllUnits(PlayerKey playerId);
+	ErrorOr<Unit<TCellKey>> getUnit(PlayerKey playerId, UnitKey unitId);
+	ErrorOr<Unit<TCellKey>[]> getAllUnits(PlayerKey playerId);
 	ErrorOr<Success> moveUnit(PlayerKey playerId, UnitKey unitId, TCellKey cellId);
 	ErrorOr<Success> deleteUnit(PlayerKey playerId, UnitKey unitId);
 

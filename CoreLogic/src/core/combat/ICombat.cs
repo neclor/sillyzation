@@ -1,9 +1,9 @@
 namespace CoreLogic;
 
-public interface ICombat<TCellKey> {
+public interface ICombat<TCellKey> where TCellKey : notnull {
 	uint id { get; }
-	IEnumerable<IUnit<TCellKey>> defenderUnit { get; }
-	IEnumerable<IUnit<TCellKey>> attackerUnit { get; }
+	IEnumerable<Unit<TCellKey>> defenderUnit { get; }
+	IEnumerable<Unit<TCellKey>> attackerUnit { get; }
 
 	/**
 	Number from -100 to 100

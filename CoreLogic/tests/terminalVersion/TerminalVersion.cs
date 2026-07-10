@@ -1,4 +1,4 @@
-global using TUnit = CoreLogic.IUnit<(uint x, uint y)>;
+global using TUnit = CoreLogic.Unit<(uint x, uint y)>;
 global using TCell = CoreLogic.ICell<(uint x, uint y)>;
 global using Neighbours = (CoreLogic.ICell<(uint x, uint y)>? top, CoreLogic.ICell<(uint x, uint y)>? bot, CoreLogic.ICell<(uint x, uint y)>? left, CoreLogic.ICell<(uint x, uint y)>? right);
 using System.Text;

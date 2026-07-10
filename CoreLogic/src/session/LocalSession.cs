@@ -14,7 +14,7 @@ internal class LocalSession<TCellKey> : ISession<TCellKey> where TCellKey : notn
 
 	PlayerKey ISession<TCellKey>.currentPlayerId => currentPlayerId;
 
-	public IUnit<TCellKey>[] current_player_units => throw new NotImplementedException();
+	public Unit<TCellKey>[] current_player_units => throw new NotImplementedException();
 
 	public LocalSession(
 		IEnumerable<(ISessionPlayer player, TCellKey[] start)> players,
@@ -72,7 +72,7 @@ internal class LocalSession<TCellKey> : ISession<TCellKey> where TCellKey : notn
 		return core.getUnitQueue(playerId, queueGroupId);
 	}
 
-	public ErrorOr<IUnit<TCellKey>[]> getAllUnitInQueue(PlayerKey playerId, QueueKey queueGroupId) {
+	public ErrorOr<Unit<TCellKey>[]> getAllUnitInQueue(PlayerKey playerId, QueueKey queueGroupId) {
 		return core.getAllUnitInQueue(playerId, queueGroupId);
 	}
 
@@ -84,7 +84,7 @@ internal class LocalSession<TCellKey> : ISession<TCellKey> where TCellKey : notn
 		return core.deployUnitQueue(playerId, queueGroupId, pos);
 	}
 
-	public ErrorOr<Success> addUnitToQueue(PlayerKey playerId, QueueKey queueGroupId, IUnit<TCellKey> unit) {
+	public ErrorOr<Success> addUnitToQueue(PlayerKey playerId, QueueKey queueGroupId, Unit<TCellKey> unit) {
 		return core.addUnitToQueue(playerId, queueGroupId, unit);
 	}
 
@@ -102,11 +102,11 @@ internal class LocalSession<TCellKey> : ISession<TCellKey> where TCellKey : notn
 
 	// Unit
 
-	public ErrorOr<IUnit<TCellKey>> getUnit(PlayerKey playerId, UnitKey unitId) {
+	public ErrorOr<Unit<TCellKey>> getUnit(PlayerKey playerId, UnitKey unitId) {
 		throw new NotImplementedException();
 	}
 
-	public ErrorOr<IUnit<TCellKey>[]> getAllUnits(PlayerKey playerId) {
+	public ErrorOr<Unit<TCellKey>[]> getAllUnits(PlayerKey playerId) {
 		return core.getAllUnits(playerId);
 	}
 
