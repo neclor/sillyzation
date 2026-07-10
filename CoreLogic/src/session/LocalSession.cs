@@ -131,6 +131,7 @@ internal class LocalSession<TCellKey> : ISession<TCellKey> where TCellKey : notn
 		if (currentPlayerId.value == players.Length) {
 			currentPlayerId = 0;
 			// Process Turn
+			_ = core.nextGameTick();
 		}
 		if (currentPlayer.isAI()) {
 			// Process AI Turn actions

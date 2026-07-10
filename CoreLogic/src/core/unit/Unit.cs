@@ -45,7 +45,7 @@ public class Unit<TCellKey> where TCellKey : notnull {
 }
 
 public class QueueUnit<TCellKey> : Unit<TCellKey> where TCellKey : notnull {
-	public uint progress { get; }
+	public uint progress { get; private set; }
 
 	public QueueUnit(
 		UnitKey id,
@@ -61,6 +61,12 @@ public class QueueUnit<TCellKey> : Unit<TCellKey> where TCellKey : notnull {
 	public MapUnit<TCellKey> deploy(TCellKey position) {
 		return new MapUnit<TCellKey>(id, name, baseHealth, health, speed, owner, position);
 	}
+
+	public void tick() {
+		progress = Math.Min(progress + 10, 100);
+	}
+
+	public bool ready => progress == 100;
 }
 
 public class MapUnit<TCellKey> : Unit<TCellKey> where TCellKey : notnull {

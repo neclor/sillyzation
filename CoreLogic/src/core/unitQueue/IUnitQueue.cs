@@ -9,4 +9,5 @@ public interface IUnitQueue<TCellKey> where TCellKey : notnull {
 	QueueUnit<TCellKey>[] getUnits();
 	ErrorOr<Success> addUnit(QueueUnit<TCellKey> unit);
 	ErrorOr<Success> removeUnit(UnitKey unitId);
+	ErrorOr<Success> tick();
 };

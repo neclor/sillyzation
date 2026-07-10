@@ -13,9 +13,20 @@ internal class Infantry<TCellKey> : Unit<TCellKey> where TCellKey : notnull {
 internal class Tank<TCellKey> : Unit<TCellKey> where TCellKey : notnull {
 	public Tank(PlayerKey owner)
 		: base(
-			"Infantry Division", // Name
+			"Tank Division", // Name
 			200, // Health
 			2, // Speed
 			owner
 		) { }
 }
+
+internal class Artillery<TCellKey> : Unit<TCellKey> where TCellKey : notnull {
+	public Artillery(PlayerKey owner)
+		: base(
+			"Artillery Division", // Name
+			200, // Health
+			1, // Speed
+			owner
+		) { }
+}
+

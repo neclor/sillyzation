@@ -56,16 +56,17 @@ internal class TerminalVersion {
 							new GoBackOption(" ↩ Go Back"),
 							new ExecuteAndContinueOption(" ○ Infantry", () => session.addUnitToQueue(session.currentPlayerId, queue, new Infantry<Coord>(session.currentPlayerId).toQueue())),
 							new ExecuteAndContinueOption(" ○ Tank", () => session.addUnitToQueue(session.currentPlayerId, queue, new Tank<Coord>(session.currentPlayerId).toQueue())),
+							new ExecuteAndContinueOption(" ○ Artillery", () => session.addUnitToQueue(session.currentPlayerId, queue, new Artillery<Coord>(session.currentPlayerId).toQueue())),
 						], defaultMenu),
 					],
-					(unit) => new SimpleMenu($" ○ Unit {unit.name}", $"Actions for Unit {unit.name}", false, [
+					(unit) => new SimpleMenu($" [{loadingBar(unit.progress)}] Unit {unit.name}", $"Actions for [{loadingBar(unit.progress)}] {unit.name} ", false, [
 						new GoBackOption(" ↩ Go Back"),
 						new ConditionalOption(
 							new SelectCellMenu(" ○ Deploy", "Choose where to deploy", false, map_size_u, null,
 								(pos) => new ExecuteAndContinueOption(" ○ Deploy", () => session.deployUnitFromQueue(session.currentPlayerId, queue, unit.id, pos)),
 								printSelectCellMenu
 							),
-							() => unit.id == 1
+							() => unit.ready
 						),
 						new ExecuteAndContinueOption(" ○ Delete", () => session.deleteUnitFromQueue(session.currentPlayerId, queue, unit.id))
 					], defaultMenu),
@@ -82,6 +83,12 @@ internal class TerminalVersion {
 			playerId => players[playerId].color,
 			c => session.getCell(session.currentPlayerId, c)
 		);
+	}
+
+	private static string loadingBar(uint prcnt) {
+		const int len = 5;
+		int i = ((int) prcnt) * len / 100;
+		return new string('█', i) + new string('░', len - i);
 	}
 
 	private void defaultMenu(string name, (string option, bool is_highlighted)[] options) {

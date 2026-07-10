@@ -25,18 +25,23 @@ internal class UnitQueue<TCellKey> : IUnitQueue<TCellKey> where TCellKey : notnu
 	}
 
 	public ErrorOr<Success> removeUnit(UnitKey unit_id) {
-		try {
-			QueueUnit<TCellKey> elem = units.FirstOrDefault(e => e.id == unit_id);
-			// if (elem.progress != 100) {
-			// 	return Error.Failure("Unit is not ready");
-			// }
-			if (!units.Remove(elem)) {
-				return Error.NotFound();
-			}
-			return Result.Success;
-		}
-		catch (ArgumentNullException) {
+		QueueUnit<TCellKey>? elem = units.FirstOrDefault(e => e!.id == unit_id, default);
+		if (elem == null) {
 			return Error.NotFound();
 		}
+		if (!elem.ready) {
+			return Error.Failure("Unit is not ready");
+		}
+		if (!units.Remove(elem)) {
+			return Error.NotFound();
+		}
+		return Result.Success;
+	}
+
+	public ErrorOr<Success> tick() {
+		foreach (QueueUnit<TCellKey> unit in units) {
+			unit.tick();
+		}
+		return Result.Success;
 	}
 }

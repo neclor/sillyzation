@@ -34,6 +34,11 @@ internal class Core<TCellKey> : ICore<TCellKey> where TCellKey : notnull {
 	}
 
 	public ErrorOr<IGameTick> nextGameTick() {
+		foreach ((_, var player) in players) {
+			foreach ((_, var queue) in player.queues) {
+				_ = queue.tick();
+			}
+		}
 		return true.ToErrorOr();
 	}
 
