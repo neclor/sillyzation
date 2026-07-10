@@ -72,7 +72,7 @@ internal class LocalSession<TCellKey> : ISession<TCellKey> where TCellKey : notn
 		return core.getUnitQueue(playerId, queueGroupId);
 	}
 
-	public ErrorOr<Unit<TCellKey>[]> getAllUnitInQueue(PlayerKey playerId, QueueKey queueGroupId) {
+	public ErrorOr<QueueUnit<TCellKey>[]> getAllUnitInQueue(PlayerKey playerId, QueueKey queueGroupId) {
 		return core.getAllUnitInQueue(playerId, queueGroupId);
 	}
 
@@ -84,7 +84,7 @@ internal class LocalSession<TCellKey> : ISession<TCellKey> where TCellKey : notn
 		return core.deployUnitQueue(playerId, queueGroupId, pos);
 	}
 
-	public ErrorOr<Success> addUnitToQueue(PlayerKey playerId, QueueKey queueGroupId, Unit<TCellKey> unit) {
+	public ErrorOr<Success> addUnitToQueue(PlayerKey playerId, QueueKey queueGroupId, QueueUnit<TCellKey> unit) {
 		return core.addUnitToQueue(playerId, queueGroupId, unit);
 	}
 

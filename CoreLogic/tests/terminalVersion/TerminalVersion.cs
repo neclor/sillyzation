@@ -49,13 +49,13 @@ internal class TerminalVersion {
 					new GoBackOption(" ↩ Go Back"),
 					new ExecuteAndContinueOption(" + New Unit Queue", () => session.createUnitQueueGroup(session.currentPlayerId)),
 				],
-				queue => new DynamicMenu<TUnit>($" ○ {queue}", $"Unit Queue : {queue}", true,
+				queue => new DynamicMenu<QueueUnit<Coord>>($" ○ {queue}", $"Unit Queue : {queue}", true,
 					[
 						new GoBackOption(" ↩ Go Back"),
 						new SimpleMenu(" + Add new unit to unit Queue", "Select new unit type", false, [
 							new GoBackOption(" ↩ Go Back"),
-							new ExecuteAndContinueOption(" ○ Infantry", () => session.addUnitToQueue(session.currentPlayerId, queue, new Infantry<Coord>(session.currentPlayerId))),
-							new ExecuteAndContinueOption(" ○ Tank", () => session.addUnitToQueue(session.currentPlayerId, queue, new Tank<Coord>(session.currentPlayerId))),
+							new ExecuteAndContinueOption(" ○ Infantry", () => session.addUnitToQueue(session.currentPlayerId, queue, new Infantry<Coord>(session.currentPlayerId).toQueue())),
+							new ExecuteAndContinueOption(" ○ Tank", () => session.addUnitToQueue(session.currentPlayerId, queue, new Tank<Coord>(session.currentPlayerId).toQueue())),
 						], defaultMenu),
 					],
 					(unit) => new SimpleMenu($" ○ Unit {unit.name}", $"Actions for Unit {unit.name}", false, [

@@ -21,10 +21,10 @@ public interface ICore<TCellKey> where TCellKey : notnull {
 	// Unit Queue
 	ErrorOr<IUnitQueue<TCellKey>[]> getAllUnitQueue(PlayerKey playerId);
 	ErrorOr<IUnitQueue<TCellKey>> getUnitQueue(PlayerKey playerId, QueueKey queueGroupId);
-	ErrorOr<Unit<TCellKey>[]> getAllUnitInQueue(PlayerKey playerId, QueueKey queueGroupId);
+	ErrorOr<QueueUnit<TCellKey>[]> getAllUnitInQueue(PlayerKey playerId, QueueKey queueGroupId);
 	ErrorOr<Success> createUnitQueue(PlayerKey playerId);
 	ErrorOr<Success> deployUnitQueue(PlayerKey playerId, QueueKey queueGroupId, TCellKey pos);
-	ErrorOr<Success> addUnitToQueue(PlayerKey playerId, QueueKey queueGroupId, Unit<TCellKey> unit);
+	ErrorOr<Success> addUnitToQueue(PlayerKey playerId, QueueKey queueGroupId, QueueUnit<TCellKey> unit);
 	ErrorOr<Success> deleteUnitFromQueue(PlayerKey playerId, QueueKey queueGroupId, UnitKey unit);
 	ErrorOr<Success> deployUnitFromQueue(PlayerKey playerId, QueueKey queueGroupId, UnitKey unit, TCellKey pos);
 
