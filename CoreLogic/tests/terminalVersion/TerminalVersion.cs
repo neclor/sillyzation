@@ -60,9 +60,12 @@ internal class TerminalVersion {
 					],
 					(unit) => new SimpleMenu($" ○ Unit {unit.name}", $"Actions for Unit {unit.name}", false, [
 						new GoBackOption(" ↩ Go Back"),
-						new SelectCellMenu(" ○ Deploy", "Choose where to deploy", false, map_size_u, null,
-							(pos) => new ExecuteAndContinueOption(" ○ Deploy", () => session.deployUnitFromQueue(session.currentPlayerId, queue, unit.id, pos)),
-							printSelectCellMenu
+						new ConditionalOption(
+							new SelectCellMenu(" ○ Deploy", "Choose where to deploy", false, map_size_u, null,
+								(pos) => new ExecuteAndContinueOption(" ○ Deploy", () => session.deployUnitFromQueue(session.currentPlayerId, queue, unit.id, pos)),
+								printSelectCellMenu
+							),
+							() => unit.id == 1
 						),
 						new ExecuteAndContinueOption(" ○ Delete", () => session.deleteUnitFromQueue(session.currentPlayerId, queue, unit.id))
 					], defaultMenu),

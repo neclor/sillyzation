@@ -61,7 +61,7 @@ internal abstract class BaseMenu : ITerminalMenuOption {
 
 internal class SimpleMenu : BaseMenu {
 	private readonly ITerminalMenuOption[] options;
-	private int option_index;
+	private uint option_index;
 	private readonly Action<string, (string option, bool is_highlighted)[]> display_func;
 
 	public SimpleMenu(
@@ -77,25 +77,39 @@ internal class SimpleMenu : BaseMenu {
 	}
 
 	protected override void displayMenu() {
-		display_func(
-			title,
-			[.. options.Select((o, i) => (o.name, i == option_index))]
-		);
+		(string option, bool is_highlighted)[] option_names = [..
+			options
+				.Select((o, i) => (o.name, is_highlighted: i == option_index))
+				.Where(o => o.name != null)
+				.Select(o => (option: o.name!, o.is_highlighted))
+		];
+
+		display_func(title, option_names);
 	}
 
 	protected override MenuResult handleKey(ConsoleKey input) {
 #pragma warning disable IDE0010 // Add missing cases
 		switch (input) {
 			case ConsoleKey.UpArrow:
-				option_index = Math.Max(option_index - 1, 0);
+				if (option_index > 0) {
+					option_index--;
+				}
+				while (option_index > 0 && options[option_index].name == null) {
+					option_index--;
+				}
 				return MenuResult.Continue;
 			case ConsoleKey.DownArrow:
-				option_index = Math.Min(option_index + 1, options.Length - 1);
+				if (option_index < options.Length - 1) {
+					option_index++;
+				}
+				while (option_index < options.Length - 1 && options[option_index].name == null) {
+					option_index++;
+				}
 				return MenuResult.Continue;
 			case ConsoleKey.Enter:
-				ITerminalMenuOption option = options[option_index];
+				MenuResult result = options[option_index].execute();
 				option_index = 0;
-				return option.execute();
+				return result;
 			default:
 				return MenuResult.Continue;
 		}
@@ -138,9 +152,16 @@ internal class DynamicMenu<T> : BaseMenu {
 		IEnumerable<ITerminalMenuOption> dynamic_options = values.Select(e => factory(e));
 		options = [.. static_options, .. dynamic_options];
 
+		(string option, bool is_highlighted)[] option_names = [..
+			options
+				.Select((o, i) => (o.name, is_highlighted: i == option_index))
+				.Where(o => o.name != null)
+				.Select(o => (option: o.name!, o.is_highlighted))
+		];
+
 		display_func(
 			title,
-			options.Select((o, i) => (o.name, i == option_index)).ToArray()
+			option_names
 		);
 	}
 
@@ -148,10 +169,20 @@ internal class DynamicMenu<T> : BaseMenu {
 #pragma warning disable IDE0010 // Add missing cases
 		switch (input) {
 			case ConsoleKey.UpArrow:
-				option_index = Math.Max(option_index - 1, 0);
+				if (option_index > 0) {
+					option_index--;
+				}
+				while (option_index > 0 && options[option_index].name == null) {
+					option_index--;
+				}
 				return MenuResult.Continue;
 			case ConsoleKey.DownArrow:
-				option_index = Math.Min(option_index + 1, options.Length - 1);
+				if (option_index < options.Length - 1) {
+					option_index++;
+				}
+				while (option_index < options.Length - 1 && options[option_index].name == null) {
+					option_index++;
+				}
 				return MenuResult.Continue;
 			case ConsoleKey.Enter:
 				ITerminalMenuOption option = options[option_index];
