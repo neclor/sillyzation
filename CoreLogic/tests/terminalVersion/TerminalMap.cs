@@ -1,18 +1,18 @@
-using AC = AnsiColors;
-using ErrorOr;
-using CoreLogic;
-using Neighbours = (
+global using Neighbours = (
 	CoreLogic.ICell<(uint x, uint y)>? top,
 	CoreLogic.ICell<(uint x, uint y)>? bot,
 	CoreLogic.ICell<(uint x, uint y)>? left,
 	CoreLogic.ICell<(uint x, uint y)>? right
 );
-using Highlights = (
+global using Highlights = (
 	AnsiColors? top,
 	AnsiColors? bot,
 	AnsiColors? left,
 	AnsiColors? right
 );
+using AC = AnsiColors;
+using ErrorOr;
+using CoreLogic;
 
 internal abstract class CellTexture {
 	public abstract AC value(uint x, uint y);
@@ -165,40 +165,27 @@ internal class TerminalMap : IUserInterfaceTerminal {
 					}
 				}
 				if (highlights.left != null) {
-					for (uint yc = 0; yc < cell_size.y; yc++) {
-						res[
-							x * cell_size.x,
-							(y * cell_size.y) + yc
-						] = new Pixel(highlights.left);
+					for (uint xc = 0; xc < 2; xc++) {
+						for (uint yc = 0; yc < cell_size.y; yc++) {
+							res[
+								(x * cell_size.x) + xc,
+								(y * cell_size.y) + yc
+							] = new Pixel(highlights.left);
+						}
 					}
 				}
 				if (highlights.right != null) {
-					for (uint yc = 0; yc < cell_size.y; yc++) {
-						res[
-							(x * cell_size.x) + cell_size.x - 1,
-							(y * cell_size.y) + yc
-						] = new Pixel(highlights.right);
+					for (uint xc = 0; xc < 2; xc++) {
+						for (uint yc = 0; yc < cell_size.y; yc++) {
+							res[
+								(x * cell_size.x) + cell_size.x - 1 - xc,
+								(y * cell_size.y) + yc
+							] = new Pixel(highlights.right);
+						}
 					}
 				}
 			}
 		}
 		return res;
 	}
-
-	public static string getAnsiBackgroundColor(Color color) => color switch {
-		Color.Red => AC.STD_RED.bg(),
-		Color.Gold => AC.STD_GOLD.bg(),
-		Color.Orange => AC.STD_ORANGE.bg(),
-		Color.Yellow => AC.STD_YELLOW.bg(),
-		Color.LightGreen => AC.STD_LIGHT_GREEN.bg(),
-		Color.DarkGreen => AC.STD_DARK_GREEN.bg(),
-		Color.Green => AC.STD_GREEN.bg(),
-		Color.LightBlue => AC.STD_CYAN.bg(),
-		Color.Blue => AC.STD_BLUE.bg(),
-		Color.Purple => AC.STD_PURPLE.bg(),
-		Color.White => AC.STD_WHITE.bg(),
-		Color.Gray => AC.STD_GRAY.bg(),
-		Color.Brown => AC.STD_BROWN.bg(),
-		_ => AC.RESET.bg()
-	};
 }

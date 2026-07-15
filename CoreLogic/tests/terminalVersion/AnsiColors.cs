@@ -1,6 +1,27 @@
+using CoreLogic;
+
 internal abstract class AnsiColors {
 	public abstract string bg();
 	public abstract string fg();
+
+	public static AnsiColors getAnsiColor(Color color) {
+		return color switch {
+			Color.Red => STD_RED,
+			Color.Gold => STD_GOLD,
+			Color.Orange => STD_ORANGE,
+			Color.Yellow => STD_YELLOW,
+			Color.LightGreen => STD_LIGHT_GREEN,
+			Color.DarkGreen => STD_DARK_GREEN,
+			Color.Green => STD_GREEN,
+			Color.LightBlue => STD_BLUE,
+			Color.Blue => STD_BLUE,
+			Color.Purple => STD_PURPLE,
+			Color.White => STD_WHITE,
+			Color.Gray => STD_GRAY,
+			Color.Brown => STD_BROWN,
+			_ => RESET
+		};
+	}
 
 	public static readonly AnsiColors RESET = new ColReset();
 

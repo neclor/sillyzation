@@ -5,7 +5,6 @@ using CoreLogic;
 using AC = AnsiColors;
 
 internal class TerminalVersion {
-	private ISession<Coord> session { get; }
 	private (int x, int y) map_size { get; }
 	private Coord map_size_u { get; }
 	private readonly SimpleMenu menu;
@@ -13,9 +12,10 @@ internal class TerminalVersion {
 	private uint map_mode;
 
 	public TerminalVersion(ISession<Coord> session, (int x, int y) map_size) {
-		this.session = session;
 		this.map_size = map_size;
 		map_size_u = ((uint) this.map_size.x, (uint) this.map_size.y);
+
+		Dictionary<PlayerKey, ISessionPlayer> players = session.getAllPlayers();
 
 		TopBar topBar = new(() => ("Country", AC.STD_GOLD, "Test123"));
 		Menu menuSelection = new(32);
@@ -44,12 +44,28 @@ internal class TerminalVersion {
 						return (cell) => new UniformCellTexture(new ColTrue(0, 0, 0));
 				}
 			},
-			(c, neighbours) => {
-				return (null, null, null, null);
+			(cell, neighbours) => {
+				Highlights res = (null, null, null, null);
+				if (cell.owner != null) {
+					if (neighbours.top == null || neighbours.top.owner != cell.owner) {
+						res.top = AC.getAnsiColor(players[cell.owner.Value].color);
+					}
+					if (neighbours.bot == null || neighbours.bot.owner != cell.owner) {
+						res.bot = AC.getAnsiColor(players[cell.owner.Value].color);
+					}
+					if (neighbours.left == null || neighbours.left.owner != cell.owner) {
+						res.left = AC.getAnsiColor(players[cell.owner.Value].color);
+					}
+					if (neighbours.right == null || neighbours.right.owner != cell.owner) {
+						res.right = AC.getAnsiColor(players[cell.owner.Value].color);
+					}
+				}
+				return res;
 			}
 		);
 
 		Grid defaultMenu = new(
+			() => AC.getAnsiColor(session.currentPlayer.color),
 			new int[,] {
 				{ 0, 0 },
 				{ 1, 2 },
@@ -150,7 +166,7 @@ internal class TerminalVersion {
 			for (var x = 0; x < screen.GetLength(0); x++) {
 				Pixel p = screen[x, y] ?? new Pixel(' ');
 				_ = sb.Append(p.background_color.bg())
-					.Append(p.background_color.fg())
+					.Append(p.text_color.fg())
 					.Append(p.c);
 			}
 			_ = sb.AppendLine();

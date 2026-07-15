@@ -14,13 +14,15 @@ internal class Grid : IUserInterfaceTerminal {
 	private readonly char[,] layoutMap;
 	private readonly int lx;
 	private readonly int ly;
+	private readonly Func<AC> get_color;
 
 	public Grid(
+		Func<AC> get_color,
 		int[,] layoutMap,
 		IUserInterfaceTerminal[] components
 	) {
 		this.components = components;
-
+		this.get_color = get_color;
 		this.layoutMap = transformToVisualGrid(layoutMap);
 		lx = this.layoutMap.GetLength(0);
 		ly = this.layoutMap.GetLength(1);
@@ -129,6 +131,7 @@ internal class Grid : IUserInterfaceTerminal {
 	}
 
 	public Pixel[,] display() {
+		AC color = get_color();
 		Pixel[][,] componentsRes = [.. components.Select(e => e.display())];
 
 		int layoutWidth = layoutMap.GetLength(0);  // lx (X dimension / Rows)
@@ -283,7 +286,8 @@ internal class Grid : IUserInterfaceTerminal {
 				else {
 					for (int dx = 0; dx < cellW; dx++) {
 						for (int dy = 0; dy < cellH; dy++) {
-							result[startX + dx, startY + dy] = new Pixel(cell);
+							Console.WriteLine($"cell {color.fg()}");
+							result[startX + dx, startY + dy] = new Pixel(cell, color, AC.RESET);
 						}
 					}
 				}
