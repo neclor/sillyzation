@@ -1,75 +1,82 @@
-internal class AnsiColors {
-	public const string RESET = "\x1b[0m";
+internal abstract class AnsiColors {
+	public abstract string bg();
+	public abstract string fg();
 
-	// High-Intensity Solid Entity Backgrounds (Guaranteed to pop)
-	public const string BG_STD_RED = "\x1b[48;5;196m";
-	public const string BG_STD_GOLD = "\x1b[48;5;220m";
-	public const string BG_STD_ORANGE = "\x1b[48;5;208m";
-	public const string BG_STD_YELLOW = "\x1b[48;5;226m";
-	public const string BG_STD_LIGHT_GREEN = "\x1b[48;5;119m";
-	public const string BG_STD_DARK_GREEN = "\x1b[48;5;40m";
-	public const string BG_STD_GREEN = "\x1b[48;5;46m";
-	public const string BG_STD_CYAN = "\x1b[48;5;87m";
-	public const string BG_STD_BLUE = "\x1b[48;5;27m";
-	public const string BG_STD_PURPLE = "\x1b[48;5;201m";
-	public const string BG_STD_WHITE = "\x1b[48;5;255m";
-	public const string BG_STD_GRAY = "\x1b[48;5;250m";
-	public const string BG_STD_BROWN = "\x1b[48;5;172m";
+	public static readonly AnsiColors RESET = new ColReset();
 
-	public const string FG_STD_RED = "\x1b[38;5;196m";
-	public const string FG_STD_GOLD = "\x1b[38;5;220m";
-	public const string FG_STD_ORANGE = "\x1b[38;5;208m";
-	public const string FG_STD_YELLOW = "\x1b[38;5;226m";
-	public const string FG_STD_LIGHT_GREEN = "\x1b[38;5;119m";
-	public const string FG_STD_DARK_GREEN = "\x1b[38;5;40m";
-	public const string FG_STD_GREEN = "\x1b[38;5;46m";
-	public const string FG_STD_CYAN = "\x1b[38;5;87m";
-	public const string FG_STD_BLUE = "\x1b[38;5;27m";
-	public const string FG_STD_PURPLE = "\x1b[38;5;201m";
-	public const string FG_STD_WHITE = "\x1b[38;5;255m";
-	public const string FG_STD_GRAY = "\x1b[38;5;250m";
-	public const string FG_STD_BROWN = "\x1b[38;5;172m";
+	public static readonly AnsiColors STD_RED = new ColId(196);
+	public static readonly AnsiColors STD_GOLD = new ColId(220);
+	public static readonly AnsiColors STD_ORANGE = new ColId(208);
+	public static readonly AnsiColors STD_YELLOW = new ColId(226);
+	public static readonly AnsiColors STD_LIGHT_GREEN = new ColId(119);
+	public static readonly AnsiColors STD_DARK_GREEN = new ColId(40);
+	public static readonly AnsiColors STD_GREEN = new ColId(46);
+	public static readonly AnsiColors STD_CYAN = new ColId(87);
+	public static readonly AnsiColors STD_BLUE = new ColId(27);
+	public static readonly AnsiColors STD_PURPLE = new ColId(201);
+	public static readonly AnsiColors STD_WHITE = new ColId(255);
+	public static readonly AnsiColors STD_GRAY = new ColId(250);
+	public static readonly AnsiColors STD_BROWN = new ColId(172);
 
-	// --- Terrain Background Truecolor Variants ---
 	// Plain
-	public const string BG_PLAIN_1 = "\x1b[48;2;35;48;35m";
-	public const string BG_PLAIN_2 = "\x1b[48;2;30;42;30m";
-	public const string BG_PLAIN_3 = "\x1b[48;2;40;54;40m";
-	public const string BG_PLAIN_4 = "\x1b[48;2;25;36;25m";
+	public static readonly AnsiColors PLAIN_1 = new ColTrue(35, 48, 35);
+	public static readonly AnsiColors PLAIN_2 = new ColTrue(30, 42, 30);
+	public static readonly AnsiColors PLAIN_3 = new ColTrue(40, 54, 40);
+	public static readonly AnsiColors PLAIN_4 = new ColTrue(25, 36, 25);
 
 	// Forest
-	public const string BG_FOREST_1 = "\x1b[48;2;15;45;18m";
-	public const string BG_FOREST_2 = "\x1b[48;2;12;38;15m";
-	public const string BG_FOREST_3 = "\x1b[48;2;18;52;21m";
-	public const string BG_FOREST_4 = "\x1b[48;2;10;32;12m";
+	public static readonly AnsiColors FOREST_1 = new ColTrue(15, 45, 18);
+	public static readonly AnsiColors FOREST_2 = new ColTrue(12, 38, 15);
+	public static readonly AnsiColors FOREST_3 = new ColTrue(18, 52, 21);
+	public static readonly AnsiColors FOREST_4 = new ColTrue(10, 32, 12);
 
 	// Desert
-	public const string BG_DESERT_1 = "\x1b[48;2;145;85;35m";
-	public const string BG_DESERT_2 = "\x1b[48;2;135;78;30m";
-	public const string BG_DESERT_3 = "\x1b[48;2;155;92;40m";
-	public const string BG_DESERT_4 = "\x1b[48;2;125;72;26m";
+	public static readonly AnsiColors DESERT_1 = new ColTrue(145, 85, 35);
+	public static readonly AnsiColors DESERT_2 = new ColTrue(135, 78, 30);
+	public static readonly AnsiColors DESERT_3 = new ColTrue(155, 92, 40);
+	public static readonly AnsiColors DESERT_4 = new ColTrue(125, 72, 26);
 
 	// Tundra
-	public const string BG_TUNDRA_1 = "\x1b[48;2;34;38;44m";
-	public const string BG_TUNDRA_2 = "\x1b[48;2;30;34;40m";
-	public const string BG_TUNDRA_3 = "\x1b[48;2;38;42;48m";
-	public const string BG_TUNDRA_4 = "\x1b[48;2;26;29;34m";
+	public static readonly AnsiColors TUNDRA_1 = new ColTrue(34, 38, 44);
+	public static readonly AnsiColors TUNDRA_2 = new ColTrue(30, 34, 40);
+	public static readonly AnsiColors TUNDRA_3 = new ColTrue(38, 42, 48);
+	public static readonly AnsiColors TUNDRA_4 = new ColTrue(26, 29, 34);
 
 	// Savanna
-	public const string BG_SAVANNA_1 = "\x1b[48;2;115;85;25m";
-	public const string BG_SAVANNA_2 = "\x1b[48;2;105;77;20m";
-	public const string BG_SAVANNA_3 = "\x1b[48;2;125;93;30m";
-	public const string BG_SAVANNA_4 = "\x1b[48;2;95;69;16m";
+	public static readonly AnsiColors SAVANNA_1 = new ColTrue(115, 85, 25);
+	public static readonly AnsiColors SAVANNA_2 = new ColTrue(105, 77, 20);
+	public static readonly AnsiColors SAVANNA_3 = new ColTrue(125, 93, 30);
+	public static readonly AnsiColors SAVANNA_4 = new ColTrue(95, 69, 16);
 
 	// Swamp
-	public const string BG_SWAMP_1 = "\x1b[48;2;18;40;38m";
-	public const string BG_SWAMP_2 = "\x1b[48;2;15;34;32m";
-	public const string BG_SWAMP_3 = "\x1b[48;2;22;46;44m";
-	public const string BG_SWAMP_4 = "\x1b[48;2;12;28;26m";
+	public static readonly AnsiColors SWAMP_1 = new ColTrue(18, 40, 38);
+	public static readonly AnsiColors SWAMP_2 = new ColTrue(15, 34, 32);
+	public static readonly AnsiColors SWAMP_3 = new ColTrue(22, 46, 44);
+	public static readonly AnsiColors SWAMP_4 = new ColTrue(12, 28, 26);
 
 	// Jungle
-	public const string BG_JUNGLE_1 = "\x1b[48;2;32;72;36m";
-	public const string BG_JUNGLE_2 = "\x1b[48;2;24;54;30m";
-	public const string BG_JUNGLE_3 = "\x1b[48;2;40;90;42m";
-	public const string BG_JUNGLE_4 = "\x1b[48;2;16;36;24m";
+	public static readonly AnsiColors JUNGLE_1 = new ColTrue(32, 72, 36);
+	public static readonly AnsiColors JUNGLE_2 = new ColTrue(24, 54, 30);
+	public static readonly AnsiColors JUNGLE_3 = new ColTrue(40, 90, 42);
+	public static readonly AnsiColors JUNGLE_4 = new ColTrue(16, 36, 24);
+}
+
+internal class ColReset : AnsiColors {
+	public override string bg() => "\x1b[49m";
+	public override string fg() => "\x1b[39m";
+}
+
+internal class ColId : AnsiColors {
+	private readonly uint color_id;
+	public ColId(uint color_id) => this.color_id = color_id;
+	public override string bg() => $"\x1b[48;5;{color_id}m";
+	public override string fg() => $"\x1b[38;5;{color_id}m";
+}
+
+internal class ColTrue : AnsiColors {
+	private readonly (char r, char g, char b) color;
+	public ColTrue(uint r, uint g, uint b) => color = ((char) r, (char) g, (char) b);
+	public ColTrue(char r, char g, char b) => color = (r, g, b);
+	public override string bg() => $"\x1b[48;2;{(int) color.r};{(int) color.g};{(int) color.b}m";
+	public override string fg() => $"\x1b[38;2;{(int) color.r};{(int) color.g};{(int) color.b}m";
 }

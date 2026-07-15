@@ -291,3 +291,6 @@ csharp_style_allow_blank_line_after_token_in_arrow_expression_clause_experimenta
 # dotnet_diagnostic.IDE3000.severity = none # IDE3000 Implement with Copilot
 dotnet_diagnostic.CA1303.severity = none
 dotnet_diagnostic.CA1515.severity = none
+
+# CA1814: Prefer jagged arrays over multidimensional
+dotnet_diagnostic.CA1814.severity = suggestion

@@ -1,247 +1,203 @@
 using AC = AnsiColors;
 using ErrorOr;
 using CoreLogic;
+using Neighbours = (
+	CoreLogic.ICell<(uint x, uint y)>? top,
+	CoreLogic.ICell<(uint x, uint y)>? bot,
+	CoreLogic.ICell<(uint x, uint y)>? left,
+	CoreLogic.ICell<(uint x, uint y)>? right
+);
+using Highlights = (
+	AnsiColors? top,
+	AnsiColors? bot,
+	AnsiColors? left,
+	AnsiColors? right
+);
+using System.Text;
 
-internal class TerminalMap {
-	private static readonly (int x, int y) cell_size = (5, 4);
-	public const int cell_width_ration = 2;
-	private static readonly string cell_block = new(' ', cell_width_ration);
-	private static readonly Dictionary<Terrain, string[][]> backgrounds = new() {
+internal abstract class CellTexture {
+	public abstract AC value(uint x, uint y);
+}
+
+internal class BlockCellTexture : CellTexture {
+	private readonly AC[][] texture;
+	public BlockCellTexture(AC[][] texture) => this.texture = texture;
+	public override AC value(uint x, uint y) => texture[y][x];
+}
+
+internal class UniformCellTexture : CellTexture {
+	private readonly AC color;
+	public UniformCellTexture(AC color) => this.color = color;
+	public override AC value(uint x, uint y) => color;
+}
+
+internal class TerminalMap : IUserInterfaceTerminal {
+	private static readonly (int x, int y) cell_size = (10, 4);
+	private readonly Coord map_size;
+	private readonly Func<Coord, ErrorOr<TCell>> get_cell;
+	private readonly Func<TCell, CellTexture> get_cell_texture;
+	private readonly Func<TCell, Neighbours, Highlights> get_cell_highlight;
+	private static readonly Dictionary<Terrain, CellTexture> backgrounds = new() {
 		{
-			Terrain.Plain, [
-				[$"{AC.BG_PLAIN_1}{cell_block}", $"{AC.BG_PLAIN_2}{cell_block}", $"{AC.BG_PLAIN_3}{cell_block}", $"{AC.BG_PLAIN_4}{cell_block}", $"{AC.BG_PLAIN_1}{cell_block}"],
-				[$"{AC.BG_PLAIN_4}{cell_block}", $"{AC.BG_PLAIN_3}{cell_block}", $"{AC.BG_PLAIN_2}{cell_block}", $"{AC.BG_PLAIN_1}{cell_block}", $"{AC.BG_PLAIN_2}{cell_block}"],
-				[$"{AC.BG_PLAIN_2}{cell_block}", $"{AC.BG_PLAIN_1}{cell_block}", $"{AC.BG_PLAIN_4}{cell_block}", $"{AC.BG_PLAIN_3}{cell_block}", $"{AC.BG_PLAIN_4}{cell_block}"],
-				[$"{AC.BG_PLAIN_3}{cell_block}", $"{AC.BG_PLAIN_4}{cell_block}", $"{AC.BG_PLAIN_1}{cell_block}", $"{AC.BG_PLAIN_2}{cell_block}", $"{AC.BG_PLAIN_3}{cell_block}"]
-			]
+			Terrain.Plain, new BlockCellTexture([
+				[AC.PLAIN_1, AC.PLAIN_1, AC.PLAIN_2, AC.PLAIN_2, AC.PLAIN_3, AC.PLAIN_3, AC.PLAIN_4, AC.PLAIN_4, AC.PLAIN_1, AC.PLAIN_1],
+				[AC.PLAIN_4, AC.PLAIN_4, AC.PLAIN_3, AC.PLAIN_3, AC.PLAIN_2, AC.PLAIN_2, AC.PLAIN_1, AC.PLAIN_1, AC.PLAIN_2, AC.PLAIN_2],
+				[AC.PLAIN_2, AC.PLAIN_2, AC.PLAIN_1, AC.PLAIN_1, AC.PLAIN_4, AC.PLAIN_4, AC.PLAIN_3, AC.PLAIN_3, AC.PLAIN_4, AC.PLAIN_4],
+				[AC.PLAIN_3, AC.PLAIN_3, AC.PLAIN_4, AC.PLAIN_4, AC.PLAIN_1, AC.PLAIN_1, AC.PLAIN_2, AC.PLAIN_2, AC.PLAIN_3, AC.PLAIN_3]
+			])
 		},
 		{
-			Terrain.Swamp, [
-				[$"{AC.BG_SWAMP_1}{cell_block}", $"{AC.BG_SWAMP_2}{cell_block}", $"{AC.BG_SWAMP_3}{cell_block}", $"{AC.BG_SWAMP_4}{cell_block}", $"{AC.BG_SWAMP_1}{cell_block}"],
-				[$"{AC.BG_SWAMP_4}{cell_block}", $"{AC.BG_SWAMP_3}{cell_block}", $"{AC.BG_SWAMP_2}{cell_block}", $"{AC.BG_SWAMP_1}{cell_block}", $"{AC.BG_SWAMP_2}{cell_block}"],
-				[$"{AC.BG_SWAMP_2}{cell_block}", $"{AC.BG_SWAMP_1}{cell_block}", $"{AC.BG_SWAMP_4}{cell_block}", $"{AC.BG_SWAMP_3}{cell_block}", $"{AC.BG_SWAMP_4}{cell_block}"],
-				[$"{AC.BG_SWAMP_3}{cell_block}", $"{AC.BG_SWAMP_4}{cell_block}", $"{AC.BG_SWAMP_1}{cell_block}", $"{AC.BG_SWAMP_2}{cell_block}", $"{AC.BG_SWAMP_3}{cell_block}"]
-			]
+			Terrain.Swamp, new BlockCellTexture([
+				[AC.SWAMP_1, AC.SWAMP_1, AC.SWAMP_2, AC.SWAMP_2, AC.SWAMP_3, AC.SWAMP_3, AC.SWAMP_4, AC.SWAMP_4, AC.SWAMP_1, AC.SWAMP_1],
+				[AC.SWAMP_4, AC.SWAMP_4, AC.SWAMP_3, AC.SWAMP_3, AC.SWAMP_2, AC.SWAMP_2, AC.SWAMP_1, AC.SWAMP_1, AC.SWAMP_2, AC.SWAMP_2],
+				[AC.SWAMP_2, AC.SWAMP_2, AC.SWAMP_1, AC.SWAMP_1, AC.SWAMP_4, AC.SWAMP_4, AC.SWAMP_3, AC.SWAMP_3, AC.SWAMP_4, AC.SWAMP_4],
+				[AC.SWAMP_3, AC.SWAMP_3, AC.SWAMP_4, AC.SWAMP_4, AC.SWAMP_1, AC.SWAMP_1, AC.SWAMP_2, AC.SWAMP_2, AC.SWAMP_3, AC.SWAMP_3]
+			])
 		},
 		{
-			Terrain.Forest, [
-				[$"{AC.BG_FOREST_1}{cell_block}", $"{AC.BG_FOREST_2}{cell_block}", $"{AC.BG_FOREST_3}{cell_block}", $"{AC.BG_FOREST_4}{cell_block}", $"{AC.BG_FOREST_1}{cell_block}"],
-				[$"{AC.BG_FOREST_4}{cell_block}", $"{AC.BG_FOREST_3}{cell_block}", $"{AC.BG_FOREST_2}{cell_block}", $"{AC.BG_FOREST_1}{cell_block}", $"{AC.BG_FOREST_2}{cell_block}"],
-				[$"{AC.BG_FOREST_2}{cell_block}", $"{AC.BG_FOREST_1}{cell_block}", $"{AC.BG_FOREST_4}{cell_block}", $"{AC.BG_FOREST_3}{cell_block}", $"{AC.BG_FOREST_4}{cell_block}"],
-				[$"{AC.BG_FOREST_3}{cell_block}", $"{AC.BG_FOREST_4}{cell_block}", $"{AC.BG_FOREST_1}{cell_block}", $"{AC.BG_FOREST_2}{cell_block}", $"{AC.BG_FOREST_3}{cell_block}"]
-			]
+			Terrain.Forest, new BlockCellTexture([
+				[AC.FOREST_1, AC.FOREST_1, AC.FOREST_2, AC.FOREST_2, AC.FOREST_3, AC.FOREST_3, AC.FOREST_4, AC.FOREST_4, AC.FOREST_1, AC.FOREST_1],
+				[AC.FOREST_4, AC.FOREST_4, AC.FOREST_3, AC.FOREST_3, AC.FOREST_2, AC.FOREST_2, AC.FOREST_1, AC.FOREST_1, AC.FOREST_2, AC.FOREST_2],
+				[AC.FOREST_2, AC.FOREST_2, AC.FOREST_1, AC.FOREST_1, AC.FOREST_4, AC.FOREST_4, AC.FOREST_3, AC.FOREST_3, AC.FOREST_4, AC.FOREST_4],
+				[AC.FOREST_3, AC.FOREST_3, AC.FOREST_4, AC.FOREST_4, AC.FOREST_1, AC.FOREST_1, AC.FOREST_2, AC.FOREST_2, AC.FOREST_3, AC.FOREST_3]
+			])
 		},
 		{
-			Terrain.Desert, [
-				[$"{AC.BG_DESERT_1}{cell_block}", $"{AC.BG_DESERT_2}{cell_block}", $"{AC.BG_DESERT_3}{cell_block}", $"{AC.BG_DESERT_4}{cell_block}", $"{AC.BG_DESERT_1}{cell_block}"],
-				[$"{AC.BG_DESERT_4}{cell_block}", $"{AC.BG_DESERT_3}{cell_block}", $"{AC.BG_DESERT_2}{cell_block}", $"{AC.BG_DESERT_1}{cell_block}", $"{AC.BG_DESERT_2}{cell_block}"],
-				[$"{AC.BG_DESERT_2}{cell_block}", $"{AC.BG_DESERT_1}{cell_block}", $"{AC.BG_DESERT_4}{cell_block}", $"{AC.BG_DESERT_3}{cell_block}", $"{AC.BG_DESERT_4}{cell_block}"],
-				[$"{AC.BG_DESERT_3}{cell_block}", $"{AC.BG_DESERT_4}{cell_block}", $"{AC.BG_DESERT_1}{cell_block}", $"{AC.BG_DESERT_2}{cell_block}", $"{AC.BG_DESERT_3}{cell_block}"]
-			]
+			Terrain.Desert, new BlockCellTexture([
+				[AC.DESERT_1, AC.DESERT_1, AC.DESERT_2, AC.DESERT_2, AC.DESERT_3, AC.DESERT_3, AC.DESERT_4, AC.DESERT_4, AC.DESERT_1, AC.DESERT_1],
+				[AC.DESERT_4, AC.DESERT_4, AC.DESERT_3, AC.DESERT_3, AC.DESERT_2, AC.DESERT_2, AC.DESERT_1, AC.DESERT_1, AC.DESERT_2, AC.DESERT_2],
+				[AC.DESERT_2, AC.DESERT_2, AC.DESERT_1, AC.DESERT_1, AC.DESERT_4, AC.DESERT_4, AC.DESERT_3, AC.DESERT_3, AC.DESERT_4, AC.DESERT_4],
+				[AC.DESERT_3, AC.DESERT_3, AC.DESERT_4, AC.DESERT_4, AC.DESERT_1, AC.DESERT_1, AC.DESERT_2, AC.DESERT_2, AC.DESERT_3, AC.DESERT_3]
+			])
 		},
 		{
-			Terrain.Tundra, [
-				[$"{AC.BG_TUNDRA_1}{cell_block}", $"{AC.BG_TUNDRA_2}{cell_block}", $"{AC.BG_TUNDRA_3}{cell_block}", $"{AC.BG_TUNDRA_4}{cell_block}", $"{AC.BG_TUNDRA_1}{cell_block}"],
-				[$"{AC.BG_TUNDRA_4}{cell_block}", $"{AC.BG_TUNDRA_3}{cell_block}", $"{AC.BG_TUNDRA_2}{cell_block}", $"{AC.BG_TUNDRA_1}{cell_block}", $"{AC.BG_TUNDRA_2}{cell_block}"],
-				[$"{AC.BG_TUNDRA_2}{cell_block}", $"{AC.BG_TUNDRA_1}{cell_block}", $"{AC.BG_TUNDRA_4}{cell_block}", $"{AC.BG_TUNDRA_3}{cell_block}", $"{AC.BG_TUNDRA_4}{cell_block}"],
-				[$"{AC.BG_TUNDRA_3}{cell_block}", $"{AC.BG_TUNDRA_4}{cell_block}", $"{AC.BG_TUNDRA_1}{cell_block}", $"{AC.BG_TUNDRA_2}{cell_block}", $"{AC.BG_TUNDRA_3}{cell_block}"]
-			]
+			Terrain.Tundra, new BlockCellTexture([
+				[AC.TUNDRA_1, AC.TUNDRA_1, AC.TUNDRA_2, AC.TUNDRA_2, AC.TUNDRA_3, AC.TUNDRA_3, AC.TUNDRA_4, AC.TUNDRA_4, AC.TUNDRA_1, AC.TUNDRA_1],
+				[AC.TUNDRA_4, AC.TUNDRA_4, AC.TUNDRA_3, AC.TUNDRA_3, AC.TUNDRA_2, AC.TUNDRA_2, AC.TUNDRA_1, AC.TUNDRA_1, AC.TUNDRA_2, AC.TUNDRA_2],
+				[AC.TUNDRA_2, AC.TUNDRA_2, AC.TUNDRA_1, AC.TUNDRA_1, AC.TUNDRA_4, AC.TUNDRA_4, AC.TUNDRA_3, AC.TUNDRA_3, AC.TUNDRA_4, AC.TUNDRA_4],
+				[AC.TUNDRA_3, AC.TUNDRA_3, AC.TUNDRA_4, AC.TUNDRA_4, AC.TUNDRA_1, AC.TUNDRA_1, AC.TUNDRA_2, AC.TUNDRA_2, AC.TUNDRA_3, AC.TUNDRA_3]
+			])
 		},
 		{
-			Terrain.Savanna, [
-				[$"{AC.BG_SAVANNA_1}{cell_block}", $"{AC.BG_SAVANNA_2}{cell_block}", $"{AC.BG_SAVANNA_3}{cell_block}", $"{AC.BG_SAVANNA_4}{cell_block}", $"{AC.BG_SAVANNA_1}{cell_block}"],
-				[$"{AC.BG_SAVANNA_4}{cell_block}", $"{AC.BG_SAVANNA_3}{cell_block}", $"{AC.BG_SAVANNA_2}{cell_block}", $"{AC.BG_SAVANNA_1}{cell_block}", $"{AC.BG_SAVANNA_2}{cell_block}"],
-				[$"{AC.BG_SAVANNA_2}{cell_block}", $"{AC.BG_SAVANNA_1}{cell_block}", $"{AC.BG_SAVANNA_4}{cell_block}", $"{AC.BG_SAVANNA_3}{cell_block}", $"{AC.BG_SAVANNA_4}{cell_block}"],
-				[$"{AC.BG_SAVANNA_3}{cell_block}", $"{AC.BG_SAVANNA_4}{cell_block}", $"{AC.BG_SAVANNA_1}{cell_block}", $"{AC.BG_SAVANNA_2}{cell_block}", $"{AC.BG_SAVANNA_3}{cell_block}"]
-			]
+			Terrain.Savanna, new BlockCellTexture([
+				[AC.SAVANNA_1, AC.SAVANNA_1, AC.SAVANNA_2, AC.SAVANNA_2, AC.SAVANNA_3, AC.SAVANNA_3, AC.SAVANNA_4, AC.SAVANNA_4, AC.SAVANNA_1, AC.SAVANNA_1],
+				[AC.SAVANNA_4, AC.SAVANNA_4, AC.SAVANNA_3, AC.SAVANNA_3, AC.SAVANNA_2, AC.SAVANNA_2, AC.SAVANNA_1, AC.SAVANNA_1, AC.SAVANNA_2, AC.SAVANNA_2],
+				[AC.SAVANNA_2, AC.SAVANNA_2, AC.SAVANNA_1, AC.SAVANNA_1, AC.SAVANNA_4, AC.SAVANNA_4, AC.SAVANNA_3, AC.SAVANNA_3, AC.SAVANNA_4, AC.SAVANNA_4],
+				[AC.SAVANNA_3, AC.SAVANNA_3, AC.SAVANNA_4, AC.SAVANNA_4, AC.SAVANNA_1, AC.SAVANNA_1, AC.SAVANNA_2, AC.SAVANNA_2, AC.SAVANNA_3, AC.SAVANNA_3]
+			])
 		},
 		{
-			Terrain.Jungle, [
-				[$"{AC.BG_JUNGLE_1}{cell_block}", $"{AC.BG_JUNGLE_2}{cell_block}", $"{AC.BG_JUNGLE_3}{cell_block}", $"{AC.BG_JUNGLE_4}{cell_block}", $"{AC.BG_JUNGLE_1}{cell_block}"],
-				[$"{AC.BG_JUNGLE_4}{cell_block}", $"{AC.BG_JUNGLE_3}{cell_block}", $"{AC.BG_JUNGLE_2}{cell_block}", $"{AC.BG_JUNGLE_1}{cell_block}", $"{AC.BG_JUNGLE_2}{cell_block}"],
-				[$"{AC.BG_JUNGLE_2}{cell_block}", $"{AC.BG_JUNGLE_1}{cell_block}", $"{AC.BG_JUNGLE_4}{cell_block}", $"{AC.BG_JUNGLE_3}{cell_block}", $"{AC.BG_JUNGLE_4}{cell_block}"],
-				[$"{AC.BG_JUNGLE_3}{cell_block}", $"{AC.BG_JUNGLE_4}{cell_block}", $"{AC.BG_JUNGLE_1}{cell_block}", $"{AC.BG_JUNGLE_2}{cell_block}", $"{AC.BG_JUNGLE_3}{cell_block}"]
-			]
+			Terrain.Jungle, new BlockCellTexture([
+				[AC.JUNGLE_1, AC.JUNGLE_1, AC.JUNGLE_2, AC.JUNGLE_2, AC.JUNGLE_3, AC.JUNGLE_3, AC.JUNGLE_4, AC.JUNGLE_4, AC.JUNGLE_1, AC.JUNGLE_1],
+				[AC.JUNGLE_4, AC.JUNGLE_4, AC.JUNGLE_3, AC.JUNGLE_3, AC.JUNGLE_2, AC.JUNGLE_2, AC.JUNGLE_1, AC.JUNGLE_1, AC.JUNGLE_2, AC.JUNGLE_2],
+				[AC.JUNGLE_2, AC.JUNGLE_2, AC.JUNGLE_1, AC.JUNGLE_1, AC.JUNGLE_4, AC.JUNGLE_4, AC.JUNGLE_3, AC.JUNGLE_3, AC.JUNGLE_4, AC.JUNGLE_4],
+				[AC.JUNGLE_3, AC.JUNGLE_3, AC.JUNGLE_4, AC.JUNGLE_4, AC.JUNGLE_1, AC.JUNGLE_1, AC.JUNGLE_2, AC.JUNGLE_2, AC.JUNGLE_3, AC.JUNGLE_3]
+			])
 		},
 	};
-	private readonly Coord map_size;
-	private readonly Func<PlayerKey, Color> getPlayerColor;
-	private readonly Func<Coord, ErrorOr<TCell>> getCell;
+
+	public static CellTexture getTerrainTexture(Terrain terrain) {
+		return backgrounds[terrain];
+	}
+
+	//  ▄███▬
+	// (⯄⯄⯄⯄)
 
 	public TerminalMap(
 		Coord map_size,
-		Func<PlayerKey, Color> getPlayerColor,
-		Func<Coord, ErrorOr<TCell>> getCell
+		Func<Coord, ErrorOr<TCell>> get_cell,
+		Func<TCell, CellTexture> get_cell_texture,
+		Func<TCell, Neighbours, Highlights> get_cell_highlight
 	) {
 		this.map_size = map_size;
-		this.getPlayerColor = getPlayerColor;
-		this.getCell = getCell;
+		this.get_cell_texture = get_cell_texture;
+		this.get_cell_highlight = get_cell_highlight;
+		this.get_cell = get_cell;
 	}
 
-	private static void hightlightSingleCell(string[] cell_line, uint yc, string color) {
-		string hightlight_str = $"{color}{cell_block}{AC.RESET}";
-
-		if (yc == 0 || yc == cell_size.y - 1) {
-			for (int i = 0; i < cell_line.Length; i++) {
-				cell_line[i] = hightlight_str;
-			}
-		}
-		cell_line[0] = hightlight_str;
-		cell_line[^1] = hightlight_str;
-	}
-
-	private static void hightlightMultipleCell(
-		string[] cell_line,
-		uint yc,
-		string color,
-		TCell cell,
-		Neighbours neighbours,
-		Func<TCell, TCell?, bool> condition
-	) {
-		string hightlight_str = $"{color}{cell_block}{AC.RESET}";
-
-		if (yc == 0) {
-			if (condition(cell, neighbours.top)) {
-				for (int i = 0; i < cell_line.Length; i++) {
-					cell_line[i] = hightlight_str;
-				}
-			}
-		}
-		if (yc == cell_size.y - 1) {
-			if (condition(cell, neighbours.bot)) {
-				for (int i = 0; i < cell_line.Length; i++) {
-					cell_line[i] = hightlight_str;
-				}
-			}
-		}
-		if (condition(cell, neighbours.left)) {
-			cell_line[0] = hightlight_str;
-		}
-		if (condition(cell, neighbours.right)) {
-			cell_line[^1] = hightlight_str;
-		}
-	}
-
-	public List<string> printDefaultMap(
-		(Coord, string, uint, Func<TCell, TCell?, bool>?)[]? highlighted_coord = null
-	) {
-		return printMap(
-			(cell, yc, neighbours) => {
-				string[] cell_line = [.. backgrounds[cell.terrain][yc].Select(e => $"{e}{AC.RESET}")];
-				return cell_line;
-			},
-			highlighted_coord
-		);
-	}
-
-	public List<string> printPopMap(
-		(Coord, string, uint, Func<TCell, TCell?, bool>?)[]? highlighted_coord = null
-	) {
-		uint max_pop = 1;
+	public Pixel[,] display() {
+		TCell[,] cells = new TCell[map_size.x, map_size.y];
 		for (uint x = 0; x < map_size.x; x++) {
 			for (uint y = 0; y < map_size.y; y++) {
-				uint pop = getCell((x + 1, y + 1)).Value.population;
-				if (pop > max_pop) {
-					max_pop = pop;
-				}
+				cells[x, y] = get_cell((x + 1, y + 1)).Value;
 			}
 		}
 
-		return printMap(
-			(cell, yc, neighbours) => {
-				float pop_ratio = (float) cell.population / max_pop;
-				int red_value = (int) (pop_ratio * 150);
-				string[] cell_line = [.. Enumerable.Repeat($"\x1b[48;2;{red_value};0;0m{cell_block}{AC.RESET}", cell_size.x)];
-				return cell_line;
-			},
-			highlighted_coord
-		);
-	}
-
-	public List<string> printRessourceMap(
-		(Coord, string, uint, Func<TCell, TCell?, bool>?)[]? highlighted_coord = null
-	) {
-		return printMap(
-			(cell, yc, neighbours) => {
-				string[] cell_line = [.. Enumerable.Repeat("  ", cell_size.x)];
-				return cell_line;
-			},
-			highlighted_coord
-		);
-	}
-
-	private List<string> printMap(
-		Func<TCell, uint, Neighbours, string[]> displayCell,
-		(Coord coord, string color, uint priority, Func<TCell, TCell?, bool>? condition_neighbours)[]? highlighted_coord = null
-	) {
-		Dictionary<Coord, (string color, Func<TCell, TCell?, bool>? condition_neighbours)> highlighted_coord_set = highlighted_coord?
-			.GroupBy(v => v.coord)
-			.ToDictionary(
-				g => g.Key,
-				g => {
-					var (_, color, priority, link_multiple) = g.MaxBy(v => v.priority);
-					return (color, link_multiple);
-				}
-			) ?? [];
-
-		TCell[][] cells = new TCell[map_size.x][];
-		for (uint x = 0; x < map_size.x; x++) {
-			cells[x] = new TCell[map_size.y];
-			for (uint y = 0; y < map_size.y; y++) {
-				cells[x][y] = getCell((x + 1, y + 1)).Value;
-			}
-		}
-
-		List<List<string[]>> map = [];
-		for (uint y = 0; y < map_size.y; y++) {
-			for (uint yc = 0; yc < cell_size.y; yc++) {
-				List<string[]> line = [];
-				for (uint x = 0; x < map_size.x; x++) {
-					TCell cell = cells[x][y];
-					Neighbours neighbours = (
-						y > 0 ? cells[x][y - 1] : null,
-						y < map_size.y - 1 ? cells[x][y + 1] : null,
-						x > 0 ? cells[x - 1][y] : null,
-						x < map_size.x - 1 ? cells[x + 1][y] : null
-					);
-					string[] cell_line = displayCell(cell, yc, neighbours);
-					if (highlighted_coord_set.TryGetValue(cell.id, out (string color, Func<TCell, TCell?, bool>? condition_neighbours) highlight)) {
-						if (highlight.condition_neighbours != null) {
-							hightlightMultipleCell(cell_line, yc, highlight.color, cell, neighbours, highlight.condition_neighbours);
-						}
-						else {
-							hightlightSingleCell(cell_line, yc, highlight.color);
-						}
-					}
-					else if (cell.owner != null) {
-						string owner_color = getAnsiBackgroundColor(getPlayerColor(cell.owner.Value));
-						hightlightMultipleCell(cell_line, yc, owner_color, cell, neighbours, (cell, other) => other == null || other.owner != cell.owner);
-					}
-					line.AddRange(cell_line);
-				}
-				map.Add(line);
-			}
-		}
-
-		return [.. map.Select(
-			(line) => line.Aggregate("", (acc, cur) => acc + string.Concat(cur)))
+		Pixel[,] res = new Pixel[
+			map_size.x * cell_size.x,
+			map_size.y * cell_size.y
 		];
+
+		for (uint x = 0; x < map_size.x; x++) {
+			for (uint y = 0; y < map_size.y; y++) {
+				TCell cell = cells[x, y];
+				Neighbours neighbours = (
+					y > 0 ? cells[x, y - 1] : null,
+					y < map_size.y - 1 ? cells[x, y + 1] : null,
+					x > 0 ? cells[x - 1, y] : null,
+					x < map_size.x - 1 ? cells[x + 1, y] : null
+				);
+				CellTexture cell_texture = get_cell_texture(cell);
+				for (uint xc = 0; xc < cell_size.x; xc++) {
+					for (uint yc = 0; yc < cell_size.y; yc++) {
+						res[
+							(x * cell_size.x) + xc,
+							(y * cell_size.y) + yc
+						] = new Pixel(cell_texture.value(xc, yc));
+					}
+				}
+				Highlights highlights = get_cell_highlight(cell, neighbours);
+				if (highlights.top != null) {
+					for (uint xc = 0; xc < cell_size.x; xc++) {
+						res[
+							(x * cell_size.x) + xc,
+							y * cell_size.y
+						] = new Pixel(highlights.top);
+					}
+				}
+				if (highlights.bot != null) {
+					for (uint xc = 0; xc < cell_size.x; xc++) {
+						res[
+							(x * cell_size.x) + xc,
+							(y * cell_size.y) + cell_size.y - 1
+						] = new Pixel(highlights.bot);
+					}
+				}
+				if (highlights.left != null) {
+					for (uint yc = 0; yc < cell_size.y; yc++) {
+						res[
+							x * cell_size.x,
+							(y * cell_size.y) + yc
+						] = new Pixel(highlights.left);
+					}
+				}
+				if (highlights.right != null) {
+					for (uint yc = 0; yc < cell_size.y; yc++) {
+						res[
+							(x * cell_size.x) + cell_size.x - 1,
+							(y * cell_size.y) + yc
+						] = new Pixel(highlights.right);
+					}
+				}
+			}
+		}
+		return res;
 	}
 
 	public static string getAnsiBackgroundColor(Color color) => color switch {
-		Color.Red => AC.BG_STD_RED,
-		Color.Gold => AC.BG_STD_GOLD,
-		Color.Orange => AC.BG_STD_ORANGE,
-		Color.Yellow => AC.BG_STD_YELLOW,
-		Color.LightGreen => AC.BG_STD_LIGHT_GREEN,
-		Color.DarkGreen => AC.BG_STD_DARK_GREEN,
-		Color.Green => AC.BG_STD_GREEN,
-		Color.LightBlue => AC.BG_STD_CYAN,
-		Color.Blue => AC.BG_STD_BLUE,
-		Color.Purple => AC.BG_STD_PURPLE,
-		Color.White => AC.BG_STD_WHITE,
-		Color.Gray => AC.BG_STD_GRAY,
-		Color.Brown => AC.BG_STD_BROWN,
-		_ => AC.RESET
+		Color.Red => AC.STD_RED.bg(),
+		Color.Gold => AC.STD_GOLD.bg(),
+		Color.Orange => AC.STD_ORANGE.bg(),
+		Color.Yellow => AC.STD_YELLOW.bg(),
+		Color.LightGreen => AC.STD_LIGHT_GREEN.bg(),
+		Color.DarkGreen => AC.STD_DARK_GREEN.bg(),
+		Color.Green => AC.STD_GREEN.bg(),
+		Color.LightBlue => AC.STD_CYAN.bg(),
+		Color.Blue => AC.STD_BLUE.bg(),
+		Color.Purple => AC.STD_PURPLE.bg(),
+		Color.White => AC.STD_WHITE.bg(),
+		Color.Gray => AC.STD_GRAY.bg(),
+		Color.Brown => AC.STD_BROWN.bg(),
+		_ => AC.RESET.bg()
 	};
 }

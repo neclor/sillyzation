@@ -1,29 +1,70 @@
 global using TCell = CoreLogic.ICell<(uint x, uint y)>;
-global using Neighbours = (CoreLogic.ICell<(uint x, uint y)>? top, CoreLogic.ICell<(uint x, uint y)>? bot, CoreLogic.ICell<(uint x, uint y)>? left, CoreLogic.ICell<(uint x, uint y)>? right);
 using System.Text;
 using session;
 using CoreLogic;
 using AC = AnsiColors;
-using ErrorOr;
 
 internal class TerminalVersion {
 	private ISession<Coord> session { get; }
 	private (int x, int y) map_size { get; }
 	private Coord map_size_u { get; }
-	private readonly Dictionary<PlayerKey, ISessionPlayer> players;
 	private readonly SimpleMenu menu;
 	private readonly TerminalMap map;
 	private uint map_mode;
-
-	private static readonly (int x, int y) cell_size = (5, 4);
-	private const int minMenuWidth = 32;
 
 	public TerminalVersion(ISession<Coord> session, (int x, int y) map_size) {
 		this.session = session;
 		this.map_size = map_size;
 		map_size_u = ((uint) this.map_size.x, (uint) this.map_size.y);
 
-		players = session.getAllPlayers();
+		TopBar topBar = new(() => ("Country", AC.STD_GOLD, "Test123"));
+		Menu menuSelection = new();
+		map = new(
+			((uint) map_size.x, (uint) map_size.y),
+			c => session.getCell(session.currentPlayerId, c),
+			(cell) => {
+				return TerminalMap.getTerrainTexture(cell.terrain);
+			},
+			(c, neighbours) => {
+				return (null, null, null, null);
+			}
+		);
+
+		Grid defaultMenu = new(
+			new int[,] {
+				{ 0, 0 },
+				{ 1, 2 },
+			},
+			[
+				topBar,
+				menuSelection,
+				map
+			]
+		);
+
+		void displayDefaultMenu(
+			string title,
+			(string option, bool is_highlighted)[] options
+		) {
+			menuSelection.setContent([
+				(title, false),
+				.. options
+			]);
+			Pixel[,] screen = defaultMenu.display();
+			printScreen(screen);
+		}
+
+		void displaySelectCellMenu(
+			string title,
+			Coord? initial_coord,
+			Coord coord
+		) {
+			menuSelection.setContent([
+				(title, false),
+			]);
+			Pixel[,] screen = defaultMenu.display();
+			printScreen(screen);
+		}
 
 		menu = new("", "Choose your option :", true, [
 			new ExecuteAndExitOption(" ⏎ End Turn", session.endTurn),
@@ -32,16 +73,16 @@ internal class TerminalVersion {
 				new ExecuteAndContinueOption(" ○ Default map mode", () => map_mode = 0),
 				new ExecuteAndContinueOption(" ○ Population map mode", () => map_mode = 1),
 				new ExecuteAndContinueOption(" ○ Ressource map mode", () => map_mode = 2),
-			], defaultMenu),
+			], displayDefaultMenu),
 			new DynamicMenu<MapUnit<Coord>>(" ○ Move Units", "Select Unit", false, [
 					new GoBackOption(" ↩ Go Back"),
 				],
 				(arg) => new SelectCellMenu($" ○ {arg}-0", "Move unit to :", false, map_size_u, (2, 2),
 					c => new ExecuteAndContinueOption($"Unit {arg} to ({c.x}, {c.y})", () => {}),
-					printSelectCellMenu
+					displaySelectCellMenu
 				),
 				() => session.getAllUnits(session.currentPlayerId),
-				defaultMenu
+				displayDefaultMenu
 			),
 			new DynamicMenu<QueueKey>(" ○ Unit Queue", "Select Unit Queue", true,
 				[
@@ -56,32 +97,26 @@ internal class TerminalVersion {
 							new ExecuteAndContinueOption(" ○ Infantry", () => session.addUnitToQueue(session.currentPlayerId, queue, new Infantry<Coord>(session.currentPlayerId).toQueue())),
 							new ExecuteAndContinueOption(" ○ Tank", () => session.addUnitToQueue(session.currentPlayerId, queue, new Tank<Coord>(session.currentPlayerId).toQueue())),
 							new ExecuteAndContinueOption(" ○ Artillery", () => session.addUnitToQueue(session.currentPlayerId, queue, new Artillery<Coord>(session.currentPlayerId).toQueue())),
-						], defaultMenu),
+						], displayDefaultMenu),
 					],
 					(unit) => new SimpleMenu($" [{loadingBar(unit.progress)}] Unit {unit.name}", $"Actions for [{loadingBar(unit.progress)}] {unit.name} ", false, [
 						new GoBackOption(" ↩ Go Back"),
 						new ConditionalOption(
 							new SelectCellMenu(" ○ Deploy", "Choose where to deploy", false, map_size_u, null,
 								(pos) => new ExecuteAndContinueOption(" ○ Deploy", () => session.deployUnitFromQueue(session.currentPlayerId, queue, unit.id, pos)),
-								printSelectCellMenu
+								displaySelectCellMenu
 							),
 							() => unit.ready
 						),
 						new ExecuteAndContinueOption(" ○ Delete", () => session.deleteUnitFromQueue(session.currentPlayerId, queue, unit.id))
-					], defaultMenu),
+					], displayDefaultMenu),
 					() => session.getAllUnitInQueue(session.currentPlayerId, queue),
-					defaultMenu
+					displayDefaultMenu
 				),
 				() => session.getAllUnitQueueId(session.currentPlayerId),
-				defaultMenu
+				displayDefaultMenu
 			),
-		], defaultMenu);
-
-		map = new(
-			((uint) map_size.x, (uint) map_size.y),
-			playerId => players[playerId].color,
-			c => session.getCell(session.currentPlayerId, c)
-		);
+		], displayDefaultMenu);
 	}
 
 	private static string loadingBar(uint prcnt) {
@@ -90,106 +125,20 @@ internal class TerminalVersion {
 		return new string('█', i) + new string('░', len - i);
 	}
 
-	private void defaultMenu(string name, (string option, bool is_highlighted)[] options) {
-		print(
-			[
-				(name, ""),
-				..options.Select((option, index) => (option.option, option.is_highlighted ? AC.BG_STD_GOLD : ""))
-			]
-		);
-	}
-
-	private void printSelectCellMenu(string title, Coord? initial_coord, Coord coord) {
-		if (initial_coord.HasValue) {
-			print([
-				(title, "")
-			], [
-				(coord, AC.BG_STD_WHITE, 1, null),
-				(initial_coord.Value, AC.BG_STD_GRAY, 0, null)
-			]);
-		}
-		else {
-			print([
-				(title, "")
-			], [
-				(coord, AC.BG_STD_WHITE, 1, null),
-			]);
-		}
-	}
-
-	public static string getAnsiTextColor(Color color) => color switch {
-		Color.Red => AC.FG_STD_RED,
-		Color.Gold => AC.FG_STD_GOLD,
-		Color.Orange => AC.FG_STD_ORANGE,
-		Color.Yellow => AC.FG_STD_YELLOW,
-		Color.LightGreen => AC.FG_STD_LIGHT_GREEN,
-		Color.DarkGreen => AC.FG_STD_DARK_GREEN,
-		Color.Green => AC.FG_STD_GREEN,
-		Color.LightBlue => AC.FG_STD_CYAN,
-		Color.Blue => AC.FG_STD_BLUE,
-		Color.Purple => AC.FG_STD_PURPLE,
-		Color.White => AC.FG_STD_WHITE,
-		Color.Gray => AC.FG_STD_GRAY,
-		Color.Brown => AC.FG_STD_BROWN,
-		_ => AC.RESET
-	};
-
-	private void print(
-		(string content,
-		string color)[] contentMenu,
-		(Coord coord, string color, uint priority, Func<TCell, TCell?, bool>? highligh)[]? highlighted_coords = null
-	) {
-		int longest = (contentMenu.Length != 0)
-			? contentMenu.Max((cur) => cur.content.Length)
-			: 0;
-		int menuWidth = Math.Max(longest, minMenuWidth);
-		int mapWidth = map_size.x * cell_size.x * TerminalMap.cell_width_ration;
-		int mapHeight = map_size.y * cell_size.y;
-		int nbLines = contentMenu.Length > mapHeight ? contentMenu.Length : mapHeight;
-
-		List<string> map_res = map_mode switch {
-			0 => map.printDefaultMap(highlighted_coords),
-			1 => map.printPopMap(highlighted_coords),
-			2 => map.printRessourceMap(highlighted_coords),
-			_ => throw new InvalidDataException("Invalid map mode index"),
-		};
-
-		string textColor = getAnsiTextColor(session.currentPlayer.color);
+	private static void printScreen(Pixel[,] screen) {
 		StringBuilder sb = new();
-#pragma warning disable IDE0058 // Expression value is never used
-
-		sb.AppendLine($"{textColor}╔{new('═', menuWidth + mapWidth)}═══╗{AC.RESET}");
-		sb.AppendLine($"{textColor}║{AC.RESET}{$" Country: {textColor}{session.currentPlayer.name}{AC.RESET}   Population: 10000   Iron: 6769{new(' ', menuWidth + 1 + mapWidth - session.currentPlayer.name.Length - 41)}"}{textColor}║{AC.RESET}");
-		sb.AppendLine($"{textColor}╠{new('═', menuWidth)}╦{new('═', mapWidth)}══╣{AC.RESET}");
-		foreach (((string content, string color), int i) in contentMenu.Select((value, index) => (value, index))) {
-			sb.Append($"{textColor}║{AC.RESET}{color}{content.PadRight(menuWidth)}{AC.RESET}{textColor}║{AC.RESET} ");
-			if (i >= mapHeight) {
-				sb.Append(' ', mapWidth);
+		for (var y = 0; y < screen.GetLength(1); y++) {
+			for (var x = 0; x < screen.GetLength(0); x++) {
+				Pixel p = screen[x, y] ?? new Pixel(' ');
+				_ = sb.Append(p.background_color.bg())
+					.Append(p.background_color.fg())
+					.Append(p.c);
 			}
-			else {
-				sb.Append(map_res[i]);
-			}
-			sb.AppendLine($" {textColor}║{AC.RESET}");
+			_ = sb.AppendLine();
 		}
-		if (contentMenu.Length < mapHeight) {
-			string leftPad = $"{textColor}║{AC.RESET}{new(' ', menuWidth)}{textColor}║{AC.RESET}";
-			string rightPad = $"{textColor}║{AC.RESET}";
-
-			for (int i = contentMenu.Length; i < mapHeight; i++) {
-				sb.AppendLine($"{leftPad} {map_res[i]} {rightPad}");
-			}
-		}
-		sb.AppendLine($"{textColor}╚{new('═', menuWidth)}╩{new('═', mapWidth)}══╝{AC.RESET}");
-#pragma warning restore IDE0058 // Expression value is never used
-
-		string res = sb.ToString();
-		clear();
-		Console.WriteLine(res);
-	}
-
-	private static void clear() {
 		Console.Write(new string('\n', Console.WindowHeight));
 		Console.Write("\x1b[H");
+		Console.WriteLine(sb.ToString());
 	}
 
 	public void start() {
