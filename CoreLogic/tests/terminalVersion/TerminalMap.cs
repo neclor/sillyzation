@@ -13,7 +13,6 @@ using Highlights = (
 	AnsiColors? left,
 	AnsiColors? right
 );
-using System.Text;
 
 internal abstract class CellTexture {
 	public abstract AC value(uint x, uint y);
@@ -35,7 +34,7 @@ internal class TerminalMap : IUserInterfaceTerminal {
 	private static readonly (int x, int y) cell_size = (10, 4);
 	private readonly Coord map_size;
 	private readonly Func<Coord, ErrorOr<TCell>> get_cell;
-	private readonly Func<TCell, CellTexture> get_cell_texture;
+	private readonly Func<TCell[,], Func<TCell, CellTexture>> get_cell_texture_func;
 	private readonly Func<TCell, Neighbours, Highlights> get_cell_highlight;
 	private static readonly Dictionary<Terrain, CellTexture> backgrounds = new() {
 		{
@@ -106,11 +105,11 @@ internal class TerminalMap : IUserInterfaceTerminal {
 	public TerminalMap(
 		Coord map_size,
 		Func<Coord, ErrorOr<TCell>> get_cell,
-		Func<TCell, CellTexture> get_cell_texture,
+		Func<TCell[,], Func<TCell, CellTexture>> get_cell_texture_func,
 		Func<TCell, Neighbours, Highlights> get_cell_highlight
 	) {
 		this.map_size = map_size;
-		this.get_cell_texture = get_cell_texture;
+		this.get_cell_texture_func = get_cell_texture_func;
 		this.get_cell_highlight = get_cell_highlight;
 		this.get_cell = get_cell;
 	}
@@ -122,6 +121,8 @@ internal class TerminalMap : IUserInterfaceTerminal {
 				cells[x, y] = get_cell((x + 1, y + 1)).Value;
 			}
 		}
+
+		Func<TCell, CellTexture> get_cell_texture = get_cell_texture_func(cells);
 
 		Pixel[,] res = new Pixel[
 			map_size.x * cell_size.x,

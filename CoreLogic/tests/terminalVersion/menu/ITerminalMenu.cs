@@ -10,7 +10,7 @@ internal enum MenuResult {
 internal abstract class BaseMenu : ITerminalMenuOption {
 	public string name { get; }
 	protected readonly string title;
-	private readonly bool is_root;
+	protected readonly bool is_root;
 
 	protected abstract MenuResult handleKey(ConsoleKey input);
 	protected abstract void displayMenu();
@@ -108,7 +108,9 @@ internal class SimpleMenu : BaseMenu {
 				return MenuResult.Continue;
 			case ConsoleKey.Enter:
 				MenuResult result = options[option_index].execute();
-				option_index = 0;
+				if (!is_root) {
+					option_index = 0;
+				}
 				return result;
 			default:
 				return MenuResult.Continue;

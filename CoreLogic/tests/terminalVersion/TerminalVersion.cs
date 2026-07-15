@@ -18,12 +18,31 @@ internal class TerminalVersion {
 		map_size_u = ((uint) this.map_size.x, (uint) this.map_size.y);
 
 		TopBar topBar = new(() => ("Country", AC.STD_GOLD, "Test123"));
-		Menu menuSelection = new();
+		Menu menuSelection = new(32);
 		map = new(
 			((uint) map_size.x, (uint) map_size.y),
 			c => session.getCell(session.currentPlayerId, c),
-			(cell) => {
-				return TerminalMap.getTerrainTexture(cell.terrain);
+			(cells) => {
+				switch (map_mode) {
+					case 0:
+						return (cell) => TerminalMap.getTerrainTexture(cell.terrain);
+					case 1:
+						uint max_pop = 1;
+						foreach (TCell cell in cells) {
+							if (cell.population > max_pop) {
+								max_pop = cell.population;
+							}
+						}
+						return (cell) => {
+							float pop_ratio = (float) cell.population / max_pop;
+							uint red_value = (uint) (pop_ratio * 150);
+							return new UniformCellTexture(new ColTrue(red_value, 0, 0));
+						};
+					case 2:
+						return (cell) => new UniformCellTexture(new ColTrue(40, 40, 40));
+					default:
+						return (cell) => new UniformCellTexture(new ColTrue(0, 0, 0));
+				}
 			},
 			(c, neighbours) => {
 				return (null, null, null, null);
@@ -68,7 +87,7 @@ internal class TerminalVersion {
 
 		menu = new("", "Choose your option :", true, [
 			new ExecuteAndExitOption(" ⏎ End Turn", session.endTurn),
-			new SimpleMenu(" ○ Change map mode", "Choose your map mode", false, [
+			new SimpleMenu(" ○ Change map mode", "Choose your map mode", true, [
 				new GoBackOption(" ↩ Go Back"),
 				new ExecuteAndContinueOption(" ○ Default map mode", () => map_mode = 0),
 				new ExecuteAndContinueOption(" ○ Population map mode", () => map_mode = 1),

@@ -318,6 +318,9 @@ internal class TopBar : IUserInterfaceTerminal {
 internal class Menu : IUserInterfaceTerminal {
 	private static readonly AC highlight_color = AC.STD_GOLD;
 	private (string content, bool highlighted)[] contents = [];
+	private readonly int min_width;
+
+	public Menu(int min_width) => this.min_width = min_width;
 
 	public void setContent((string content, bool highlighted)[] contents) {
 		this.contents = contents;
@@ -325,6 +328,9 @@ internal class Menu : IUserInterfaceTerminal {
 
 	public Pixel[,] display() {
 		int longest = contents.Max((c) => c.content.Length);
+		if (longest < min_width) {
+			longest = min_width;
+		}
 
 		Pixel[,] res = new Pixel[longest, contents.Length];
 
