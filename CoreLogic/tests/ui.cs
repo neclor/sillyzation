@@ -194,7 +194,7 @@ internal class Grid : IUserInterfaceTerminal {
 					contentSpanY++;
 			}
 
-			int reqWidthPerCell = (int) Math.Ceiling((double) compWidth / (contentSpanX > 0 ? contentSpanX : 1));
+			int reqWidthPerCell = (int) Math.Ceiling((double) (compWidth + 2) / (contentSpanX > 0 ? contentSpanX : 1));
 			int reqHeightPerCell = (int) Math.Ceiling((double) compHeight / (contentSpanY > 0 ? contentSpanY : 1));
 
 			for (int x = minX; x <= maxX; x++) {
@@ -270,8 +270,9 @@ internal class Grid : IUserInterfaceTerminal {
 									compY++;
 							}
 
-							if (compX < comp.GetLength(0) && compY < comp.GetLength(1)) {
-								result[absX, absY] = comp[compX, compY];
+							int sourceX = compX - 1;
+							if (sourceX >= 0 && sourceX < comp.GetLength(0) && compY < comp.GetLength(1)) {
+								result[absX, absY] = comp[sourceX, compY];
 							}
 							else {
 								result[absX, absY] = new Pixel(' ');
