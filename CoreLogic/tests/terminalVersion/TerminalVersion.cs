@@ -69,7 +69,9 @@ internal class TerminalVersion {
 					res.top = res.right = res.left = res.bot = AC.STD_WHITE;
 				}
 				return res;
-			}
+			},
+			() => session.getAllUnitsVisibleFromPlayer(session.currentPlayerId).Value,
+			(player) => AC.getAnsiColor(players[player].color)
 		);
 
 		Grid defaultMenu = new(
@@ -125,11 +127,11 @@ internal class TerminalVersion {
 			new DynamicMenu<MapUnit<Coord>>(" ○ Move Units", "Select Unit", false, [
 					new GoBackOption(" ↩ Go Back"),
 				],
-				(arg) => new SelectCellMenu($" ○ {arg}-0", "Move unit to :", false, map_size_u, (2, 2),
-					c => new ExecuteAndContinueOption($"Unit {arg} to ({c.x}, {c.y})", () => {}),
+				(unit) => new SelectCellMenu($" ○ {unit.name}", "Move unit to :", false, map_size_u, unit.position,
+					c => new ExecuteAndContinueOption($"Unit {unit.name} to ({c.x}, {c.y})", () => session.moveUnit(session.currentPlayerId, unit.id, c)),
 					displaySelectCellMenu
 				),
-				() => session.getAllUnits(session.currentPlayerId),
+				() => session.getAllUnitsOfPlayer(session.currentPlayerId),
 				displayDefaultMenu
 			),
 			new DynamicMenu<QueueKey>(" ○ Unit Queue", "Select Unit Queue", true,

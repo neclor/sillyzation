@@ -103,19 +103,23 @@ internal class LocalSession<TCellKey> : ISession<TCellKey> where TCellKey : notn
 	// Unit
 
 	public ErrorOr<MapUnit<TCellKey>> getUnit(PlayerKey playerId, UnitKey unitId) {
-		throw new NotImplementedException();
+		return core.getUnit(playerId, unitId);
 	}
 
-	public ErrorOr<MapUnit<TCellKey>[]> getAllUnits(PlayerKey playerId) {
-		return core.getAllUnits(playerId);
+	public ErrorOr<MapUnit<TCellKey>[]> getAllUnitsVisibleFromPlayer(PlayerKey playerId) {
+		return core.getAllUnitsVisibleFromPlayer(playerId);
+	}
+
+	public ErrorOr<MapUnit<TCellKey>[]> getAllUnitsOfPlayer(PlayerKey playerId) {
+		return core.getAllUnitsOfPlayer(playerId);
 	}
 
 	public ErrorOr<Success> moveUnit(PlayerKey playerId, UnitKey unitId, TCellKey cellId) {
-		throw new NotImplementedException();
+		return core.moveUnit(playerId, unitId, cellId);
 	}
 
 	public ErrorOr<Success> deleteUnit(PlayerKey playerId, UnitKey unitId) {
-		throw new NotImplementedException();
+		return deleteUnit(playerId, unitId);
 	}
 
 	public ErrorOr<ICombat<TCellKey>> getCombatInfo(PlayerKey playerId, uint combatId) {

@@ -1,5 +1,11 @@
 namespace CoreLogic;
 
+public enum UnitType {
+	Infantry,
+	Tank,
+	Artillery,
+}
+
 public class Unit<TCellKey> where TCellKey : notnull {
 	private static uint id_counter = 1;
 	public UnitKey id { get; }
@@ -8,14 +14,17 @@ public class Unit<TCellKey> where TCellKey : notnull {
 	public uint health { get; }
 	public uint speed { get; }
 	public PlayerKey owner { get; }
+	public UnitType type { get; }
 
 	public Unit(
+		UnitType type,
 		string name,
 		uint health,
 		uint speed,
 		PlayerKey owner
 	) {
 		id = id_counter++;
+		this.type = type;
 		this.name = name;
 		baseHealth = health;
 		this.health = health;
@@ -25,6 +34,7 @@ public class Unit<TCellKey> where TCellKey : notnull {
 
 	public Unit(
 		UnitKey id,
+		UnitType type,
 		string name,
 		uint baseHealth,
 		uint health,
@@ -32,6 +42,7 @@ public class Unit<TCellKey> where TCellKey : notnull {
 		PlayerKey owner
 	) {
 		this.id = id;
+		this.type = type;
 		this.name = name;
 		this.baseHealth = baseHealth;
 		this.health = health;
@@ -40,7 +51,7 @@ public class Unit<TCellKey> where TCellKey : notnull {
 	}
 
 	public QueueUnit<TCellKey> toQueue() {
-		return new QueueUnit<TCellKey>(id, name, baseHealth, health, speed, owner);
+		return new QueueUnit<TCellKey>(id, type, name, baseHealth, health, speed, owner);
 	}
 }
 
@@ -49,17 +60,18 @@ public class QueueUnit<TCellKey> : Unit<TCellKey> where TCellKey : notnull {
 
 	public QueueUnit(
 		UnitKey id,
+		UnitType type,
 		string name,
 		uint baseHealth,
 		uint health,
 		uint speed,
 		PlayerKey owner
-	) : base(id, name, baseHealth, health, speed, owner) {
+	) : base(id, type, name, baseHealth, health, speed, owner) {
 		progress = 0;
 	}
 
 	public MapUnit<TCellKey> deploy(TCellKey position) {
-		return new MapUnit<TCellKey>(id, name, baseHealth, health, speed, owner, position);
+		return new MapUnit<TCellKey>(id, type, name, baseHealth, health, speed, owner, position);
 	}
 
 	public void tick() {
@@ -70,17 +82,18 @@ public class QueueUnit<TCellKey> : Unit<TCellKey> where TCellKey : notnull {
 }
 
 public class MapUnit<TCellKey> : Unit<TCellKey> where TCellKey : notnull {
-	public TCellKey position { get; }
+	public TCellKey position { get; set; }
 
 	public MapUnit(
 		UnitKey id,
+		UnitType type,
 		string name,
 		uint baseHealth,
 		uint health,
 		uint speed,
 		PlayerKey owner,
 		TCellKey position
-	) : base(id, name, baseHealth, health, speed, owner) {
+	) : base(id, type, name, baseHealth, health, speed, owner) {
 		this.position = position;
 	}
 }

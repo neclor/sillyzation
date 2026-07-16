@@ -36,6 +36,9 @@ internal class TerminalMap : IUserInterfaceTerminal {
 	private readonly Func<Coord, ErrorOr<TCell>> get_cell;
 	private readonly Func<TCell[,], Func<TCell, CellTexture>> get_cell_texture_func;
 	private readonly Func<TCell, Neighbours, Highlights> get_cell_highlight;
+	private readonly Func<MapUnit<Coord>[]> get_units;
+	private readonly Func<PlayerKey, AC> get_player_color;
+
 	private static readonly Dictionary<Terrain, CellTexture> backgrounds = new() {
 		{
 			Terrain.Plain, new BlockCellTexture([
@@ -95,23 +98,45 @@ internal class TerminalMap : IUserInterfaceTerminal {
 		},
 	};
 
+	private static readonly Dictionary<UnitType, char[,]> unit_textures = new() {
+		{
+			UnitType.Tank, new [,]{
+				{ ' ', '▄', '█', '█', '▬', ' ' },
+				{ '(', '⯄', '⯄', '⯄', '⯄', ')' },
+			}
+		},
+		{
+			UnitType.Artillery, new [,]{
+				{ ' ', ' ', ' ', '╱', '╱', ' ' },
+				{ ' ', '◢', '⯄', '█', '◣', ' ' },
+			}
+		},
+		{
+			UnitType.Infantry, new [,]{
+				{ '⚲', ' ', '⚲', ' ', '⚲', ' ' },
+				{ 'λ', '^', 'λ', '^', 'λ', '^' },
+			}
+		},
+	};
+
 	public static CellTexture getTerrainTexture(Terrain terrain) {
 		return backgrounds[terrain];
 	}
-
-	//  ▄███▬
-	// (⯄⯄⯄⯄)
 
 	public TerminalMap(
 		Coord map_size,
 		Func<Coord, ErrorOr<TCell>> get_cell,
 		Func<TCell[,], Func<TCell, CellTexture>> get_cell_texture_func,
-		Func<TCell, Neighbours, Highlights> get_cell_highlight
+		Func<TCell, Neighbours, Highlights> get_cell_highlight,
+		Func<MapUnit<Coord>[]> get_units,
+		Func<PlayerKey, AC> get_player_color
 	) {
 		this.map_size = map_size;
 		this.get_cell_texture_func = get_cell_texture_func;
 		this.get_cell_highlight = get_cell_highlight;
 		this.get_cell = get_cell;
+		this.get_units = get_units;
+		this.get_player_color = get_player_color;
 	}
 
 	public Pixel[,] display() {
@@ -186,6 +211,26 @@ internal class TerminalMap : IUserInterfaceTerminal {
 				}
 			}
 		}
+
+		MapUnit<Coord>[] units = get_units();
+
+		foreach (MapUnit<Coord> unit in units) {
+			Coord coord = unit.position;
+			Console.WriteLine(unit.type);
+			char[,] texture = unit_textures[unit.type];
+			AC color = get_player_color(unit.owner);
+			for (uint xc = 0; xc < 6; xc++) {
+				for (uint yc = 0; yc < 2; yc++) {
+					Pixel pixel = res[
+						((coord.x - 1) * cell_size.x) + 2 + xc,
+						((coord.y - 1) * cell_size.y) + 1 + yc
+					];
+					pixel.c = texture[yc, xc];
+					pixel.text_color = color;
+				}
+			}
+		}
+
 		return res;
 	}
 }

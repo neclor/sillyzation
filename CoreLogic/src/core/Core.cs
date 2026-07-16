@@ -157,27 +157,37 @@ internal class Core<TCellKey> : ICore<TCellKey> where TCellKey : notnull {
 		return queue.addUnit(unit);
 	}
 
-	public ErrorOr<Success> deleteUnitFromQueue(PlayerKey playerId, QueueKey queueGroupId, UnitKey unit) {
+	public ErrorOr<Success> deleteUnitFromQueue(PlayerKey playerId, QueueKey queueGroupId, UnitKey unit_id) {
 		if (!players.TryGetValue(playerId, out var player)) {
 			return Error.NotFound();
 		}
 		if (!player.queues.TryGetValue(queueGroupId, out IUnitQueue<TCellKey>? queue)) {
 			return Error.NotFound();
 		}
-		return queue.removeUnit(unit);
+		ErrorOr<QueueUnit<TCellKey>> unit = queue.removeUnit(unit_id);
+		if (unit.IsError) {
+			return Error.NotFound();
+		}
+		return Result.Success;
 	}
 
-	public ErrorOr<Success> deployUnitFromQueue(PlayerKey playerId, QueueKey queueGroupId, UnitKey unit, TCellKey pos) {
+	public ErrorOr<Success> deployUnitFromQueue(PlayerKey playerId, QueueKey queueGroupId, UnitKey unit_id, TCellKey pos) {
 		if (!players.TryGetValue(playerId, out var player)) {
 			return Error.NotFound();
 		}
 		if (!player.queues.TryGetValue(queueGroupId, out IUnitQueue<TCellKey>? queue)) {
 			return Error.NotFound();
 		}
-		if (queue.removeUnit(unit).IsError) {
+
+		// Remove from queue
+		ErrorOr<QueueUnit<TCellKey>> unit = queue.removeUnit(unit_id);
+		if (unit.IsError) {
 			return Error.NotFound();
 		}
-		// TODO place the unit
+
+		// Deploy on the map
+		MapUnit<TCellKey> map_unit = unit.Value.deploy(pos);
+		player.units[unit_id] = map_unit;
 		return Result.Success;
 	}
 
@@ -194,7 +204,11 @@ internal class Core<TCellKey> : ICore<TCellKey> where TCellKey : notnull {
 		return unit.ToErrorOr();
 	}
 
-	public ErrorOr<MapUnit<TCellKey>[]> getAllUnits(PlayerKey playerId) {
+	public ErrorOr<MapUnit<TCellKey>[]> getAllUnitsVisibleFromPlayer(PlayerKey playerId) {
+		return players.Values.SelectMany(p => p.units.Values).ToArray().ToErrorOr();
+	}
+
+	public ErrorOr<MapUnit<TCellKey>[]> getAllUnitsOfPlayer(PlayerKey playerId) {
 		if (!players.TryGetValue(playerId, out var player)) {
 			return Error.NotFound();
 		}
@@ -202,7 +216,14 @@ internal class Core<TCellKey> : ICore<TCellKey> where TCellKey : notnull {
 	}
 
 	public ErrorOr<Success> moveUnit(PlayerKey playerId, UnitKey unitId, TCellKey cellId) {
-		throw new NotImplementedException();
+		if (!players.TryGetValue(playerId, out var player)) {
+			return Error.NotFound();
+		}
+		if (!player.units.TryGetValue(unitId, out var unit)) {
+			return Error.NotFound();
+		}
+		unit.position = cellId;
+		return Result.Success;
 	}
 
 	public ErrorOr<Success> deleteUnit(PlayerKey playerId, UnitKey unitId) {

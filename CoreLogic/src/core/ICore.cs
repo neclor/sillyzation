@@ -30,7 +30,8 @@ public interface ICore<TCellKey> where TCellKey : notnull {
 
 	// Unit
 	ErrorOr<MapUnit<TCellKey>> getUnit(PlayerKey playerId, UnitKey unitId);
-	ErrorOr<MapUnit<TCellKey>[]> getAllUnits(PlayerKey playerId);
+	ErrorOr<MapUnit<TCellKey>[]> getAllUnitsVisibleFromPlayer(PlayerKey playerId);
+	ErrorOr<MapUnit<TCellKey>[]> getAllUnitsOfPlayer(PlayerKey playerId);
 	ErrorOr<Success> moveUnit(PlayerKey playerId, UnitKey unitId, TCellKey cellId);
 	ErrorOr<Success> deleteUnit(PlayerKey playerId, UnitKey unitId);
 

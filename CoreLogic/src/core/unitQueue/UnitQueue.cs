@@ -5,7 +5,7 @@ namespace CoreLogic;
 internal class UnitQueue<TCellKey> : IUnitQueue<TCellKey> where TCellKey : notnull {
 	private static uint id_counter = 1;
 	public uint id { get; }
-	public List<QueueUnit<TCellKey>> units { get; }
+	public Dictionary<UnitKey, QueueUnit<TCellKey>> units { get; }
 
 	public UnitQueue() {
 		id = id_counter++;
@@ -13,33 +13,32 @@ internal class UnitQueue<TCellKey> : IUnitQueue<TCellKey> where TCellKey : notnu
 	}
 
 	public QueueUnit<TCellKey>[] getUnits() {
-		foreach (QueueUnit<TCellKey> unit in units) {
+		foreach (QueueUnit<TCellKey> unit in units.Values) {
 			Console.WriteLine(unit.id + " " + unit.progress);
 		}
-		return [.. units];
+		return [.. units.Values];
 	}
 
 	public ErrorOr<Success> addUnit(QueueUnit<TCellKey> unit) {
-		units.Add(unit);
+		units[unit.id] = unit;
 		return Result.Success;
 	}
 
-	public ErrorOr<Success> removeUnit(UnitKey unit_id) {
-		QueueUnit<TCellKey>? elem = units.FirstOrDefault(e => e!.id == unit_id, default);
-		if (elem == null) {
+	public ErrorOr<QueueUnit<TCellKey>> removeUnit(UnitKey unit_id) {
+		if (!units.TryGetValue(unit_id, out QueueUnit<TCellKey>? unit)) {
 			return Error.NotFound();
 		}
-		if (!elem.ready) {
+		if (!unit.ready) {
 			return Error.Failure("Unit is not ready");
 		}
-		if (!units.Remove(elem)) {
+		if (!units.Remove(unit_id)) {
 			return Error.NotFound();
 		}
-		return Result.Success;
+		return unit;
 	}
 
 	public ErrorOr<Success> tick() {
-		foreach (QueueUnit<TCellKey> unit in units) {
+		foreach (QueueUnit<TCellKey> unit in units.Values) {
 			unit.tick();
 		}
 		return Result.Success;
