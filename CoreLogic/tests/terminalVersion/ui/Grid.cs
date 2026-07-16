@@ -1,14 +1,5 @@
 using AC = AnsiColors;
 
-internal interface IUserInterfaceTerminal {
-	Pixel[,] display();
-}
-
-[System.Diagnostics.CodeAnalysis.SuppressMessage(
-	"Performance",
-	"CA1814:Prefer jagged arrays over multidimensional",
-	Justification = "Structure is strictly rectangular by design"
-)]
 internal class Grid : IUserInterfaceTerminal {
 	private readonly IUserInterfaceTerminal[] components;
 	private readonly char[,] layoutMap;
@@ -295,58 +286,5 @@ internal class Grid : IUserInterfaceTerminal {
 		}
 
 		return result;
-	}
-}
-
-internal class TopBar : IUserInterfaceTerminal {
-	private readonly Func<(string country, AC country_color, string info)> get_current_info;
-
-	public TopBar(Func<(string country, AC country_color, string info)> get_current_info) {
-		this.get_current_info = get_current_info;
-	}
-
-	public Pixel[,] display() {
-		(string country, AC country_color, string info) = get_current_info();
-
-		string to_print = $"Country: {country} {info}";
-
-		Pixel[,] result = new Pixel[to_print.Length, 1];
-		foreach ((int i, char c) in to_print.Index()) {
-			result[i, 0] = new Pixel(c);
-		}
-
-		return result;
-	}
-}
-
-internal class Menu : IUserInterfaceTerminal {
-	private static readonly AC highlight_color = AC.STD_GOLD;
-	private (string content, bool highlighted)[] contents = [];
-	private readonly int min_width;
-
-	public Menu(int min_width) => this.min_width = min_width;
-
-	public void setContent((string content, bool highlighted)[] contents) {
-		this.contents = contents;
-	}
-
-	public Pixel[,] display() {
-		int longest = contents.Max((c) => c.content.Length);
-		if (longest < min_width) {
-			longest = min_width;
-		}
-
-		Pixel[,] res = new Pixel[longest, contents.Length];
-
-		foreach ((int index, (string content, bool highlighted)) in contents.Index()) {
-			AC color = highlighted ? highlight_color : AC.RESET;
-			foreach ((int i, char c) in content.Index()) {
-				res[i, index] = new Pixel(c, color);
-			}
-			for (int i = content.Length; i < longest; i++) {
-				res[i, index] = new Pixel(color);
-			}
-		}
-		return res;
 	}
 }

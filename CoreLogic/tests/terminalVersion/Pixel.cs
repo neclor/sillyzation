@@ -1,5 +1,3 @@
-using CoreLogic;
-
 internal class Pixel {
 	public char c { get; set; }
 	public AnsiColors text_color { get; set; }
