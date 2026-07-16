@@ -277,7 +277,6 @@ internal class Grid : IUserInterfaceTerminal {
 				else {
 					for (int dx = 0; dx < cellW; dx++) {
 						for (int dy = 0; dy < cellH; dy++) {
-							Console.WriteLine($"cell {color.fg()}");
 							result[startX + dx, startY + dy] = new Pixel(cell, color, AC.RESET);
 						}
 					}

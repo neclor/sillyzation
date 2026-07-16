@@ -50,8 +50,7 @@ internal class Program {
 			]
 		);
 
-		TerminalVersion app = new(session, (4, 4));
-		app.start();
+		_ = new TerminalVersion(session, (4, 4));
 	}
 }
 

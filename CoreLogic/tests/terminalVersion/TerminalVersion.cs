@@ -10,6 +10,8 @@ internal class TerminalVersion {
 	private readonly SimpleMenu menu;
 	private readonly TerminalMap map;
 	private uint map_mode;
+	private Coord? selected_cell;
+	private Coord? previous_cell;
 
 	public TerminalVersion(ISession<Coord> session, (int x, int y) map_size) {
 		this.map_size = map_size;
@@ -60,6 +62,12 @@ internal class TerminalVersion {
 						res.right = AC.getAnsiColor(players[cell.owner.Value].color);
 					}
 				}
+				if (previous_cell != null && previous_cell.Value == cell.id) {
+					res.top = res.right = res.left = res.bot = AC.STD_GRAY;
+				}
+				if (selected_cell != null && selected_cell.Value == cell.id) {
+					res.top = res.right = res.left = res.bot = AC.STD_WHITE;
+				}
 				return res;
 			}
 		);
@@ -85,6 +93,8 @@ internal class TerminalVersion {
 				(title, false),
 				.. options
 			]);
+			selected_cell = null;
+			previous_cell = null;
 			Pixel[,] screen = defaultMenu.display();
 			printScreen(screen);
 		}
@@ -97,6 +107,9 @@ internal class TerminalVersion {
 			menuSelection.setContent([
 				(title, false),
 			]);
+			Console.WriteLine(initial_coord);
+			selected_cell = coord;
+			previous_cell = initial_coord;
 			Pixel[,] screen = defaultMenu.display();
 			printScreen(screen);
 		}
@@ -152,6 +165,10 @@ internal class TerminalVersion {
 				displayDefaultMenu
 			),
 		], displayDefaultMenu);
+
+		while (true) {
+			_ = menu.execute();
+		}
 	}
 
 	private static string loadingBar(uint prcnt) {
@@ -162,23 +179,25 @@ internal class TerminalVersion {
 
 	private static void printScreen(Pixel[,] screen) {
 		StringBuilder sb = new();
-		for (var y = 0; y < screen.GetLength(1); y++) {
-			for (var x = 0; x < screen.GetLength(0); x++) {
-				Pixel p = screen[x, y] ?? new Pixel(' ');
-				_ = sb.Append(p.background_color.bg())
-					.Append(p.text_color.fg())
-					.Append(p.c);
+		Pixel? p = null;
+		Pixel? prev;
+		for (int y = 0; y < screen.GetLength(1); y++) {
+			for (int x = 0; x < screen.GetLength(0); x++) {
+				prev = p;
+				p = screen[x, y] ?? new Pixel(' ');
+				if (prev == null || prev.text_color != p.text_color) {
+					_ = sb.Append(p.text_color.fg());
+				}
+				if (prev == null || prev.background_color != p.background_color) {
+					_ = sb.Append(p.background_color.bg());
+				}
+				_ = sb.Append(p.c);
 			}
-			_ = sb.AppendLine();
+			_ = sb.AppendLine("\x1b[0m");
+			p = null;
 		}
 		Console.Write(new string('\n', Console.WindowHeight));
 		Console.Write("\x1b[H");
 		Console.WriteLine(sb.ToString());
-	}
-
-	public void start() {
-		while (true) {
-			_ = menu.execute();
-		}
 	}
 }
